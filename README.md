@@ -26,11 +26,14 @@ Please, fill the following sections about your project.
 
 ### Problematic
 
-We will visualize the occupancy of EPFL's rooms to provide availability information of the rooms for a given time period.
-We will visualize the data on an EPFL map. Going over rooms and clicking them would also provide the availability information. 
+We will visualize the occupancy of EPFL's rooms to provide availability information for a given time period.
+We will visualize the data on an [EPFL map](https://map.epfl.ch/). Going over rooms and clicking them would also provide the availability information. 
+
+We will also provide a tool to visualize all the rooms that are available at a given time, which would be useful for students looking for a place to study, or for personnel looking to reserve a room for a meeting or event.
 
 There has been no reliable method of providing the availabity with appealing visualization yet.
-The target audience would be both personnel who can reserve the rooms if available and students who might use a room as a study place if not booked. 
+
+The target audience would be both personnel who can reserve the rooms if available, and students who might use a room as a study place if not used by a lecturer. 
 
 ### Exploratory Data Analysis
 
@@ -40,22 +43,24 @@ The target audience would be both personnel who can reserve the rooms if availab
 ### Related work
 
 #### 1. What others have already done with the data?
-Several tools and services already use EPFL room reservation and scheduling data, although they often focus more on functional access to information than on advanced visualization.
+Other tools and services already use EPFL room reservation and scheduling data, although they often focus more on functional access to information than on advanced visualization.
 
-One example is [occupancy.epfl.ch](https://occupancy.epfl.ch/) platform, which allows users to check room occupancy based on course schedules. 
+* One example is [occupancy.epfl.ch](https://occupancy.epfl.ch/) platform, which allows users to check room occupancy based on course schedules. 
 The interface typically presents availability information in a time-based table or list, enabling users to see whether a room is free during a specific time slot. However, the visualization is relatively simple and mostly textual.
 
-Another example is [rEPFL](https://repfl.ch/), a community-built website that aggregates information about available rooms across the EPFL campus. 
+* The exchange calendar of EPFL personnel also provides a way of checking room availability, but it is primarily designed for scheduling meetings and events rather than providing a spatial overview of available rooms. For example, to find an availble room, users need to iteratively check the calendar for each room, until they find one that is free for the selected time period. This process can be time-consuming and does not offer a visual representation of room availability across the campus. Moreover, this feature is not easily accessible to students, who may not have permissions to view all room calendars.
+
+* Another example is [rEPFL](https://repfl.ch/), a community-built website that aggregates information about available rooms across the EPFL campus. 
 It provides students with an easy way to discover rooms that may be free for studying or working. 
 The interface simplifies the search process but still focuses mostly on lists of rooms and availability indicators, rather than spatial or exploratory visualizations.
 
-Another related project is [Occupancy FLEP](https://occupancy.flep.ch/), a student-built platform that provides real-time information about available rooms across the EPFL campus. Its goal is to help students quickly find study spaces, especially during busy periods. 
+* Another related project is [Occupancy FLEP](https://occupancy.flep.ch/), a student-built platform that provides real-time information about available rooms across the EPFL campus. Its goal is to help students quickly find study spaces, especially during busy periods. 
 The platform aggregates scheduling information and presents it in a clear interface to reduce the time spent searching for rooms.
 
-Beyond EPFL-specific tools, similar systems exist in other contexts. For example:
+<!-- Beyond EPFL-specific tools, similar systems exist in other contexts. For example:
 - Libraries often provide real-time occupancy dashboards to indicate how busy a space is, helping visitors choose the best time to come.
 - Universities typically use calendar-based reservation systems (e.g., Outlook/Exchange room calendars) where room availability appears in scheduling interfaces rather than spatial visualizations.
-Overall, existing solutions primarily display room availability as lists, calendars, or simple dashboards, with limited spatial interaction or visual exploration.
+Overall, existing solutions primarily display room availability as lists, calendars, or simple dashboards, with limited spatial interaction or visual exploration. -->
 
 #### 2. Why is your approach original?
 The originality of our approach lies in the integration of room occupancy data with an interactive spatial visualization of the EPFL campus.
@@ -92,12 +97,6 @@ Several types of visualization inspired our approach.
    - interactive news graphics
    
    often combine interaction, filtering, and visual encoding to help users explore datasets intuitively. Our design similarly emphasizes exploration through interaction.
-
-The main solution so far is [occupancy.epfl.ch](https://occupancy.epfl.ch/) which is
-> - What others have already done with the data?
-> - Why is your approach original?
-> - What source of inspiration do you take? Visualizations that you found on other websites or magazines (might be unrelated to your data).
-> - In case you are using a dataset that you have already explored in another context (ML or ADA course, semester project...), you are required to share the report of that work to outline the differences with the submission for this class.
 
 ## Milestone 2 (17th April, 5pm)
 
