@@ -39,6 +39,50 @@ The target audience would be both personnel who can reserve the rooms if availab
 
 ### Related work
 
+#### 1. What others have already done with the data?
+Several tools and services already use EPFL room reservation and scheduling data, although they often focus more on functional access to information than on advanced visualization.
+
+One example is [occupancy.epfl.ch](https://occupancy.epfl.ch/) platform, which allows users to check room occupancy based on course schedules. 
+The interface typically presents availability information in a time-based table or list, enabling users to see whether a room is free during a specific time slot. However, the visualization is relatively simple and mostly textual.
+
+Another related project is [Occupancy FLEP](https://occupancy.flep.ch/), a student-built platform that provides real-time information about available rooms across the EPFL campus. Its goal is to help students quickly find study spaces, especially during busy periods. 
+The platform aggregates scheduling information and presents it in a clear interface to reduce the time spent searching for rooms.
+
+Beyond EPFL-specific tools, similar systems exist in other contexts. For example:
+- Libraries often provide real-time occupancy dashboards to indicate how busy a space is, helping visitors choose the best time to come.
+- Universities typically use calendar-based reservation systems (e.g., Outlook/Exchange room calendars) where room availability appears in scheduling interfaces rather than spatial visualizations.
+Overall, existing solutions primarily display room availability as lists, calendars, or simple dashboards, with limited spatial interaction or visual exploration.
+
+#### 2. Why is your approach original?
+The originality of our approach lies in the integration of room occupancy data with an interactive spatial visualization of the EPFL campus.
+Instead of presenting availability in a textual schedule or calendar format, our project:
+- Displays rooms directly on an EPFL campus map, linking spatial context with scheduling data.
+- Allows users to hover over or click on rooms to instantly view availability for a chosen time period.
+- Makes it easier to discover nearby available rooms, which is difficult when using traditional schedule tables.
+- Provides a more intuitive and exploratory interface, especially for students looking for quick study spaces.
+This spatial visualization transforms room availability data into a navigable environment, helping users understand not only when rooms are free but also where they are located.
+By combining scheduling data with geographic context, the visualization improves usability and situational awareness compared to existing tools.
+
+#### 3. What sources of inspiration influenced the project?
+Several types of visualization inspired our approach.
+
+1. Interactive maps
+   Many modern web applications use interactive maps with clickable elements to explore spatial data. Examples include:
+   - campus maps showing facilities
+   - real-estate availability maps
+   - transportation or traffic visualizations
+   These interfaces allow users to explore data geographically, which improves discoverability and usability.
+
+2. Room occupancy dashboards
+   Applications used in libraries or coworking spaces often display real-time occupancy indicators, such as percentages or color-coded availability levels. These dashboards inspired the idea of visually representing room availability rather than only listing it.
+
+3. Data-driven interactive visualizations
+   Popular visualization platforms such as:
+   - Datawrapper
+   - Observable
+   - interactive news graphics
+   often combine interaction, filtering, and visual encoding to help users explore datasets intuitively. Our design similarly emphasizes exploration through interaction.
+
 The main solution so far is [occupancy.epfl.ch](https://occupancy.epfl.ch/) which is
 > - What others have already done with the data?
 > - Why is your approach original?
