@@ -422,11 +422,6 @@ The interface simplifies the search process but still focuses mostly on lists of
 * Another related project is [Occupancy FLEP](https://occupancy.flep.ch/), a student-built platform that provides real-time information about available rooms across the EPFL campus. Its goal is to help students quickly find study spaces, especially during busy periods. 
 The platform aggregates scheduling information and presents it in a clear interface to reduce the time spent searching for rooms.
 
-<!-- Beyond EPFL-specific tools, similar systems exist in other contexts. For example:
-- Libraries often provide real-time occupancy dashboards to indicate how busy a space is, helping visitors choose the best time to come.
-- Universities typically use calendar-based reservation systems (e.g., Outlook/Exchange room calendars) where room availability appears in scheduling interfaces rather than spatial visualizations.
-Overall, existing solutions primarily display room availability as lists, calendars, or simple dashboards, with limited spatial interaction or visual exploration. -->
-
 #### 2. Why is your approach original?
 The originality of our approach lies in the integration of room occupancy data with an interactive spatial visualization of the EPFL campus.
 Instead of presenting availability in a textual schedule or calendar format, our project:
