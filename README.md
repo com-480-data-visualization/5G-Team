@@ -11,6 +11,8 @@
 
 ## Milestone 1 (20th March, 5pm)
 
+
+
 **10% of the final grade**
 
 This is a preliminary milestone to let you set up goals for your final project and assess the feasibility of your ideas.
@@ -19,6 +21,379 @@ Please, fill the following sections about your project.
 *(max. 2000 characters per section)*
 
 ### Dataset
+
+Our dataset consists of the publicly available EPFL occupancy data. We retrieve them using the public API:
+
+```bash
+curl -X GET "https://ewa.epfl.ch/room/Default.aspx?room=inm201" | grep "v.events" | sed 's/v.events = //' | sed 's/;//' | jq .
+```
+The abovegiven command yields the following result which forms the base of our dataset.
+
+```json
+[
+  {
+    "ResizeDisabled": true,
+    "Header": "15:15 - 17:00",
+    "Tag": [
+      "ISA - Game design & prototyping<br>",
+      "inm20146"
+    ],
+    "Start": "2026-03-09T15:15:00",
+    "FontColor": "#000000",
+    "BorderColor": "#42658C",
+    "ClickDisabled": true,
+    "Value": "inm20146",
+    "Resource": null,
+    "AllDay": false,
+    "BackColor": "#C3D9FF",
+    "RecurrentMasterId": null,
+    "DeleteDisabled": true,
+    "End": "2026-03-09T17:00:00",
+    "DoubleClickDisabled": true,
+    "Text": "ISA - Game design & prototyping<br>",
+    "Recurrent": false,
+    "MoveDisabled": true,
+    "Sort": null
+  },
+  {
+    "ResizeDisabled": true,
+    "Header": "15:15 - 17:00",
+    "Tag": [
+      "ISA - Relativity and cosmology II<br>",
+      "inm20147"
+    ],
+    "Start": "2026-03-10T15:15:00",
+    "FontColor": "#000000",
+    "BorderColor": "#42658C",
+    "ClickDisabled": true,
+    "Value": "inm20147",
+    "Resource": null,
+    "AllDay": false,
+    "BackColor": "#C3D9FF",
+    "RecurrentMasterId": null,
+    "DeleteDisabled": true,
+    "End": "2026-03-10T17:00:00",
+    "DoubleClickDisabled": true,
+    "Text": "ISA - Relativity and cosmology II<br>",
+    "Recurrent": false,
+    "MoveDisabled": true,
+    "Sort": null
+  },
+  {
+    "ResizeDisabled": true,
+    "Header": "17:15 - 19:00",
+    "Tag": [
+      "ISA - Relativity and cosmology II<br>",
+      "inm20148"
+    ],
+    "Start": "2026-03-10T17:15:00",
+    "FontColor": "#000000",
+    "BorderColor": "#42658C",
+    "ClickDisabled": true,
+    "Value": "inm20148",
+    "Resource": null,
+    "AllDay": false,
+    "BackColor": "#C3D9FF",
+    "RecurrentMasterId": null,
+    "DeleteDisabled": true,
+    "End": "2026-03-10T19:00:00",
+    "DoubleClickDisabled": true,
+    "Text": "ISA - Relativity and cosmology II<br>",
+    "Recurrent": false,
+    "MoveDisabled": true,
+    "Sort": null
+  },
+  {
+    "ResizeDisabled": true,
+    "Header": "08:15 - 10:00",
+    "Tag": [
+      "ISA - Astrophysics IV : stellar and galactic dynamics<br>",
+      "inm20149"
+    ],
+    "Start": "2026-03-11T08:15:00",
+    "FontColor": "#000000",
+    "BorderColor": "#42658C",
+    "ClickDisabled": true,
+    "Value": "inm20149",
+    "Resource": null,
+    "AllDay": false,
+    "BackColor": "#C3D9FF",
+    "RecurrentMasterId": null,
+    "DeleteDisabled": true,
+    "End": "2026-03-11T10:00:00",
+    "DoubleClickDisabled": true,
+    "Text": "ISA - Astrophysics IV : stellar and galactic dynamics<br>",
+    "Recurrent": false,
+    "MoveDisabled": true,
+    "Sort": null
+  },
+  {
+    "ResizeDisabled": true,
+    "Header": "10:15 - 12:00",
+    "Tag": [
+      "ISA - Astrophysics IV : stellar and galactic dynamics<br>",
+      "inm20150"
+    ],
+    "Start": "2026-03-11T10:15:00",
+    "FontColor": "#000000",
+    "BorderColor": "#42658C",
+    "ClickDisabled": true,
+    "Value": "inm20150",
+    "Resource": null,
+    "AllDay": false,
+    "BackColor": "#C3D9FF",
+    "RecurrentMasterId": null,
+    "DeleteDisabled": true,
+    "End": "2026-03-11T12:00:00",
+    "DoubleClickDisabled": true,
+    "Text": "ISA - Astrophysics IV : stellar and galactic dynamics<br>",
+    "Recurrent": false,
+    "MoveDisabled": true,
+    "Sort": null
+  },
+  {
+    "ResizeDisabled": true,
+    "Header": "14:15 - 16:00",
+    "Tag": [
+      "ISA - Introduction to magnetic materials in modern technologies<br>",
+      "inm20151"
+    ],
+    "Start": "2026-03-11T14:15:00",
+    "FontColor": "#000000",
+    "BorderColor": "#42658C",
+    "ClickDisabled": true,
+    "Value": "inm20151",
+    "Resource": null,
+    "AllDay": false,
+    "BackColor": "#C3D9FF",
+    "RecurrentMasterId": null,
+    "DeleteDisabled": true,
+    "End": "2026-03-11T16:00:00",
+    "DoubleClickDisabled": true,
+    "Text": "ISA - Introduction to magnetic materials in modern technologies<br>",
+    "Recurrent": false,
+    "MoveDisabled": true,
+    "Sort": null
+  },
+  {
+    "ResizeDisabled": true,
+    "Header": "16:15 - 19:00",
+    "Tag": [
+      "ISA - Culture médiatique II<br>",
+      "inm20152"
+    ],
+    "Start": "2026-03-11T16:15:00",
+    "FontColor": "#000000",
+    "BorderColor": "#42658C",
+    "ClickDisabled": true,
+    "Value": "inm20152",
+    "Resource": null,
+    "AllDay": false,
+    "BackColor": "#C3D9FF",
+    "RecurrentMasterId": null,
+    "DeleteDisabled": true,
+    "End": "2026-03-11T19:00:00",
+    "DoubleClickDisabled": true,
+    "Text": "ISA - Culture médiatique II<br>",
+    "Recurrent": false,
+    "MoveDisabled": true,
+    "Sort": null
+  },
+  {
+    "ResizeDisabled": true,
+    "Header": "19:00 - 22:00",
+    "Tag": [
+      "ISA - Evénements<br>",
+      "inm20153"
+    ],
+    "Start": "2026-03-11T19:00:00",
+    "FontColor": "#000000",
+    "BorderColor": "#42658C",
+    "ClickDisabled": true,
+    "Value": "inm20153",
+    "Resource": null,
+    "AllDay": false,
+    "BackColor": "#C3D9FF",
+    "RecurrentMasterId": null,
+    "DeleteDisabled": true,
+    "End": "2026-03-11T22:00:00",
+    "DoubleClickDisabled": true,
+    "Text": "ISA - Evénements<br>",
+    "Recurrent": false,
+    "MoveDisabled": true,
+    "Sort": null
+  },
+  {
+    "ResizeDisabled": true,
+    "Header": "09:15 - 10:00",
+    "Tag": [
+      "ISA - Laser fundamentals and applications for engineers<br>",
+      "inm20154"
+    ],
+    "Start": "2026-03-12T09:15:00",
+    "FontColor": "#000000",
+    "BorderColor": "#42658C",
+    "ClickDisabled": true,
+    "Value": "inm20154",
+    "Resource": null,
+    "AllDay": false,
+    "BackColor": "#C3D9FF",
+    "RecurrentMasterId": null,
+    "DeleteDisabled": true,
+    "End": "2026-03-12T10:00:00",
+    "DoubleClickDisabled": true,
+    "Text": "ISA - Laser fundamentals and applications for engineers<br>",
+    "Recurrent": false,
+    "MoveDisabled": true,
+    "Sort": null
+  },
+  {
+    "ResizeDisabled": true,
+    "Header": "10:15 - 12:00",
+    "Tag": [
+      "ISA - Analyse II<br>",
+      "inm20155"
+    ],
+    "Start": "2026-03-12T10:15:00",
+    "FontColor": "#000000",
+    "BorderColor": "#42658C",
+    "ClickDisabled": true,
+    "Value": "inm20155",
+    "Resource": null,
+    "AllDay": false,
+    "BackColor": "#C3D9FF",
+    "RecurrentMasterId": null,
+    "DeleteDisabled": true,
+    "End": "2026-03-12T12:00:00",
+    "DoubleClickDisabled": true,
+    "Text": "ISA - Analyse II<br>",
+    "Recurrent": false,
+    "MoveDisabled": true,
+    "Sort": null
+  },
+  {
+    "ResizeDisabled": true,
+    "Header": "12:00 - 13:00",
+    "Tag": [
+      "ISA - Réservation ponctuelle<br>",
+      "inm20156"
+    ],
+    "Start": "2026-03-12T12:00:00",
+    "FontColor": "#000000",
+    "BorderColor": "#42658C",
+    "ClickDisabled": true,
+    "Value": "inm20156",
+    "Resource": null,
+    "AllDay": false,
+    "BackColor": "#C3D9FF",
+    "RecurrentMasterId": null,
+    "DeleteDisabled": true,
+    "End": "2026-03-12T13:00:00",
+    "DoubleClickDisabled": true,
+    "Text": "ISA - Réservation ponctuelle<br>",
+    "Recurrent": false,
+    "MoveDisabled": true,
+    "Sort": null
+  },
+  {
+    "ResizeDisabled": true,
+    "Header": "16:15 - 17:00",
+    "Tag": [
+      "ISA - Mécanique statistique pour la chimie<br>",
+      "inm20157"
+    ],
+    "Start": "2026-03-12T16:15:00",
+    "FontColor": "#000000",
+    "BorderColor": "#42658C",
+    "ClickDisabled": true,
+    "Value": "inm20157",
+    "Resource": null,
+    "AllDay": false,
+    "BackColor": "#C3D9FF",
+    "RecurrentMasterId": null,
+    "DeleteDisabled": true,
+    "End": "2026-03-12T17:00:00",
+    "DoubleClickDisabled": true,
+    "Text": "ISA - Mécanique statistique pour la chimie<br>",
+    "Recurrent": false,
+    "MoveDisabled": true,
+    "Sort": null
+  },
+  {
+    "ResizeDisabled": true,
+    "Header": "08:15 - 10:00",
+    "Tag": [
+      "ISA - Signal processing<br>",
+      "inm20158"
+    ],
+    "Start": "2026-03-13T08:15:00",
+    "FontColor": "#000000",
+    "BorderColor": "#42658C",
+    "ClickDisabled": true,
+    "Value": "inm20158",
+    "Resource": null,
+    "AllDay": false,
+    "BackColor": "#C3D9FF",
+    "RecurrentMasterId": null,
+    "DeleteDisabled": true,
+    "End": "2026-03-13T10:00:00",
+    "DoubleClickDisabled": true,
+    "Text": "ISA - Signal processing<br>",
+    "Recurrent": false,
+    "MoveDisabled": true,
+    "Sort": null
+  },
+  {
+    "ResizeDisabled": true,
+    "Header": "10:15 - 12:00",
+    "Tag": [
+      "ISA - Fault-tolerant quantum computing<br>",
+      "inm20159"
+    ],
+    "Start": "2026-03-13T10:15:00",
+    "FontColor": "#000000",
+    "BorderColor": "#42658C",
+    "ClickDisabled": true,
+    "Value": "inm20159",
+    "Resource": null,
+    "AllDay": false,
+    "BackColor": "#C3D9FF",
+    "RecurrentMasterId": null,
+    "DeleteDisabled": true,
+    "End": "2026-03-13T12:00:00",
+    "DoubleClickDisabled": true,
+    "Text": "ISA - Fault-tolerant quantum computing<br>",
+    "Recurrent": false,
+    "MoveDisabled": true,
+    "Sort": null
+  },
+  {
+    "ResizeDisabled": true,
+    "Header": "16:15 - 17:00",
+    "Tag": [
+      "ISA - Information, calcul, communication<br>",
+      "inm20160"
+    ],
+    "Start": "2026-03-13T16:15:00",
+    "FontColor": "#000000",
+    "BorderColor": "#42658C",
+    "ClickDisabled": true,
+    "Value": "inm20160",
+    "Resource": null,
+    "AllDay": false,
+    "BackColor": "#C3D9FF",
+    "RecurrentMasterId": null,
+    "DeleteDisabled": true,
+    "End": "2026-03-13T17:00:00",
+    "DoubleClickDisabled": true,
+    "Text": "ISA - Information, calcul, communication<br>",
+    "Recurrent": false,
+    "MoveDisabled": true,
+    "Sort": null
+  }
+]
+
+```
 
 > Find a dataset (or multiple) that you will explore. Assess the quality of the data it contains and how much preprocessing / data-cleaning it will require before tackling visualization. We recommend using a standard dataset as this course is not about scraping nor data processing.
 >
