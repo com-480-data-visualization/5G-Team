@@ -1,0 +1,99 @@
+{
+  "action": "Command",
+  "parameters": {
+    "command": "navigate"
+  },
+  "data": {
+    "start": "2026-03-16T00:00:00",
+    "end": "2026-03-23T00:00:00",
+    "days": 7
+  },
+  "header": {
+    "control": "dpc",
+    "id": "ContentPlaceHolder1_DayPilotCalendar1",
+    "clientState": {},
+    "columns": [
+      {
+        "Value": null,
+        "Name": "11.03.2026",
+        "ToolTip": null,
+        "Date": "2026-03-11T00:00:00",
+        "Children": []
+      },
+      {
+        "Value": null,
+        "Name": "12.03.2026",
+        "ToolTip": null,
+        "Date": "2026-03-12T00:00:00",
+        "Children": []
+      },
+      {
+        "Value": null,
+        "Name": "13.03.2026",
+        "ToolTip": null,
+        "Date": "2026-03-13T00:00:00",
+        "Children": []
+      },
+      {
+        "Value": null,
+        "Name": "14.03.2026",
+        "ToolTip": null,
+        "Date": "2026-03-14T00:00:00",
+        "Children": []
+      },
+      {
+        "Value": null,
+        "Name": "15.03.2026",
+        "ToolTip": null,
+        "Date": "2026-03-15T00:00:00",
+        "Children": []
+      },
+      {
+        "Value": null,
+        "Name": "16.03.2026",
+        "ToolTip": null,
+        "Date": "2026-03-16T00:00:00",
+        "Children": []
+      },
+      {
+        "Value": null,
+        "Name": "17.03.2026",
+        "ToolTip": null,
+        "Date": "2026-03-17T00:00:00",
+        "Children": []
+      }
+    ],
+    "days": 7,
+    "startDate": "2026-03-11T00:00:00",
+    "cellDuration": 30,
+    "heightSpec": "BusinessHours",
+    "businessBeginsHour": 7,
+    "businessEndsHour": 20,
+    "viewType": "Days",
+    "dayBeginsHour": 0,
+    "dayEndsHour": 0,
+    "headerLevels": 1,
+    "backColor": "White",
+    "nonBusinessBackColor": "White",
+    "eventHeaderVisible": true,
+    "timeFormat": "Clock12Hours",
+    "showAllDayEvents": true,
+    "tagFields": [
+      "name",
+      "id"
+    ],
+    "hourNameBackColor": "#F3F3F9",
+    "hourFontFamily": "Tahoma,Verdana,Sans-serif",
+    "hourFontSize": "16pt",
+    "hourFontColor": "#42658C",
+    "selected": "",
+    "hashes": {
+      "callBack": "yQgBxztAvDTXZ9N3wVJiXw7uJrc=",
+      "columns": "S7hHC6Ffq406IinurKES90mtrQ4=",
+      "events": "l9Fw4VUO7kr8CvBlt4zaMCqXZ0w=",
+      "colors": "1H12mM7TfILZJYfVjIXTeuvAqRM=",
+      "hours": "K iMpCQsduglOsYkdIUQZQMtaDM=",
+      "corner": "Auhfe57Ct1ipVS rluRkTJw3kdo="
+    }
+  }
+}
