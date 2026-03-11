@@ -70,19 +70,23 @@ Several types of visualization inspired our approach.
 
 1. Interactive maps
    Many modern web applications use interactive maps with clickable elements to explore spatial data. Examples include:
+   
    - campus maps showing facilities
    - real-estate availability maps
    - transportation or traffic visualizations
+   
    These interfaces allow users to explore data geographically, which improves discoverability and usability.
 
-2. Room occupancy dashboards
+3. Room occupancy dashboards
    Applications used in libraries or coworking spaces often display real-time occupancy indicators, such as percentages or color-coded availability levels. These dashboards inspired the idea of visually representing room availability rather than only listing it.
 
-3. Data-driven interactive visualizations
+4. Data-driven interactive visualizations
    Popular visualization platforms such as:
+   
    - Datawrapper
    - Observable
    - interactive news graphics
+   
    often combine interaction, filtering, and visual encoding to help users explore datasets intuitively. Our design similarly emphasizes exploration through interaction.
 
 The main solution so far is [occupancy.epfl.ch](https://occupancy.epfl.ch/) which is
