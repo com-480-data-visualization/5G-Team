@@ -26,9 +26,11 @@ Please, fill the following sections about your project.
 
 ### Problematic
 
-> Frame the general topic of your visualization and the main axis that you want to develop.
-> - What am I trying to show with my visualization?
-> - Think of an overview for the project, your motivation, and the target audience.
+We will visualize the occupancy of EPFL's rooms to provide availability information of the rooms for a given time period.
+We will visualize the data on an EPFL map. Going over rooms and clicking them would also provide the availability information. 
+
+There has been no reliable method of providing the availabity with appealing visualization yet.
+The target audience would be both personnel who can reserve the rooms if available and students who might use a room as a study place if not booked. 
 
 ### Exploratory Data Analysis
 
@@ -37,7 +39,7 @@ Please, fill the following sections about your project.
 
 ### Related work
 
-
+The main solution so far is [occupancy.epfl.ch](https://occupancy.epfl.ch/) which is
 > - What others have already done with the data?
 > - Why is your approach original?
 > - What source of inspiration do you take? Visualizations that you found on other websites or magazines (might be unrelated to your data).
