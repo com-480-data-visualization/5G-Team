@@ -45,6 +45,10 @@ Several tools and services already use EPFL room reservation and scheduling data
 One example is [occupancy.epfl.ch](https://occupancy.epfl.ch/) platform, which allows users to check room occupancy based on course schedules. 
 The interface typically presents availability information in a time-based table or list, enabling users to see whether a room is free during a specific time slot. However, the visualization is relatively simple and mostly textual.
 
+Another example is [rEPFL](https://repfl.ch/), a community-built website that aggregates information about available rooms across the EPFL campus. 
+It provides students with an easy way to discover rooms that may be free for studying or working. 
+The interface simplifies the search process but still focuses mostly on lists of rooms and availability indicators, rather than spatial or exploratory visualizations.
+
 Another related project is [Occupancy FLEP](https://occupancy.flep.ch/), a student-built platform that provides real-time information about available rooms across the EPFL campus. Its goal is to help students quickly find study spaces, especially during busy periods. 
 The platform aggregates scheduling information and presents it in a clear interface to reduce the time spent searching for rooms.
 
