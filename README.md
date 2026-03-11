@@ -56,10 +56,12 @@ Overall, existing solutions primarily display room availability as lists, calend
 #### 2. Why is your approach original?
 The originality of our approach lies in the integration of room occupancy data with an interactive spatial visualization of the EPFL campus.
 Instead of presenting availability in a textual schedule or calendar format, our project:
+
 - Displays rooms directly on an EPFL campus map, linking spatial context with scheduling data.
 - Allows users to hover over or click on rooms to instantly view availability for a chosen time period.
 - Makes it easier to discover nearby available rooms, which is difficult when using traditional schedule tables.
 - Provides a more intuitive and exploratory interface, especially for students looking for quick study spaces.
+
 This spatial visualization transforms room availability data into a navigable environment, helping users understand not only when rooms are free but also where they are located.
 By combining scheduling data with geographic context, the visualization improves usability and situational awareness compared to existing tools.
 
