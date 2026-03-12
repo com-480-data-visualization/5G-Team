@@ -42,3 +42,8 @@ coverage/
 # Misc
 .vercel
 .netlify
+
+# Python
+__pycache__/
+.venv/
+venv/
