@@ -11,7 +11,9 @@ Please, fill the following sections about your project.
 
 ### Dataset
 
-Our dataset consists of the publicly available EPFL occupancy data. We retrieve them using the public API:
+We compiled a [list of rooms at EPFL](/scraper/rooms.txt) by quering the EPFL mapserver.
+
+From this list, our dataset consists of the publicly available EPFL occupancy data. We retrieve them using the public API:
 
 ```bash
 curl -X GET "https://ewa.epfl.ch/room/Default.aspx?room=inm201" | grep "v.events" | sed 's/v.events = //' | sed 's/;//' | jq .
