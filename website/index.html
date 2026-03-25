@@ -84,10 +84,102 @@
             <label>
               <span>Duration</span>
               <select id="duration" name="duration">
+                <option value="15">15 minutes</option>
                 <option value="30">30 minutes</option>
+                <option value="45">45 minutes</option>
                 <option value="60" selected>1 hour</option>
-                <option value="90">1 hour 30</option>
+                <option value="75">1 hour 15 minutes</option>
+                <option value="90">1 hour 30 minutes</option>
+                <option value="105">1 hour 45 minutes</option>
                 <option value="120">2 hours</option>
+                <option value="135">2 hours 15 minutes</option>
+                <option value="150">2 hours 30 minutes</option>
+                <option value="165">2 hours 45 minutes</option>
+                <option value="180">3 hours</option>
+                <option value="195">3 hours 15 minutes</option>
+                <option value="210">3 hours 30 minutes</option>
+                <option value="225">3 hours 45 minutes</option>
+                <option value="240">4 hours</option>
+                <option value="255">4 hours 15 minutes</option>
+                <option value="270">4 hours 30 minutes</option>
+                <option value="285">4 hours 45 minutes</option>
+                <option value="300">5 hours</option>
+                <option value="315">5 hours 15 minutes</option>
+                <option value="330">5 hours 30 minutes</option>
+                <option value="345">5 hours 45 minutes</option>
+                <option value="360">6 hours</option>
+                <option value="375">6 hours 15 minutes</option>
+                <option value="390">6 hours 30 minutes</option>
+                <option value="405">6 hours 45 minutes</option>
+                <option value="420">7 hours</option>
+                <option value="435">7 hours 15 minutes</option>
+                <option value="450">7 hours 30 minutes</option>
+                <option value="465">7 hours 45 minutes</option>
+                <option value="480">8 hours</option>
+                <option value="495">8 hours 15 minutes</option>
+                <option value="510">8 hours 30 minutes</option>
+                <option value="525">8 hours 45 minutes</option>
+                <option value="540">9 hours</option>
+                <option value="555">9 hours 15 minutes</option>
+                <option value="570">9 hours 30 minutes</option>
+                <option value="585">9 hours 45 minutes</option>
+                <option value="600">10 hours</option>
+                <option value="615">10 hours 15 minutes</option>
+                <option value="630">10 hours 30 minutes</option>
+                <option value="645">10 hours 45 minutes</option>
+                <option value="660">11 hours</option>
+                <option value="675">11 hours 15 minutes</option>
+                <option value="690">11 hours 30 minutes</option>
+                <option value="705">11 hours 45 minutes</option>
+                <option value="720">12 hours</option>
+                <option value="735">12 hours 15 minutes</option>
+                <option value="750">12 hours 30 minutes</option>
+                <option value="765">12 hours 45 minutes</option>
+                <option value="780">13 hours</option>
+                <option value="795">13 hours 15 minutes</option>
+                <option value="810">13 hours 30 minutes</option>
+                <option value="825">13 hours 45 minutes</option>
+                <option value="840">14 hours</option>
+                <option value="855">14 hours 15 minutes</option>
+                <option value="870">14 hours 30 minutes</option>
+                <option value="885">14 hours 45 minutes</option>
+                <option value="900">15 hours</option>
+                <option value="915">15 hours 15 minutes</option>
+                <option value="930">15 hours 30 minutes</option>
+                <option value="945">15 hours 45 minutes</option>
+                <option value="960">16 hours</option>
+                <option value="975">16 hours 15 minutes</option>
+                <option value="990">16 hours 30 minutes</option>
+                <option value="1005">16 hours 45 minutes</option>
+                <option value="1020">17 hours</option>
+                <option value="1035">17 hours 15 minutes</option>
+                <option value="1050">17 hours 30 minutes</option>
+                <option value="1065">17 hours 45 minutes</option>
+                <option value="1080">18 hours</option>
+                <option value="1095">18 hours 15 minutes</option>
+                <option value="1110">18 hours 30 minutes</option>
+                <option value="1125">18 hours 45 minutes</option>
+                <option value="1140">19 hours</option>
+                <option value="1155">19 hours 15 minutes</option>
+                <option value="1170">19 hours 30 minutes</option>
+                <option value="1185">19 hours 45 minutes</option>
+                <option value="1200">20 hours</option>
+                <option value="1215">20 hours 15 minutes</option>
+                <option value="1230">20 hours 30 minutes</option>
+                <option value="1245">20 hours 45 minutes</option>
+                <option value="1260">21 hours</option>
+                <option value="1275">21 hours 15 minutes</option>
+                <option value="1290">21 hours 30 minutes</option>
+                <option value="1305">21 hours 45 minutes</option>
+                <option value="1320">22 hours</option>
+                <option value="1335">22 hours 15 minutes</option>
+                <option value="1350">22 hours 30 minutes</option>
+                <option value="1365">22 hours 45 minutes</option>
+                <option value="1380">23 hours</option>
+                <option value="1395">23 hours 15 minutes</option>
+                <option value="1410">23 hours 30 minutes</option>
+                <option value="1425">23 hours 45 minutes</option>
+                <option value="1440">24 hours</option>
               </select>
             </label>
             <button class="search-button" type="submit">Search</button>
@@ -147,17 +239,6 @@
 
           <!-- The map frame combines a floating explanation card and the actual map. -->
           <div class="map-frame">
-            <!-- Overlay text introduces the current prototype approach. -->
-            <div class="map-overlay">
-              <p class="eyebrow">EPFL campus</p>
-              <h3>Map-first room discovery</h3>
-              <p>
-                The long-term goal is a true availability heatmap. This first
-                version resolves OpenStreetMap building ids into clickable
-                building footprints over the campus map.
-              </p>
-            </div>
-
             <aside class="building-panel is-empty" id="buildingPanel" aria-live="polite">
               <div class="building-panel-header">
                 <div>

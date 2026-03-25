@@ -84,7 +84,6 @@ select {
 
 .brand-group h1,
 .search-heading h2,
-.map-overlay h3,
 .legend-card h3 {
   /* Remove default heading spacing so alignment stays tight. */
   margin: 0;
@@ -160,7 +159,6 @@ select {
 
 .search-panel,
 .legend-card,
-.map-overlay,
 .building-panel {
   /* Shared glass-card treatment used throughout the UI. */
   border: 1px solid var(--border);
@@ -347,17 +345,6 @@ select {
   min-height: min(78vh, 920px);
 }
 
-.map-overlay {
-  /* Floating text card in the top-left corner of the map. */
-  position: absolute;
-  top: 18px;
-  left: 18px;
-  z-index: 500;
-  max-width: 340px;
-  padding: 18px 20px;
-  border-radius: 24px;
-}
-
 .building-panel {
   position: absolute;
   top: 18px;
@@ -377,6 +364,10 @@ select {
 }
 
 .building-panel.is-empty .timeline-shell {
+  display: none;
+}
+
+.building-panel.is-empty .panel-close {
   display: none;
 }
 
@@ -594,7 +585,6 @@ select {
   .topbar,
   .search-panel,
   .legend-card,
-  .map-overlay,
   .building-panel {
     border-radius: 22px;
   }
@@ -610,11 +600,6 @@ select {
   .map-frame,
   #map {
     min-height: 560px;
-  }
-
-  .map-overlay {
-    right: 18px;
-    max-width: none;
   }
 
   .timeline-header,

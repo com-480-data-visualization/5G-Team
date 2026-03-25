@@ -1,18 +1,27 @@
+// Create the Leaflet map immediately.
+// We start zoomed out, then fit the viewport to the EPFL building footprints
+// once the geometry has been loaded.
 const map = L.map("map", {
   zoomControl: true,
   scrollWheelZoom: true,
 }).setView([0, 0], 2);
 
+// OpenStreetMap base tiles.
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
   attribution: "&copy; OpenStreetMap contributors",
 }).addTo(map);
 
+// Reference to the currently rendered building layer on the map.
 let buildingLayer;
 
+// LocalStorage key for cached building geometry fetched from OSM.
 const osmCacheKey = "epfl-building-geometry-v2";
+
+// The room timeline is drawn as a fixed 24-hour day.
 const timelineHours = Array.from({ length: 24 }, (_, hour) => hour);
 
+// Cache important DOM nodes once instead of querying the DOM repeatedly.
 const buildingPanel = document.getElementById("buildingPanel");
 const buildingPanelTitle = document.getElementById("buildingPanelTitle");
 const buildingPanelCopy = document.getElementById("buildingPanelCopy");
@@ -21,17 +30,32 @@ const timelineHeader = document.getElementById("timelineHeader");
 const timelineBody = document.getElementById("timelineBody");
 const closeBuildingPanel = document.getElementById("closeBuildingPanel");
 
+// Frontend state:
+// - roomsDataset: canonical room list used for building membership
+// - occupancyByRoom: occupancy slots indexed by normalized room id
+// - baseBuildingFeatures: raw EPFL buildings before search scoring
+// - activeSearchWindow: current searched period from the form
+// - knownBuildingCodes: building names sorted for prefix-safe room matching
+// - activeBuildingSelection: currently open building in the side panel
 let roomsDataset = [];
 let occupancyByRoom = new Map();
+let baseBuildingFeatures = [];
+let activeSearchWindow = null;
+let knownBuildingCodes = [];
+let activeBuildingSelection = null;
 
+// Single helper for the status line under the search form.
 function setStatus(message) {
   document.getElementById("statusBanner").textContent = message;
 }
 
+// Deterministic pseudo-random hash used for initial demo availability values.
 function hashCode(text) {
   return [...text].reduce((sum, char, index) => sum + char.charCodeAt(0) * (index + 1), 0);
 }
 
+// Landing-page availability before the user applies a search window.
+// Later, search recalculates score/room counts from the occupancy data instead.
 function buildAvailability(name) {
   const hash = hashCode(name);
   const score = 0.2 + (hash % 70) / 100;
@@ -39,6 +63,7 @@ function buildAvailability(name) {
   return { score, rooms };
 }
 
+// Map fill colors for the building heatmap.
 function getColor(score) {
   if (score > 0.8) return "#2f8f5b";
   if (score > 0.6) return "#7db55a";
@@ -46,6 +71,7 @@ function getColor(score) {
   return "#dd6b6b";
 }
 
+// Slightly lighter outline colors so the polygon edges stay readable.
 function getBorderColor(score) {
   if (score > 0.8) return "#81c29e";
   if (score > 0.6) return "#b8db95";
@@ -53,6 +79,9 @@ function getBorderColor(score) {
   return "#f0abab";
 }
 
+// Parse an OpenStreetMap URL like:
+// https://www.openstreetmap.org/way/30334086
+// into its type (`way`) and numeric id (`30334086`).
 function parseOSMReference(url) {
   const match = url.match(/openstreetmap\.org\/(way|relation|node)\/(\d+)/);
 
@@ -66,6 +95,8 @@ function parseOSMReference(url) {
   };
 }
 
+// Build a bounding box from a list of [lat, lon] coordinates.
+// This is useful both as fallback logic and for fitting the map bounds.
 function computeBoundsFromCoordinates(coords) {
   if (!coords.length) {
     return null;
@@ -87,6 +118,7 @@ function computeBoundsFromCoordinates(coords) {
   );
 }
 
+// Some data exports may already include bounds. If so, use them directly.
 function extractLocalBounds(record) {
   if (record.bounds) return record.bounds;
   if (record.bounding_box) return record.bounding_box;
@@ -108,6 +140,7 @@ function extractLocalBounds(record) {
   return null;
 }
 
+// Same idea as extractLocalBounds, but for full geometry/GeoJSON.
 function extractLocalGeometry(record) {
   if (record.geometry?.type && record.geometry?.coordinates) {
     return record.geometry;
@@ -120,6 +153,7 @@ function extractLocalGeometry(record) {
   return null;
 }
 
+// Read previously cached geometry/bounds from localStorage.
 function readBoundsCache() {
   try {
     return JSON.parse(localStorage.getItem(osmCacheKey) || "{}");
@@ -128,10 +162,14 @@ function readBoundsCache() {
   }
 }
 
+// Persist the geometry cache to localStorage.
 function writeBoundsCache(cache) {
   localStorage.setItem(osmCacheKey, JSON.stringify(cache));
 }
 
+// Fallback path: derive only the bounds from the OSM full.json payload.
+// The preferred rendering path uses exact geometry, but bounds are still useful
+// if geometry extraction fails for a building.
 async function fetchBoundsFromOSM(osmUrl) {
   const ref = parseOSMReference(osmUrl);
   const response = await fetch(`https://www.openstreetmap.org/api/0.6/${ref.type}/${ref.id}/full.json`);
@@ -187,6 +225,7 @@ async function fetchBoundsFromOSM(osmUrl) {
   return null;
 }
 
+// Convert GeoJSON geometry back into a simple bounds object.
 function boundsFromGeometry(geometry) {
   const coords = [];
 
@@ -199,6 +238,8 @@ function boundsFromGeometry(geometry) {
   return computeBoundsFromCoordinates(coords);
 }
 
+// Fetch the exact OSM geometry and convert it to GeoJSON using osmtogeojson.
+// This avoids writing fragile custom code for OSM ways/relations.
 async function fetchGeometryFromOSM(osmUrl) {
   const ref = parseOSMReference(osmUrl);
   const response = await fetch(`https://www.openstreetmap.org/api/0.6/${ref.type}/${ref.id}/full.json`);
@@ -225,6 +266,10 @@ async function fetchGeometryFromOSM(osmUrl) {
   return null;
 }
 
+// Resolve one building's geometry with this priority:
+// 1. geometry already shipped in local JSON
+// 2. geometry already cached in localStorage
+// 3. live geometry fetched from OpenStreetMap
 async function resolveBuildingGeometry(record, cache) {
   const localGeometry = extractLocalGeometry(record);
 
@@ -248,6 +293,7 @@ async function resolveBuildingGeometry(record, cache) {
   return geometry;
 }
 
+// Resolve one building's bounds from local data, cache, geometry, or OSM fallback.
 async function resolveBuildingBounds(record, cache) {
   const localBounds = extractLocalBounds(record);
 
@@ -272,11 +318,21 @@ async function resolveBuildingBounds(record, cache) {
   return bounds;
 }
 
+// Turn the raw building records into GeoJSON features that Leaflet can render.
+// This is where OSM ids become actual clickable building polygons.
 async function buildFeaturesFromRecords(records) {
   const cache = readBoundsCache();
   const features = [];
 
+  // Sort by descending length so specific codes like BCH are checked before BC.
+  // This is important later when we infer a room's building from its room name.
+  knownBuildingCodes = records
+    .map((record) => normalizeBuildingCode(record.properties?.name))
+    .filter(Boolean)
+    .sort((left, right) => right.length - left.length);
+
   for (const record of records) {
+    // Prefer exact geometry, but fall back to bounds if geometry is unavailable.
     const geometry = await resolveBuildingGeometry(record, cache);
     const bounds = geometry
       ? boundsFromGeometry(geometry)
@@ -289,6 +345,10 @@ async function buildFeaturesFromRecords(records) {
     const name = record.properties?.name || "Unknown";
     const { score, rooms } = buildAvailability(name);
 
+    // We keep geometry plus metadata in each feature so later steps can:
+    // - color the building
+    // - open popups
+    // - compute search-window availability summaries
     features.push({
       type: "Feature",
       properties: {
@@ -317,6 +377,7 @@ async function buildFeaturesFromRecords(records) {
   return features;
 }
 
+// Leaflet style callback for one building polygon.
 function styleFeature(feature) {
   const { score } = feature.properties;
 
@@ -328,6 +389,8 @@ function styleFeature(feature) {
   };
 }
 
+// Normalize a building code so comparisons are stable.
+// Example: "CH H" -> "CHH"
 function normalizeBuildingCode(value) {
   return String(value || "")
     .trim()
@@ -335,47 +398,57 @@ function normalizeBuildingCode(value) {
     .replace(/\s+/g, "");
 }
 
-function roomBelongsToBuilding(roomName, buildingCode) {
+// Build a compact room key so data coming from different sources can still match.
+// Example:
+// - "BCH 1113" -> "bch1113"
+// - "BC 133" -> "bc133"
+// - "MA C-1 C2" -> "mac1c2"
+function normalizeRoomKey(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+}
+
+// Extract the room's building code by taking the longest matching known code.
+// This avoids prefix collisions such as BC matching BCH, or MA matching MAC.
+function extractBuildingCodeFromRoom(roomName) {
   const normalizedRoom = normalizeBuildingCode(roomName);
+  return knownBuildingCodes.find((code) => normalizedRoom.startsWith(code)) || null;
+}
+
+// True if a room belongs to the given building.
+// We do not rely on naive startsWith(buildingCode) because that breaks for
+// collisions like BC vs BCH.
+function roomBelongsToBuilding(roomName, buildingCode) {
   const normalizedBuilding = normalizeBuildingCode(buildingCode);
 
-  if (!normalizedRoom || !normalizedBuilding) {
+  if (!normalizedBuilding) {
     return false;
   }
 
-  if (normalizedBuilding === "RLC") {
-    return normalizedRoom.startsWith("RLC");
-  }
-
-  if (normalizedBuilding.startsWith("CH") && normalizedBuilding.length === 3) {
-    const spacedCode = `${normalizedBuilding.slice(0, 2)} ${normalizedBuilding.slice(2)}`;
-    return String(roomName || "").toUpperCase().startsWith(spacedCode);
-  }
-
-  if (normalizedBuilding.startsWith("PH") && normalizedBuilding.length === 3) {
-    const spacedCode = `${normalizedBuilding.slice(0, 2)} ${normalizedBuilding.slice(2)}`;
-    return String(roomName || "").toUpperCase().startsWith(spacedCode);
-  }
-
-  if (normalizedBuilding.startsWith("MA") && normalizedBuilding.length === 3) {
-    const spacedCode = `${normalizedBuilding.slice(0, 2)} ${normalizedBuilding.slice(2)}`;
-    return String(roomName || "").toUpperCase().startsWith(spacedCode);
-  }
-
-  return normalizedRoom.startsWith(normalizedBuilding);
+  return extractBuildingCodeFromRoom(roomName) === normalizedBuilding;
 }
 
+// Build the room list shown in the side panel for one building.
+// rooms.json defines the canonical room names/types, and room_occupancy.json is
+// used as a filter so we only keep rooms that actually have timeline data.
 function getRoomsForBuilding(buildingCode) {
   return roomsDataset
     .filter((entry) => Array.isArray(entry) && entry.length >= 2)
     .map(([room, type]) => ({ room, type }))
-    .filter((entry) => roomBelongsToBuilding(entry.room, buildingCode));
+    .filter((entry) => roomBelongsToBuilding(entry.room, buildingCode))
+    .filter((entry) => occupancyByRoom.has(normalizeRoomKey(entry.room)));
 }
 
+// Label formatter for the timeline header.
 function formatHour(hour) {
   return `${String(hour).padStart(2, "0")}:00`;
 }
 
+// Create either:
+// - the header grid with hour labels
+// - or a room grid that receives colored segments later
 function createTimelineGrid(isHeader = false) {
   const grid = document.createElement("div");
   grid.className = `timeline-grid${isHeader ? " timeline-hours" : ""}`;
@@ -390,23 +463,78 @@ function createTimelineGrid(isHeader = false) {
   return grid;
 }
 
-function getDayStart() {
-  return new Date("2026-03-24T00:00:00");
+// The visible timeline day should follow the current search window.
+// If no search exists yet, fall back to the current local day.
+function getTimelineDayStart() {
+  const sourceDate = activeSearchWindow?.start || new Date();
+  return new Date(
+    sourceDate.getFullYear(),
+    sourceDate.getMonth(),
+    sourceDate.getDate(),
+    0,
+    0,
+    0,
+    0
+  );
 }
 
+// Local YYYY-MM-DD key for the currently visible timeline day.
+// This intentionally uses local date parts, not UTC, so the page does not
+// accidentally shift occupancy to the wrong calendar day.
+function getTimelineDateKey() {
+  const dayStart = getTimelineDayStart();
+  const year = dayStart.getFullYear();
+  const month = String(dayStart.getMonth() + 1).padStart(2, "0");
+  const day = String(dayStart.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+// Generic helper used when converting times into timeline positions.
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
 }
 
+// Convert a timestamp to "minutes since the start of the visible day".
+// This is the x-position unit for the timeline.
 function minutesSinceDayStart(isoString) {
   const date = new Date(isoString);
-  return Math.round((date.getTime() - getDayStart().getTime()) / 60000);
+  return Math.round((date.getTime() - getTimelineDayStart().getTime()) / 60000);
 }
 
+// Lookup all occupancy slots for one room by its normalized room id.
 function getRoomSlots(roomName) {
-  return occupancyByRoom.get(roomName) || [];
+  return occupancyByRoom.get(normalizeRoomKey(roomName)) || [];
 }
 
+// Parse the current search form into a concrete time window.
+// The rest of the page uses this as the single source of truth for filtering.
+function getSearchWindowFromForm() {
+  const startValue = document.getElementById("startTime").value;
+  const endValue = document.getElementById("endTime").value;
+
+  if (!startValue || !endValue) {
+    return null;
+  }
+
+  const start = new Date(startValue);
+  const end = new Date(endValue);
+
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end <= start) {
+    return null;
+  }
+
+  return { start, end };
+}
+
+// Convert a timestamp into minutes within its own day so it can be positioned
+// on the 24-hour timeline grid.
+function minutesWithinDay(date) {
+  return date.getHours() * 60 + date.getMinutes();
+}
+
+// Parse and normalize the current room's occupancy slots for the visible day only.
+// If a room has occupancy data on another day but nothing on this day, the room
+// should appear fully available, not "missing".
 function normalizeSlots(roomName) {
   const slots = getRoomSlots(roomName);
 
@@ -418,13 +546,61 @@ function normalizeSlots(roomName) {
     .map(([startIso, endIso]) => ({
       startIso,
       endIso,
+      startDateKey: startIso.slice(0, 10),
       startMinutes: clamp(minutesSinceDayStart(startIso), 0, 24 * 60),
       endMinutes: clamp(minutesSinceDayStart(endIso), 0, 24 * 60),
     }))
+    // Only draw occupancy blocks for the currently visible timeline day.
+    // If a room has data on other days but nothing on this day, that means
+    // the room is fully available here, not "missing data".
+    .filter((slot) => slot.startDateKey === getTimelineDateKey())
     .filter((slot) => slot.endMinutes > slot.startMinutes)
     .sort((left, right) => left.startMinutes - right.startMinutes);
 }
 
+// Check whether a room has any occupancy block that intersects the searched window.
+// If one interval overlaps, the room is considered unavailable for that search.
+function roomIsAvailableInWindow(roomName, searchWindow) {
+  if (!searchWindow) {
+    return true;
+  }
+
+  const slots = getRoomSlots(roomName);
+
+  return !slots.some(([startIso, endIso]) => {
+    const slotStart = new Date(startIso);
+    const slotEnd = new Date(endIso);
+    return searchWindow.start < slotEnd && searchWindow.end > slotStart;
+  });
+}
+
+// Build a new feature list for the active search window.
+// The map colors come from this computed score, not from a fixed landing-page value.
+function applyAvailabilityToFeatures(features, searchWindow) {
+  return features.map((feature) => {
+    // Find every occupancy-backed room in this building.
+    const rooms = getRoomsForBuilding(feature.properties.name);
+    const totalRooms = rooms.length;
+
+    // A room is considered available if none of its occupied slots overlap the
+    // selected search interval.
+    const availableRooms = rooms.filter((room) => roomIsAvailableInWindow(room.room, searchWindow));
+    const score = totalRooms ? availableRooms.length / totalRooms : 0;
+
+    return {
+      ...feature,
+      properties: {
+        ...feature.properties,
+        score,
+        rooms: totalRooms,
+        availableRooms: availableRooms.length,
+      },
+    };
+  });
+}
+
+// Draw one colored block in a timeline row.
+// Blocks are positioned as percentages of the full 24-hour width.
 function appendSegment(grid, startMinutes, endMinutes, className, title) {
   if (endMinutes <= startMinutes) {
     return;
@@ -440,10 +616,18 @@ function appendSegment(grid, startMinutes, endMinutes, className, title) {
   grid.appendChild(segment);
 }
 
+// Draw the room timeline:
+// - red rounded blocks for occupied periods
+// - green rounded blocks for the gaps between them (available time)
+// If the room has no occupancy record at all, show the empty-data label instead.
 function addTimelineSegments(grid, roomName) {
+  const allRoomSlots = getRoomSlots(roomName);
   const slots = normalizeSlots(roomName);
 
-  if (!slots.length) {
+  // If the room is not present in room_occupancy.json at all, only then do we
+  // show the "no occupancy data" state. If it has records on other days but not
+  // on the selected day, it should appear fully available.
+  if (!allRoomSlots.length) {
     const emptyState = document.createElement("div");
     emptyState.className = "timeline-empty-state";
     emptyState.textContent = "No occupancy data yet";
@@ -454,6 +638,7 @@ function addTimelineSegments(grid, roomName) {
   let cursor = 0;
 
   slots.forEach((slot) => {
+    // Available gap before the next occupied block.
     appendSegment(
       grid,
       cursor,
@@ -461,6 +646,8 @@ function addTimelineSegments(grid, roomName) {
       "timeline-segment-available",
       `${formatHour(Math.floor(cursor / 60))} - ${slot.startIso.slice(11, 16)} available`
     );
+
+    // Occupied block itself.
     appendSegment(
       grid,
       slot.startMinutes,
@@ -471,6 +658,7 @@ function addTimelineSegments(grid, roomName) {
     cursor = slot.endMinutes;
   });
 
+  // Final available block until the end of the day.
   appendSegment(
     grid,
     cursor,
@@ -480,6 +668,7 @@ function addTimelineSegments(grid, roomName) {
   );
 }
 
+// Wrap a timeline grid in a horizontally scrollable container.
 function createTimelineScroll(isHeader = false) {
   const scroll = document.createElement("div");
   scroll.className = "timeline-scroll";
@@ -487,6 +676,25 @@ function createTimelineScroll(isHeader = false) {
   return scroll;
 }
 
+// Keep the searched period in view by centering the horizontal timeline near
+// the middle of the requested time window.
+function centerTimelineOnSearchWindow(scrollElements) {
+  if (!activeSearchWindow || !scrollElements.length) {
+    return;
+  }
+
+  const midpointMinutes =
+    (minutesWithinDay(activeSearchWindow.start) + minutesWithinDay(activeSearchWindow.end)) / 2;
+
+  scrollElements.forEach((scrollElement) => {
+    const content = scrollElement.firstChild;
+    const target =
+      (midpointMinutes / (24 * 60)) * content.scrollWidth - scrollElement.clientWidth / 2;
+    scrollElement.scrollLeft = Math.max(0, target);
+  });
+}
+
+// Keep the hour header and all room rows horizontally synchronized.
 function syncTimelineScroll(scrollElements) {
   scrollElements.forEach((element) => {
     element.addEventListener("scroll", () => {
@@ -499,7 +707,10 @@ function syncTimelineScroll(scrollElements) {
   });
 }
 
+// Build the right-side building panel for the selected building.
+// This creates one timeline row per room and keeps all rows horizontally linked.
 function openBuildingPanel(buildingCode, rooms) {
+  activeBuildingSelection = buildingCode;
   buildingPanel.classList.remove("is-empty");
   buildingPanelTitle.textContent = buildingCode;
   buildingPanelCopy.textContent =
@@ -526,8 +737,9 @@ function openBuildingPanel(buildingCode, rooms) {
   const headerScroll = createTimelineScroll(true);
   timelineHeader.append(headerLabel, headerScroll);
 
+  // The header scroll plus every row scroll are synchronized together.
   const scrollElements = [headerScroll];
-  const visibleRooms = rooms.length ? rooms : [{ room: "No room found", type: "No matching room name in rooms.json" }];
+  const visibleRooms = rooms.length ? rooms : [{ room: "No room found", type: "No matching room in room_occupancy.json" }];
 
   visibleRooms.forEach((roomEntry) => {
     const row = document.createElement("div");
@@ -546,9 +758,12 @@ function openBuildingPanel(buildingCode, rooms) {
   });
 
   syncTimelineScroll(scrollElements);
+  centerTimelineOnSearchWindow(scrollElements);
 }
 
+// Return the side panel to its initial "select a building" state.
 function resetBuildingPanel() {
+  activeBuildingSelection = null;
   buildingPanel.classList.add("is-empty");
   buildingPanelTitle.textContent = "Select a building";
   buildingPanelCopy.textContent =
@@ -562,13 +777,27 @@ closeBuildingPanel.addEventListener("click", () => {
   resetBuildingPanel();
 });
 
+// If the user changes the search while a building panel is open, rebuild the
+// panel immediately so the room timelines reflect the new searched period.
+function refreshOpenBuildingPanel() {
+  if (!activeBuildingSelection) {
+    return;
+  }
+
+  const rooms = getRoomsForBuilding(activeBuildingSelection);
+  openBuildingPanel(activeBuildingSelection, rooms);
+}
+
+// Leaflet feature callback for each building polygon.
+// This wires hover feedback, popup content, and click-to-open behavior.
 function onEachFeature(feature, layer) {
-  const { name, score, id } = feature.properties;
+  const { name, score, id, availableRooms, rooms } = feature.properties;
 
   layer.bindPopup(`
     <div class="room-popup">
       <h4>${name}</h4>
-      <p>Mock availability score: ${Math.round(score * 100)}%</p>
+      <p>Availability in search window: ${availableRooms}/${rooms} rooms</p>
+      <p>Availability score: ${Math.round(score * 100)}%</p>
       <p><a href="${id}" target="_blank" rel="noreferrer">Open in OpenStreetMap</a></p>
     </div>
   `);
@@ -588,11 +817,12 @@ function onEachFeature(feature, layer) {
     const rooms = getRoomsForBuilding(name);
     openBuildingPanel(name, rooms);
     setStatus(
-      `Selected building ${name}. Showing the first matching room on an empty day timeline.`
+      `Selected building ${name}. The room timeline is centered on your searched time window.`
     );
   });
 }
 
+// Render the building heatmap and update the summary card beside the map.
 function renderBuildings(features) {
   if (buildingLayer) {
     map.removeLayer(buildingLayer);
@@ -619,11 +849,12 @@ function renderBuildings(features) {
 
   document.getElementById("visibleRooms").textContent = features.length;
   document.getElementById("bestZone").textContent = bestBuilding.properties.name;
-  document.getElementById("visibleRooms").title = `${totalRooms} mocked free rooms across all loaded buildings`;
+  document.getElementById("visibleRooms").title = `${totalRooms} rooms represented across all loaded buildings`;
 
   map.fitBounds(buildingLayer.getBounds(), { padding: [24, 24] });
 }
 
+// Fetch the building source file that maps EPFL codes to OSM ids.
 async function loadBuildingRecords() {
   const response = await fetch("./epfl_buildings.json");
 
@@ -634,6 +865,7 @@ async function loadBuildingRecords() {
   return response.json();
 }
 
+// Fetch the canonical room list.
 async function loadRoomsDataset() {
   const response = await fetch("./rooms.json");
 
@@ -644,6 +876,7 @@ async function loadRoomsDataset() {
   return response.json();
 }
 
+// Fetch occupancy records for the rooms that have timeline data.
 async function loadRoomOccupancyDataset() {
   const response = await fetch("./room_occupancy.json");
 
@@ -654,6 +887,9 @@ async function loadRoomOccupancyDataset() {
   return response.json();
 }
 
+// Convert the occupancy JSON array into a map:
+// normalized room name -> list of [start, end] slots
+// This makes room timeline lookups fast.
 function indexOccupancyByRoom(entries) {
   const indexed = new Map();
 
@@ -667,17 +903,19 @@ function indexOccupancyByRoom(entries) {
     const slots = Array.isArray(entry.slots)
       ? entry.slots.filter((slot) => Array.isArray(slot) && slot.length === 2)
       : [];
-    indexed.set(roomName, slots);
+    indexed.set(normalizeRoomKey(roomName), slots);
   });
 
   return indexed;
 }
 
+// Convert a Date object into the exact string required by datetime-local inputs.
 function toLocalInputValue(date) {
   const adjusted = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
   return adjusted.toISOString().slice(0, 16);
 }
 
+// Give the search form a sensible initial time range.
 function seedDefaultTimes() {
   const now = new Date();
   const start = new Date(now);
@@ -692,18 +930,34 @@ function seedDefaultTimes() {
   document.getElementById("endTime").value = toLocalInputValue(end);
 }
 
+// Search submission turns the current form values into the active search window.
+// Then it:
+// 1. recomputes the building heatmap
+// 2. refreshes the currently open building panel, if any
 document.getElementById("availability-form").addEventListener("submit", (event) => {
   event.preventDefault();
 
   const start = document.getElementById("startTime").value;
   const end = document.getElementById("endTime").value;
   const duration = document.getElementById("duration").value;
+  const searchWindow = getSearchWindowFromForm();
+
+  if (!searchWindow) {
+    setStatus("Search window is invalid. Please choose a beginning before the end.");
+    return;
+  }
+
+  activeSearchWindow = searchWindow;
+  renderBuildings(applyAvailabilityToFeatures(baseBuildingFeatures, activeSearchWindow));
+  refreshOpenBuildingPanel();
 
   setStatus(
-    `Demo search saved: ${start || "no start"} to ${end || "no end"} for ${duration} minutes. Building shapes and room timelines are still using static placeholder data.`
+    `Search applied: ${start} to ${end} for ${duration} minutes. Building colors now reflect room availability only within that time window.`
   );
 });
 
+// Preset buttons only update the search form values.
+// The user still has to press Search to apply them to the map.
 document.querySelectorAll(".shortcut-chip").forEach((button) => {
   button.addEventListener("click", () => {
     const now = new Date();
@@ -728,15 +982,20 @@ document.querySelectorAll(".shortcut-chip").forEach((button) => {
 
     document.getElementById("startTime").value = toLocalInputValue(start);
     document.getElementById("endTime").value = toLocalInputValue(end);
-    setStatus(`Preset applied: ${button.textContent}. Timeline view remains empty until occupancy data is connected.`);
+    setStatus(`Preset applied: ${button.textContent}. Press Search to update building availability for that time window.`);
   });
 });
 
+// Main boot sequence for the whole page.
+// 1. seed the search form
+// 2. load buildings, rooms, and occupancy
+// 3. resolve OSM geometry
+// 4. render the initial searched heatmap
 async function initializeApp() {
   try {
     seedDefaultTimes();
     resetBuildingPanel();
-    setStatus("Loading EPFL buildings and room list...");
+    setStatus("Loading EPFL buildings, rooms, and room occupancy data...");
 
     const [records, rooms, occupancy] = await Promise.all([
       loadBuildingRecords(),
@@ -746,15 +1005,16 @@ async function initializeApp() {
     roomsDataset = rooms;
     occupancyByRoom = indexOccupancyByRoom(occupancy);
 
-    const features = await buildFeaturesFromRecords(records);
+    baseBuildingFeatures = await buildFeaturesFromRecords(records);
+    activeSearchWindow = getSearchWindowFromForm();
 
-    if (!features.length) {
+    if (!baseBuildingFeatures.length) {
       throw new Error("No building bounds could be resolved.");
     }
 
-    renderBuildings(features);
+    renderBuildings(applyAvailabilityToFeatures(baseBuildingFeatures, activeSearchWindow));
     setStatus(
-      `Loaded ${features.length} buildings, ${roomsDataset.length} rooms, and synthesized occupancy data. Click a building to open its room timeline panel.`
+      `Loaded ${baseBuildingFeatures.length} buildings, ${roomsDataset.length} known rooms, and ${occupancyByRoom.size} occupancy-backed rooms. Use Search to update the heatmap for a specific time window.`
     );
   } catch (error) {
     console.error(error);
