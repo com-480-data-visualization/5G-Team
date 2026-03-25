@@ -297,7 +297,7 @@ select {
   /* Visual legend from low to high availability intensity. */
   height: 10px;
   border-radius: 999px;
-  background: linear-gradient(90deg, #254f94 0%, #5ba7d1 45%, #8ef2c6 100%);
+  background: linear-gradient(90deg, #dd6b6b 0%, #f3b458 45%, #2f8f5b 100%);
 }
 
 .metric-list {

@@ -40,17 +40,17 @@ function buildAvailability(name) {
 }
 
 function getColor(score) {
-  if (score > 0.8) return "#8ef2c6";
-  if (score > 0.6) return "#6ac0df";
-  if (score > 0.4) return "#4b82d9";
-  return "#2f4f85";
+  if (score > 0.8) return "#2f8f5b";
+  if (score > 0.6) return "#7db55a";
+  if (score > 0.4) return "#f3b458";
+  return "#dd6b6b";
 }
 
 function getBorderColor(score) {
-  if (score > 0.8) return "#d7fff0";
-  if (score > 0.6) return "#a6edff";
-  if (score > 0.4) return "#87a8ff";
-  return "#62749d";
+  if (score > 0.8) return "#81c29e";
+  if (score > 0.6) return "#b8db95";
+  if (score > 0.4) return "#ffd39a";
+  return "#f0abab";
 }
 
 function parseOSMReference(url) {
