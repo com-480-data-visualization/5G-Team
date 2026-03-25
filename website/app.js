@@ -1,52 +1,9 @@
-// Geographic center of the EPFL campus used to initialize the map view.
-const epflCenter = [46.5191, 6.5668];
-
-// Full list of EPFL building codes provided for the prototype.
-// We use these identifiers as the labels for the synthetic building polygons.
-const buildingCodes = [
-  "PPH", "SPP", "BCH", "BC", "CSB", "GEN", "QIJ", "DLLEL", "FBC", "AAC", "PSEB",
-  "AAB", "BIO_A", "CO", "ALO", "PS_QN", "FO", "SOS2", "GA", "QIG", "BAR", "SPN",
-  "INJ", "MXF", "DIA", "BFFA", "ALP", "TRIH", "EXTRA", "H4", "TCV", "AST", "GO10",
-  "BAF", "TRIE", "PO", "PSEL", "STF", "BAP", "B25A", "SF", "AN", "QIH", "ELL",
-  "PH", "PSEC", "BAH", "AI", "INR", "GR", "INN", "MA", "SS", "ELG", "MXD", "AU",
-  "ZD", "I17", "H8", "QIE", "STT", "QIF", "INF", "ELB", "LE", "ODY", "MED", "AAD",
-  "B1", "TRIC", "ELH", "MXH", "SV", "ELA", "SKIL", "G6", "ECAL", "QIK", "SSH",
-  "RLC", "BS", "QII", "INM", "ELE", "CM", "ART", "PPB", "CH", "PV", "VOR", "CCT",
-  "GEO", "CE", "CSN", "CAPU", "PSEA", "QIO", "BM", "QIN", "ELD", "ZP", "BAC", "BP",
-  "HBL", "CSV", "I23", "SAUV", "CRR", "I19", "CSS", "CL", "VR15", "SCT", "BSP",
-  "STCC", "MC", "JORD", "ME", "NH", "MXC", "CP1", "MXG", "BI", "SG", "PSED", "GC",
-  "MXE", "ZC", "SOS1", "B3",
-];
-
-// A few recognisable building anchors are manually placed near plausible locations.
-// This makes the map feel less arbitrary for known campus landmarks.
-const anchoredCenters = {
-  RLC: [46.51867, 6.56611],
-  BC: [46.5202, 6.5682],
-  CO: [46.5214, 6.5652],
-  INM: [46.5181, 6.5695],
-  MA: [46.5171, 6.5645],
-  CM: [46.5162, 6.5678],
-  CE: [46.5210, 6.5702],
-  SV: [46.5178, 6.5712],
-  PH: [46.5206, 6.5638],
-  MX: [46.5198, 6.5628],
-};
-
-// Approximate campus area used to place synthetic building polygons.
-// The boxes are placeholders until real building geometry is connected.
-const campusBounds = {
-  minLat: 46.5157,
-  maxLat: 46.5226,
-  minLng: 6.5616,
-  maxLng: 6.5727,
-};
-
-// Create the Leaflet map inside <div id="map"> and center it on EPFL.
+// Create the Leaflet map immediately, but start from a neutral world view.
+// Once the EPFL building bounds are loaded, the map will fit to them automatically.
 const map = L.map("map", {
   zoomControl: true,
   scrollWheelZoom: true,
-}).setView(epflCenter, 16);
+}).setView([0, 0], 2);
 
 // Add the OpenStreetMap tile layer, which is the visible base map.
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -54,13 +11,29 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "&copy; OpenStreetMap contributors",
 }).addTo(map);
 
-// GeoJSON layer reference so we can clear and redraw the building polygons.
+// GeoJSON layer reference so we can redraw the building polygons after loading data.
 let buildingLayer;
 
-// Deterministic number from a building code.
-// This avoids true randomness and gives stable shapes on every reload.
-function hashCode(code) {
-  return [...code].reduce((sum, char, index) => sum + char.charCodeAt(0) * (index + 1), 0);
+// Cache key used to avoid refetching the same OSM bounds on every page reload.
+const osmCacheKey = "epfl-building-bounds-v1";
+
+// Central helper for updating the feedback banner under the search controls.
+function setStatus(message) {
+  document.getElementById("statusBanner").textContent = message;
+}
+
+// Deterministic number from a building name.
+// We still use synthetic availability scores, but geometry now comes from your JSON/OSM ids.
+function hashCode(text) {
+  return [...text].reduce((sum, char, index) => sum + char.charCodeAt(0) * (index + 1), 0);
+}
+
+// Generate a stable demo score and room count for a building.
+function buildAvailability(name) {
+  const hash = hashCode(name);
+  const score = 0.2 + (hash % 70) / 100;
+  const rooms = 1 + (hash % 6);
+  return { score, rooms };
 }
 
 // Convert a 0..1 availability score into a fill color.
@@ -79,86 +52,203 @@ function getBorderColor(score) {
   return "#62749d";
 }
 
-// Generate a stable score and room count for demo purposes.
-function buildAvailability(code) {
-  const hash = hashCode(code);
-  const score = 0.2 + (hash % 70) / 100;
-  const rooms = 1 + (hash % 6);
-  return { score, rooms };
+// Parse a URL like https://www.openstreetmap.org/way/30334086 into type + numeric id.
+function parseOSMReference(url) {
+  const match = url.match(/openstreetmap\.org\/(way|relation|node)\/(\d+)/);
+
+  if (!match) {
+    throw new Error(`Unsupported OSM id format: ${url}`);
+  }
+
+  return {
+    type: match[1],
+    id: match[2],
+  };
 }
 
-// Create a simple rectangular polygon from a center point.
-// Leaflet's L.geoJSON understands standard GeoJSON polygon coordinates.
-function makeBoxPolygon(center, halfHeight, halfWidth) {
-  const [lat, lng] = center;
-
+// Convert bounds into a GeoJSON rectangle polygon.
+// OSM bounds use minlat/minlon/maxlat/maxlon.
+function boundsToPolygon(bounds) {
   return [
     [
-      [lng - halfWidth, lat - halfHeight],
-      [lng + halfWidth, lat - halfHeight],
-      [lng + halfWidth, lat + halfHeight],
-      [lng - halfWidth, lat + halfHeight],
-      [lng - halfWidth, lat - halfHeight],
+      [bounds.minlon, bounds.minlat],
+      [bounds.maxlon, bounds.minlat],
+      [bounds.maxlon, bounds.maxlat],
+      [bounds.minlon, bounds.maxlat],
+      [bounds.minlon, bounds.minlat],
     ],
   ];
 }
 
-// If a building is not manually anchored, place it on a dense campus grid.
-function generateGridCenter(code, fallbackIndex) {
-  const hash = hashCode(code);
-  const columns = 12;
-  const col = fallbackIndex % columns;
-  const row = Math.floor(fallbackIndex / columns);
-  const latStep = 0.00058;
-  const lngStep = 0.00078;
-  const latJitter = ((hash % 7) - 3) * 0.00005;
-  const lngJitter = ((Math.floor(hash / 7) % 7) - 3) * 0.00005;
+// Compute bounds from a list of node coordinates when the OSM element does not expose them directly.
+function computeBoundsFromCoordinates(coords) {
+  if (!coords.length) {
+    return null;
+  }
 
-  const lat = campusBounds.maxLat - row * latStep + latJitter;
-  const lng = campusBounds.minLng + col * lngStep + lngJitter;
-
-  return [lat, lng];
+  return coords.reduce(
+    (acc, [lat, lon]) => ({
+      minlat: Math.min(acc.minlat, lat),
+      maxlat: Math.max(acc.maxlat, lat),
+      minlon: Math.min(acc.minlon, lon),
+      maxlon: Math.max(acc.maxlon, lon),
+    }),
+    {
+      minlat: Infinity,
+      maxlat: -Infinity,
+      minlon: Infinity,
+      maxlon: -Infinity,
+    }
+  );
 }
 
-// Turn the building code list into a GeoJSON feature collection.
-function generateBuildingsGeoJSON() {
-  let fallbackIndex = 0;
+// Some JSON exports may already include the bounds directly.
+// Accept a few common field names to keep the frontend flexible.
+function extractLocalBounds(record) {
+  if (record.bounds) return record.bounds;
+  if (record.bounding_box) return record.bounding_box;
+  if (record.bbox) {
+    const bbox = record.bbox;
 
-  const features = buildingCodes.map((code) => {
-    const center = anchoredCenters[code] || generateGridCenter(code, fallbackIndex++);
-    const hash = hashCode(code);
-    const { score, rooms } = buildAvailability(code);
+    if (Array.isArray(bbox) && bbox.length === 4) {
+      return {
+        minlon: Number(bbox[0]),
+        minlat: Number(bbox[1]),
+        maxlon: Number(bbox[2]),
+        maxlat: Number(bbox[3]),
+      };
+    }
 
-    // Vary box sizes slightly so the map feels less uniform.
-    const halfHeight = 0.00011 + (hash % 4) * 0.000025;
-    const halfWidth = 0.00014 + (Math.floor(hash / 5) % 4) * 0.00003;
+    return bbox;
+  }
 
-    return {
+  return null;
+}
+
+function readBoundsCache() {
+  try {
+    return JSON.parse(localStorage.getItem(osmCacheKey) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function writeBoundsCache(cache) {
+  localStorage.setItem(osmCacheKey, JSON.stringify(cache));
+}
+
+// Fetch OSM details for a way/relation and derive a bounding box from the response.
+async function fetchBoundsFromOSM(osmUrl) {
+  const ref = parseOSMReference(osmUrl);
+  const response = await fetch(`https://www.openstreetmap.org/api/0.6/${ref.type}/${ref.id}/full.json`);
+
+  if (!response.ok) {
+    throw new Error(`OSM request failed for ${ref.type}/${ref.id}`);
+  }
+
+  const data = await response.json();
+  const targetElement = data.elements.find(
+    (element) => element.type === ref.type && String(element.id) === ref.id
+  );
+
+  if (targetElement?.bounds) {
+    return targetElement.bounds;
+  }
+
+  // Ways can be reconstructed from their node ids.
+  if (ref.type === "way" && targetElement?.nodes) {
+    const nodeMap = new Map(
+      data.elements
+        .filter((element) => element.type === "node")
+        .map((node) => [String(node.id), [node.lat, node.lon]])
+    );
+
+    const coords = targetElement.nodes
+      .map((nodeId) => nodeMap.get(String(nodeId)))
+      .filter(Boolean);
+
+    return computeBoundsFromCoordinates(coords);
+  }
+
+  // Relations may be composed of ways; gather all member nodes to derive the bounds.
+  if (ref.type === "relation" && targetElement?.members) {
+    const memberWayIds = new Set(
+      targetElement.members
+        .filter((member) => member.type === "way")
+        .map((member) => String(member.ref))
+    );
+
+    const nodeMap = new Map(
+      data.elements
+        .filter((element) => element.type === "node")
+        .map((node) => [String(node.id), [node.lat, node.lon]])
+    );
+
+    const coords = data.elements
+      .filter((element) => element.type === "way" && memberWayIds.has(String(element.id)))
+      .flatMap((way) => way.nodes.map((nodeId) => nodeMap.get(String(nodeId))))
+      .filter(Boolean);
+
+    return computeBoundsFromCoordinates(coords);
+  }
+
+  return null;
+}
+
+// Resolve building bounds from local JSON first, then from cached OSM fetches, then from the live OSM API.
+async function resolveBuildingBounds(record, cache) {
+  const localBounds = extractLocalBounds(record);
+
+  if (localBounds) {
+    return localBounds;
+  }
+
+  if (cache[record.id]) {
+    return cache[record.id];
+  }
+
+  const bounds = await fetchBoundsFromOSM(record.id);
+
+  if (bounds) {
+    cache[record.id] = bounds;
+  }
+
+  return bounds;
+}
+
+// Convert the JSON file records into the GeoJSON features expected by Leaflet.
+async function buildFeaturesFromRecords(records) {
+  const cache = readBoundsCache();
+  const features = [];
+
+  for (const record of records) {
+    const bounds = await resolveBuildingBounds(record, cache);
+
+    if (!bounds) {
+      continue;
+    }
+
+    const name = record.properties?.name || "Unknown";
+    const { score, rooms } = buildAvailability(name);
+
+    features.push({
       type: "Feature",
       properties: {
-        name: code,
+        name,
+        id: record.id,
         rooms,
         score,
+        bounds,
       },
       geometry: {
         type: "Polygon",
-        coordinates: makeBoxPolygon(center, halfHeight, halfWidth),
+        coordinates: boundsToPolygon(bounds),
       },
-    };
-  });
+    });
+  }
 
-  return {
-    type: "FeatureCollection",
-    features,
-  };
-}
-
-// Shared building dataset used by the GeoJSON layer.
-const buildingsData = generateBuildingsGeoJSON();
-
-// Central helper for updating the feedback banner under the search controls.
-function setStatus(message) {
-  document.getElementById("statusBanner").textContent = message;
+  writeBoundsCache(cache);
+  return features;
 }
 
 // Returns a style object for each building polygon.
@@ -173,17 +263,16 @@ function styleFeature(feature) {
   };
 }
 
-// This mirrors the Leaflet pattern you shared:
-// each feature gets event handlers as it is added to the layer.
+// Attach interactivity to each GeoJSON feature as Leaflet adds it to the map.
 function onEachFeature(feature, layer) {
-  const { name, rooms, score } = feature.properties;
+  const { name, rooms, score, id } = feature.properties;
 
   layer.bindPopup(`
     <div class="room-popup">
       <h4>${name}</h4>
       <p>Mock availability score: ${Math.round(score * 100)}%</p>
       <p>Estimated free rooms: ${rooms}</p>
-      <p>Click to focus this building.</p>
+      <p><a href="${id}" target="_blank" rel="noreferrer">Open in OpenStreetMap</a></p>
     </div>
   `);
 
@@ -199,45 +288,53 @@ function onEachFeature(feature, layer) {
   });
 
   layer.on("click", () => {
-    // A static prototype does not have real /buildings/:name pages yet,
-    // so clicking updates the UI instead of navigating to a broken route.
     setStatus(
-      `Selected building ${name}. Demo availability: ${rooms} rooms, ${Math.round(score * 100)}% score. This will later open a building-specific view.`
+      `Selected building ${name}. Bounding box comes from your EPFL OSM id dataset${feature.properties.bounds ? "" : ""}.`
     );
   });
 }
 
 // Draw all building polygons on the map and update the side summary.
-function renderBuildings() {
+function renderBuildings(features) {
   if (buildingLayer) {
     map.removeLayer(buildingLayer);
   }
 
-  buildingLayer = L.geoJSON(buildingsData, {
-    style: styleFeature,
-    onEachFeature,
-  }).addTo(map);
+  buildingLayer = L.geoJSON(
+    {
+      type: "FeatureCollection",
+      features,
+    },
+    {
+      style: styleFeature,
+      onEachFeature,
+    }
+  ).addTo(map);
 
-  const bestBuilding = buildingsData.features.reduce((best, current) => {
+  const bestBuilding = features.reduce((best, current) => {
     return current.properties.score > best.properties.score ? current : best;
   });
 
-  const totalRooms = buildingsData.features.reduce((sum, feature) => {
+  const totalRooms = features.reduce((sum, feature) => {
     return sum + feature.properties.rooms;
   }, 0);
 
-  document.getElementById("visibleRooms").textContent = buildingsData.features.length;
+  document.getElementById("visibleRooms").textContent = features.length;
   document.getElementById("bestZone").textContent = bestBuilding.properties.name;
+  document.getElementById("visibleRooms").title = `${totalRooms} mocked free rooms across all loaded buildings`;
 
-  setStatus(
-    `Showing ${buildingsData.features.length} synthetic building boxes over EPFL. They use demo availability data and are ready to be replaced with real geometry.`
-  );
-
-  // Fit the map to the generated buildings with a little padding.
   map.fitBounds(buildingLayer.getBounds(), { padding: [24, 24] });
+}
 
-  // Keep the total room count available in the legend title tooltip.
-  document.getElementById("visibleRooms").title = `${totalRooms} mocked free rooms across all buildings`;
+// Load the local building source file supplied in the project.
+async function loadBuildingRecords() {
+  const response = await fetch("./epfl_buildings.json");
+
+  if (!response.ok) {
+    throw new Error("Could not load epfl_buildings.json");
+  }
+
+  return response.json();
 }
 
 // Convert a JavaScript Date into the exact string format required by <input type="datetime-local">.
@@ -251,11 +348,9 @@ function seedDefaultTimes() {
   const now = new Date();
   const start = new Date(now);
 
-  // Round to the next whole hour to make the inputs cleaner.
   start.setMinutes(0, 0, 0);
   start.setHours(start.getHours() + 1);
 
-  // Default search window spans two hours.
   const end = new Date(start);
   end.setHours(end.getHours() + 2);
 
@@ -273,12 +368,11 @@ document.getElementById("availability-form").addEventListener("submit", (event) 
   const duration = document.getElementById("duration").value;
 
   setStatus(
-    `Demo search saved: ${start || "no start"} to ${end || "no end"} for ${duration} minutes. The map shows building boxes, but live availability is not connected yet.`
+    `Demo search saved: ${start || "no start"} to ${end || "no end"} for ${duration} minutes. Building shapes now come from epfl_buildings.json and OSM ids.`
   );
 });
 
 // Add click behavior for the preset range chips.
-// Each button exposes its mode through a data-range attribute in the HTML.
 document.querySelectorAll(".shortcut-chip").forEach((button) => {
   button.addEventListener("click", () => {
     const now = new Date();
@@ -286,7 +380,6 @@ document.querySelectorAll(".shortcut-chip").forEach((button) => {
     const end = new Date(now);
     const range = button.dataset.range;
 
-    // Each branch assigns a different example time window.
     if (range === "today") {
       start.setHours(14, 0, 0, 0);
       end.setHours(17, 0, 0, 0);
@@ -302,13 +395,39 @@ document.querySelectorAll(".shortcut-chip").forEach((button) => {
       end.setHours(18, 0, 0, 0);
     }
 
-    // Push the computed dates into the form inputs.
     document.getElementById("startTime").value = toLocalInputValue(start);
     document.getElementById("endTime").value = toLocalInputValue(end);
-    setStatus(`Preset applied: ${button.textContent}. Building boxes still use mocked availability data.`);
+    setStatus(`Preset applied: ${button.textContent}. OSM-linked building bounds remain loaded on the map.`);
   });
 });
 
-// Boot sequence: initialize the form first, then paint the building polygons.
-seedDefaultTimes();
-renderBuildings();
+// Boot sequence:
+// 1. initialize the form
+// 2. load the local building id file
+// 3. resolve bounds from local JSON or OSM API
+// 4. render the map polygons
+async function initializeApp() {
+  try {
+    seedDefaultTimes();
+    setStatus("Loading EPFL buildings from epfl_buildings.json and resolving OSM bounds...");
+
+    const records = await loadBuildingRecords();
+    const features = await buildFeaturesFromRecords(records);
+
+    if (!features.length) {
+      throw new Error("No building bounds could be resolved.");
+    }
+
+    renderBuildings(features);
+    setStatus(
+      `Loaded ${features.length} buildings from your EPFL dataset. Geometry now comes from the JSON ids and resolved OSM bounds, not from hardcoded campus coordinates.`
+    );
+  } catch (error) {
+    console.error(error);
+    setStatus(
+      "Failed to load building bounds. Make sure you run the site through a local server and that epfl_buildings.json is present."
+    );
+  }
+}
+
+initializeApp();
