@@ -17,6 +17,7 @@ let buildingLayer;
 
 // LocalStorage key for cached building geometry fetched from OSM.
 const osmGeometryCacheKey = "epfl-building-geometry-v2";
+const themeStorageKey = "epfl-room-finder-theme";
 
 // The room timeline is drawn as a fixed 24-hour day.
 const timelineHours = Array.from({ length: 24 }, (_, hour) => hour);
@@ -29,9 +30,11 @@ const buildingMeta = document.getElementById("buildingMeta");
 const timelineHeader = document.getElementById("timelineHeader");
 const timelineBody = document.getElementById("timelineBody");
 const closeBuildingPanel = document.getElementById("closeBuildingPanel");
+const themeToggle = document.getElementById("themeToggle");
 const mapSection = document.getElementById("map-section");
 const mapFrame = document.querySelector(".map-frame");
 const mobilePanelMedia = window.matchMedia("(max-width: 720px)");
+const systemDarkModeMedia = window.matchMedia("(prefers-color-scheme: dark)");
 const buildingPanelDesktopAnchor = document.createComment("building-panel-desktop-anchor");
 
 // The building panel lives inside the map on desktop, but on mobile we move it
@@ -52,6 +55,36 @@ let baseBuildingFeatures = [];
 let activeSearchWindow = null;
 let knownBuildingCodes = [];
 let activeBuildingSelection = null;
+
+// Apply the selected theme to the <body> element and keep the toggle label
+// synchronized with the actual current mode.
+function applyTheme(theme) {
+  document.body.dataset.theme = theme;
+  themeToggle.textContent = theme === "light" ? "Dark mode" : "Light mode";
+  themeToggle.setAttribute("aria-pressed", String(theme === "light"));
+}
+
+// Decide which theme to use on startup.
+// Priority:
+// 1. explicit user choice saved in localStorage
+// 2. operating-system/browser preference
+function resolveInitialTheme() {
+  const storedTheme = localStorage.getItem(themeStorageKey);
+
+  if (storedTheme === "light" || storedTheme === "dark") {
+    return storedTheme;
+  }
+
+  return systemDarkModeMedia.matches ? "dark" : "light";
+}
+
+// Toggle between light and dark mode and persist the user's choice so the
+// page keeps the same look after a refresh.
+function toggleTheme() {
+  const nextTheme = document.body.dataset.theme === "light" ? "dark" : "light";
+  localStorage.setItem(themeStorageKey, nextTheme);
+  applyTheme(nextTheme);
+}
 
 function mountBuildingPanelForViewport() {
   if (mobilePanelMedia.matches) {
@@ -665,6 +698,20 @@ closeBuildingPanel.addEventListener("click", () => {
   resetBuildingPanel();
 });
 
+themeToggle.addEventListener("click", () => {
+  toggleTheme();
+});
+
+// If the user has not explicitly chosen a theme yet, follow the system theme
+// when it changes. Once a choice is saved, the stored preference wins.
+systemDarkModeMedia.addEventListener("change", () => {
+  if (localStorage.getItem(themeStorageKey)) {
+    return;
+  }
+
+  applyTheme(systemDarkModeMedia.matches ? "dark" : "light");
+});
+
 mobilePanelMedia.addEventListener("change", () => {
   mountBuildingPanelForViewport();
 });
@@ -895,6 +942,7 @@ document.querySelectorAll(".shortcut-chip").forEach((button) => {
 // 4. render the initial searched heatmap
 async function initializeApp() {
   try {
+    applyTheme(resolveInitialTheme());
     mountBuildingPanelForViewport();
     seedDefaultTimes();
     resetBuildingPanel();
