@@ -10,6 +10,8 @@ import requests
 # From there we can build stable paths to the input and output files.
 BASE_DIR = Path(__file__).resolve().parents[1]
 BUILDINGS_JSON = BASE_DIR / "buildings" / "buildings_main_campus.json"
+REPO_ROOT = BASE_DIR.parent
+WEBSITE_BUILDINGS_JSON = REPO_ROOT / "website" / "epfl_buildings.json"
 
 # Overpass has multiple public instances. This script tries them in sequence
 # so one temporary outage does not break the workflow completely.
@@ -364,11 +366,13 @@ out ids tags center;
     result.extend(MANUAL_BUILDINGS)
 
     write_json(OUTPUT_JSON, result)
+    write_json(str(WEBSITE_BUILDINGS_JSON), result)
     write_json(MISSING_JSON, missing)
     write_json(DEBUG_JSON, debug_unmatched)
 
     log_section("FINAL SUMMARY")
     print(f"Saved matched buildings to: {OUTPUT_JSON}")
+    print(f"Saved matched buildings to website: {WEBSITE_BUILDINGS_JSON}")
     print(f"Saved missing building codes to: {MISSING_JSON}")
     print(f"Saved unmatched debug data to: {DEBUG_JSON}")
     print(f"Matched: {len(result)}")
