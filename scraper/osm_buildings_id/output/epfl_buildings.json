@@ -108,6 +108,12 @@
     }
   },
   {
+    "id": "https://www.openstreetmap.org/way/1492610340",
+    "properties": {
+      "name": "DIA"
+    }
+  },
+  {
     "id": "https://www.openstreetmap.org/way/30333702",
     "properties": {
       "name": "ELA"

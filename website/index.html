@@ -123,8 +123,8 @@
             </div>
             <p>
               Each polygon is built from your EPFL OSM dataset. The frontend
-              resolves the OpenStreetMap ids into real building bounds and then
-              colors them by demo availability.
+              resolves the OpenStreetMap ids into real building footprints and
+              then colors them by demo availability.
             </p>
 
             <div class="legend-scale">
@@ -154,7 +154,7 @@
               <p>
                 The long-term goal is a true availability heatmap. This first
                 version resolves OpenStreetMap building ids into clickable
-                building boxes over the campus map.
+                building footprints over the campus map.
               </p>
             </div>
 
@@ -171,6 +171,9 @@
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
       crossorigin=""
     ></script>
+
+    <!-- osmtogeojson converts raw OSM API responses into correct GeoJSON footprints. -->
+    <script src="https://unpkg.com/osmtogeojson@3.0.0-beta.5/osmtogeojson.js"></script>
 
     <!-- App logic: map setup, mock data rendering, and form interactions. -->
     <script src="./app.js"></script>

@@ -15,7 +15,9 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 let buildingLayer;
 
 // Cache key used to avoid refetching the same OSM bounds on every page reload.
-const osmCacheKey = "epfl-building-bounds-v1";
+// Bump the cache version whenever the geometry extraction logic changes.
+// This prevents stale incorrect shapes from older implementations from persisting.
+const osmCacheKey = "epfl-building-geometry-v2";
 
 // Central helper for updating the feedback banner under the search controls.
 function setStatus(message) {
@@ -66,20 +68,6 @@ function parseOSMReference(url) {
   };
 }
 
-// Convert bounds into a GeoJSON rectangle polygon.
-// OSM bounds use minlat/minlon/maxlat/maxlon.
-function boundsToPolygon(bounds) {
-  return [
-    [
-      [bounds.minlon, bounds.minlat],
-      [bounds.maxlon, bounds.minlat],
-      [bounds.maxlon, bounds.maxlat],
-      [bounds.minlon, bounds.maxlat],
-      [bounds.minlon, bounds.minlat],
-    ],
-  ];
-}
-
 // Compute bounds from a list of node coordinates when the OSM element does not expose them directly.
 function computeBoundsFromCoordinates(coords) {
   if (!coords.length) {
@@ -125,6 +113,19 @@ function extractLocalBounds(record) {
   return null;
 }
 
+// Some JSON exports may already include exact geometry directly.
+function extractLocalGeometry(record) {
+  if (record.geometry?.type && record.geometry?.coordinates) {
+    return record.geometry;
+  }
+
+  if (record.geojson?.type && record.geojson?.coordinates) {
+    return record.geojson;
+  }
+
+  return null;
+}
+
 function readBoundsCache() {
   try {
     return JSON.parse(localStorage.getItem(osmCacheKey) || "{}");
@@ -138,6 +139,7 @@ function writeBoundsCache(cache) {
 }
 
 // Fetch OSM details for a way/relation and derive a bounding box from the response.
+// This is now mainly a fallback path; the preferred rendering uses exact geometry.
 async function fetchBoundsFromOSM(osmUrl) {
   const ref = parseOSMReference(osmUrl);
   const response = await fetch(`https://www.openstreetmap.org/api/0.6/${ref.type}/${ref.id}/full.json`);
@@ -195,6 +197,69 @@ async function fetchBoundsFromOSM(osmUrl) {
   return null;
 }
 
+function boundsFromGeometry(geometry) {
+  const coords = [];
+
+  if (geometry.type === "Polygon") {
+    geometry.coordinates.flat().forEach((pair) => coords.push([pair[1], pair[0]]));
+  } else if (geometry.type === "MultiPolygon") {
+    geometry.coordinates.flat(2).forEach((pair) => coords.push([pair[1], pair[0]]));
+  }
+
+  return computeBoundsFromCoordinates(coords);
+}
+
+// Resolve the exact OSM geometry for a way/relation from the full.json payload.
+async function fetchGeometryFromOSM(osmUrl) {
+  const ref = parseOSMReference(osmUrl);
+  const response = await fetch(`https://www.openstreetmap.org/api/0.6/${ref.type}/${ref.id}/full.json`);
+
+  if (!response.ok) {
+    throw new Error(`OSM request failed for ${ref.type}/${ref.id}`);
+  }
+
+  const data = await response.json();
+  const featureCollection = osmtogeojson(data);
+  const targetFeature = featureCollection.features.find((feature) => {
+    const featureId = String(feature.id || "");
+    return (
+      featureId === `${ref.type}/${ref.id}` ||
+      featureId === `${ref.type[0]}/${ref.id}` ||
+      String(feature.properties?.id || "") === ref.id
+    );
+  });
+
+  if (targetFeature?.geometry) {
+    return targetFeature.geometry;
+  }
+
+  return null;
+}
+
+// Resolve building geometry from local JSON first, then from the live OSM API.
+async function resolveBuildingGeometry(record, cache) {
+  const localGeometry = extractLocalGeometry(record);
+
+  if (localGeometry) {
+    return localGeometry;
+  }
+
+  if (cache[record.id]?.geometry) {
+    return cache[record.id].geometry;
+  }
+
+  const geometry = await fetchGeometryFromOSM(record.id);
+
+  if (geometry) {
+    cache[record.id] = {
+      geometry,
+      bounds: boundsFromGeometry(geometry),
+    };
+  }
+
+  return geometry;
+}
+
 // Resolve building bounds from local JSON first, then from cached OSM fetches, then from the live OSM API.
 async function resolveBuildingBounds(record, cache) {
   const localBounds = extractLocalBounds(record);
@@ -203,14 +268,18 @@ async function resolveBuildingBounds(record, cache) {
     return localBounds;
   }
 
-  if (cache[record.id]) {
-    return cache[record.id];
+  if (cache[record.id]?.bounds) {
+    return cache[record.id].bounds;
   }
 
-  const bounds = await fetchBoundsFromOSM(record.id);
+  const geometry = await resolveBuildingGeometry(record, cache);
+  const bounds = geometry ? boundsFromGeometry(geometry) : await fetchBoundsFromOSM(record.id);
 
   if (bounds) {
-    cache[record.id] = bounds;
+    cache[record.id] = {
+      ...cache[record.id],
+      bounds,
+    };
   }
 
   return bounds;
@@ -222,9 +291,12 @@ async function buildFeaturesFromRecords(records) {
   const features = [];
 
   for (const record of records) {
-    const bounds = await resolveBuildingBounds(record, cache);
+    const geometry = await resolveBuildingGeometry(record, cache);
+    const bounds = geometry
+      ? boundsFromGeometry(geometry)
+      : await resolveBuildingBounds(record, cache);
 
-    if (!bounds) {
+    if (!geometry && !bounds) {
       continue;
     }
 
@@ -240,9 +312,17 @@ async function buildFeaturesFromRecords(records) {
         score,
         bounds,
       },
-      geometry: {
+      geometry: geometry || {
         type: "Polygon",
-        coordinates: boundsToPolygon(bounds),
+        coordinates: [
+          [
+            [bounds.minlon, bounds.minlat],
+            [bounds.maxlon, bounds.minlat],
+            [bounds.maxlon, bounds.maxlat],
+            [bounds.minlon, bounds.maxlat],
+            [bounds.minlon, bounds.minlat],
+          ],
+        ],
       },
     });
   }
@@ -289,7 +369,7 @@ function onEachFeature(feature, layer) {
 
   layer.on("click", () => {
     setStatus(
-      `Selected building ${name}. Bounding box comes from your EPFL OSM id dataset${feature.properties.bounds ? "" : ""}.`
+      `Selected building ${name}. The shape on the map comes from the exact OSM geometry resolved from your EPFL dataset.`
     );
   });
 }
@@ -367,10 +447,10 @@ document.getElementById("availability-form").addEventListener("submit", (event) 
   const end = document.getElementById("endTime").value;
   const duration = document.getElementById("duration").value;
 
-  setStatus(
-    `Demo search saved: ${start || "no start"} to ${end || "no end"} for ${duration} minutes. Building shapes now come from epfl_buildings.json and OSM ids.`
-  );
-});
+    setStatus(
+      `Demo search saved: ${start || "no start"} to ${end || "no end"} for ${duration} minutes. Building shapes now come from epfl_buildings.json and exact OSM geometry.`
+    );
+  });
 
 // Add click behavior for the preset range chips.
 document.querySelectorAll(".shortcut-chip").forEach((button) => {
@@ -420,7 +500,7 @@ async function initializeApp() {
 
     renderBuildings(features);
     setStatus(
-      `Loaded ${features.length} buildings from your EPFL dataset. Geometry now comes from the JSON ids and resolved OSM bounds, not from hardcoded campus coordinates.`
+      `Loaded ${features.length} buildings from your EPFL dataset. Geometry now comes from the JSON ids and resolved OSM footprints, not from hardcoded campus coordinates.`
     );
   } catch (error) {
     console.error(error);
