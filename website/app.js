@@ -407,8 +407,41 @@ function getRoomSlots(roomName) {
   return occupancyByRoom.get(roomName) || [];
 }
 
-function addOccupancySegments(grid, roomName) {
+function normalizeSlots(roomName) {
   const slots = getRoomSlots(roomName);
+
+  if (!slots.length) {
+    return [];
+  }
+
+  return slots
+    .map(([startIso, endIso]) => ({
+      startIso,
+      endIso,
+      startMinutes: clamp(minutesSinceDayStart(startIso), 0, 24 * 60),
+      endMinutes: clamp(minutesSinceDayStart(endIso), 0, 24 * 60),
+    }))
+    .filter((slot) => slot.endMinutes > slot.startMinutes)
+    .sort((left, right) => left.startMinutes - right.startMinutes);
+}
+
+function appendSegment(grid, startMinutes, endMinutes, className, title) {
+  if (endMinutes <= startMinutes) {
+    return;
+  }
+
+  const segment = document.createElement("div");
+  segment.className = `timeline-segment ${className}`;
+  segment.style.left = `${(startMinutes / (24 * 60)) * 100}%`;
+  segment.style.width = `${((endMinutes - startMinutes) / (24 * 60)) * 100}%`;
+  if (title) {
+    segment.title = title;
+  }
+  grid.appendChild(segment);
+}
+
+function addTimelineSegments(grid, roomName) {
+  const slots = normalizeSlots(roomName);
 
   if (!slots.length) {
     const emptyState = document.createElement("div");
@@ -418,22 +451,33 @@ function addOccupancySegments(grid, roomName) {
     return;
   }
 
+  let cursor = 0;
+
   slots.forEach((slot) => {
-    const [startIso, endIso] = slot;
-    const startMinutes = clamp(minutesSinceDayStart(startIso), 0, 24 * 60);
-    const endMinutes = clamp(minutesSinceDayStart(endIso), 0, 24 * 60);
-
-    if (endMinutes <= startMinutes) {
-      return;
-    }
-
-    const segment = document.createElement("div");
-    segment.className = "timeline-segment timeline-segment-occupied";
-    segment.style.left = `${(startMinutes / (24 * 60)) * 100}%`;
-    segment.style.width = `${((endMinutes - startMinutes) / (24 * 60)) * 100}%`;
-    segment.title = `${startIso.slice(11, 16)} - ${endIso.slice(11, 16)}`;
-    grid.appendChild(segment);
+    appendSegment(
+      grid,
+      cursor,
+      slot.startMinutes,
+      "timeline-segment-available",
+      `${formatHour(Math.floor(cursor / 60))} - ${slot.startIso.slice(11, 16)} available`
+    );
+    appendSegment(
+      grid,
+      slot.startMinutes,
+      slot.endMinutes,
+      "timeline-segment-occupied",
+      `${slot.startIso.slice(11, 16)} - ${slot.endIso.slice(11, 16)} occupied`
+    );
+    cursor = slot.endMinutes;
   });
+
+  appendSegment(
+    grid,
+    cursor,
+    24 * 60,
+    "timeline-segment-available",
+    `${formatHour(Math.floor(cursor / 60))} - 24:00 available`
+  );
 }
 
 function createTimelineScroll(isHeader = false) {
@@ -494,7 +538,7 @@ function openBuildingPanel(buildingCode, rooms) {
     rowLabel.innerHTML = `<strong>${roomEntry.room}</strong><span>${roomEntry.type}</span>`;
 
     const rowScroll = createTimelineScroll(false);
-    addOccupancySegments(rowScroll.firstChild, roomEntry.room);
+    addTimelineSegments(rowScroll.firstChild, roomEntry.room);
 
     row.append(rowLabel, rowScroll);
     timelineBody.appendChild(row);
