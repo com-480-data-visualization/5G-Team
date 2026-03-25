@@ -363,6 +363,14 @@ select {
   min-height: 0;
 }
 
+.building-panel.is-empty {
+  /* The empty state is just an instructional card, so it should size itself
+     from the viewport instead of reusing the much wider timeline layout. */
+  width: clamp(320px, 32vw, 520px);
+  max-width: min(calc(100% - 36px), 520px);
+  max-height: fit-content;
+}
+
 .building-panel.is-empty .timeline-shell {
   display: none;
 }
