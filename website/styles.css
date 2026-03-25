@@ -1,0 +1,437 @@
+:root {
+  /* Shared design tokens so the theme can be changed from one place. */
+  --bg: #14181f;
+  --panel: rgba(24, 29, 38, 0.92);
+  --panel-soft: rgba(32, 38, 49, 0.74);
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #edf2ff;
+  --muted: #9ba6bd;
+  --accent: #6f7cff;
+  --accent-strong: #5162ff;
+  --accent-soft: rgba(111, 124, 255, 0.22);
+  --success: #62d39f;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+}
+
+* {
+  /* Makes padding and borders stay inside declared element widths. */
+  box-sizing: border-box;
+}
+
+html,
+body {
+  /* Page-wide background and default typography. */
+  margin: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top left, rgba(111, 124, 255, 0.18), transparent 24%),
+    linear-gradient(180deg, #181d25 0%, #101318 100%);
+  color: var(--text);
+  font-family: "Manrope", sans-serif;
+}
+
+body {
+  /* Outer breathing room around the whole interface. */
+  padding: 20px;
+}
+
+button,
+input,
+select {
+  /* Ensures form controls inherit the same font as the page. */
+  font: inherit;
+}
+
+.app-shell {
+  /* Keeps the dashboard from stretching too wide on large screens. */
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.topbar {
+  /* Main toolbar layout: brand, nav, and utility action. */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 24px;
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  background: var(--panel);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow);
+}
+
+.brand-group {
+  /* Aligns the icon and title block horizontally. */
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand-mark {
+  /* Small visual identity tile. */
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent), #8fc0ff);
+  color: #0d1020;
+  font-weight: 800;
+  font-size: 1.25rem;
+}
+
+.brand-group h1,
+.search-heading h2,
+.map-overlay h3,
+.legend-card h3 {
+  /* Remove default heading spacing so alignment stays tight. */
+  margin: 0;
+}
+
+.eyebrow {
+  /* Reusable small uppercase label used above titles. */
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.topnav {
+  /* Compact nav pill background similar to app dashboards. */
+  display: flex;
+  gap: 10px;
+  padding: 6px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.topnav a,
+.ghost-button,
+.shortcut-chip,
+.search-button {
+  /* Shared interaction polish for clickable elements. */
+  border: 0;
+  border-radius: 16px;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    background 180ms ease,
+    color 180ms ease,
+    opacity 180ms ease;
+}
+
+.topnav a {
+  /* Neutral nav links become highlighted through the active state below. */
+  padding: 12px 18px;
+  color: var(--muted);
+}
+
+.topnav a.active,
+.topnav a:hover,
+.ghost-button:hover,
+.shortcut-chip:hover,
+.search-button:hover {
+  transform: translateY(-1px);
+}
+
+.topnav a.active {
+  /* Indicates the current section focus in the top nav. */
+  background: rgba(111, 124, 255, 0.18);
+  color: var(--text);
+}
+
+.ghost-button {
+  /* Secondary low-emphasis button in the header. */
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+}
+
+.content {
+  /* Vertical stack of the search panel and the map section. */
+  display: grid;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.search-panel,
+.legend-card,
+.map-overlay {
+  /* Shared glass-card treatment used throughout the UI. */
+  border: 1px solid var(--border);
+  background: var(--panel);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow);
+}
+
+.search-panel {
+  /* Outer container for all search-related controls and messaging. */
+  padding: 22px;
+  border-radius: 28px;
+}
+
+.search-heading {
+  /* Heading and explanatory text sit side by side on wide screens. */
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.search-copy,
+.legend-card p,
+.map-overlay p,
+.status-banner {
+  /* Shared muted paragraph style for helper text. */
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.search-controls {
+  /* Four-column grid: start, end, duration, submit button. */
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.search-controls label {
+  /* Keeps label text and form field vertically grouped. */
+  display: grid;
+  gap: 8px;
+}
+
+.search-controls span {
+  /* Small caption above each control. */
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.search-controls input,
+.search-controls select {
+  /* Dashboard-like field styling with dark surfaces. */
+  width: 100%;
+  padding: 16px 18px;
+  color: var(--text);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: var(--panel-soft);
+  outline: none;
+}
+
+.search-controls input:focus,
+.search-controls select:focus {
+  /* Stronger focus treatment helps keyboard navigation and accessibility. */
+  border-color: rgba(111, 124, 255, 0.7);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.search-button {
+  /* Primary call to action. */
+  align-self: end;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, var(--accent), #8d84ff);
+  color: #0d1020;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.shortcut-row {
+  /* Preset chips wrap naturally on smaller screens. */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.shortcut-chip {
+  /* Quick action buttons for predefined date ranges. */
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.status-banner {
+  /* Gives feedback after search or preset interactions. */
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(98, 211, 159, 0.09);
+  border: 1px solid rgba(98, 211, 159, 0.2);
+}
+
+.map-section {
+  /* Two-column layout: left legend card, right map. */
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 18px;
+  min-height: 680px;
+}
+
+.legend-card {
+  /* Holds the explanation and summary metrics for the mock availability view. */
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  padding: 22px;
+  border-radius: 28px;
+}
+
+.legend-scale {
+  /* Horizontal scale for interpreting the color gradient. */
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.gradient-bar {
+  /* Visual legend from low to high availability intensity. */
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #254f94 0%, #5ba7d1 45%, #8ef2c6 100%);
+}
+
+.metric-list {
+  /* Removes default list styling and makes metrics stack cleanly. */
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.metric-list li {
+  /* Each summary metric appears as its own card-like row. */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.metric-list strong {
+  /* Emphasized numeric highlight. */
+  font-size: 1.5rem;
+}
+
+.metric-list span {
+  /* Secondary description for each metric. */
+  color: var(--muted);
+  text-align: right;
+}
+
+.map-frame {
+  /* Relative positioning allows the info overlay to sit on top of the map. */
+  position: relative;
+  min-height: 680px;
+  border-radius: 30px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+#map {
+  /* The Leaflet map fills the entire frame. */
+  width: 100%;
+  height: 100%;
+  min-height: 680px;
+}
+
+.map-overlay {
+  /* Floating text card in the top-left corner of the map. */
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 500;
+  max-width: 340px;
+  padding: 18px 20px;
+  border-radius: 24px;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  /* Restyles Leaflet popups so they match the dark theme. */
+  background: #151a22;
+  color: var(--text);
+}
+
+.room-popup h4 {
+  /* Tight popup heading spacing. */
+  margin: 0 0 6px;
+}
+
+.room-popup p {
+  /* Popup description styling. */
+  margin: 0;
+  color: var(--muted);
+}
+
+@media (max-width: 1100px) {
+  /* Tablet layout: stack major sections vertically and reduce column count. */
+  .topbar,
+  .search-heading,
+  .map-section {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .topbar {
+    justify-content: stretch;
+  }
+
+  .topnav {
+    overflow-x: auto;
+  }
+
+  .search-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .map-section {
+    min-height: auto;
+  }
+
+  .legend-card {
+    order: 2;
+  }
+}
+
+@media (max-width: 720px) {
+  /* Mobile layout: simplify spacing and keep the map readable. */
+  body {
+    padding: 12px;
+  }
+
+  .topbar,
+  .search-panel,
+  .legend-card,
+  .map-overlay {
+    border-radius: 22px;
+  }
+
+  .search-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-group {
+    align-items: flex-start;
+  }
+
+  .map-frame,
+  #map {
+    min-height: 560px;
+  }
+
+  .map-overlay {
+    right: 18px;
+    max-width: none;
+  }
+}

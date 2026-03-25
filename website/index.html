@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Basic document metadata and responsive viewport settings. -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EPFL Room Finder</title>
+
+    <!-- External font used to get a more intentional dashboard look. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Leaflet provides the map UI; its CSS styles the map tiles and controls. -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+
+    <!-- Project-specific styles for layout, colors, spacing, and responsiveness. -->
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <!-- Main application shell containing the full page UI. -->
+    <div class="app-shell">
+      <!-- Top navigation bar inspired by dashboard products like Dawarich. -->
+      <header class="topbar">
+        <!-- Branding block: app mark plus project title. -->
+        <div class="brand-group">
+          <div class="brand-mark">E</div>
+          <div>
+            <p class="eyebrow">Course project</p>
+            <h1>EPFL Room Finder</h1>
+          </div>
+        </div>
+
+        <!-- Simple in-page navigation for jumping between major sections. -->
+        <nav class="topnav" aria-label="Primary">
+          <a class="active" href="#map-section">Map</a>
+          <a href="#search-panel">Search</a>
+          <a href="#legend-card">Availability</a>
+        </nav>
+
+        <!-- Placeholder action button to mimic a product-style toolbar. -->
+        <button class="ghost-button" type="button">Prototype</button>
+      </header>
+
+      <main class="content">
+        <!-- Search section: this is where the future room query will begin. -->
+        <section class="search-panel" id="search-panel">
+          <!-- Section heading explains the purpose of the form. -->
+          <div class="search-heading">
+            <div>
+              <p class="eyebrow">Meeting availability</p>
+              <h2>Find free rooms across the EPFL campus</h2>
+            </div>
+            <p class="search-copy">
+              Enter a start date, end date, and meeting duration. The current
+              prototype keeps the form UI and map flow in place while the real
+              room-availability backend is still to be connected.
+            </p>
+          </div>
+
+          <!--
+            Form inputs mirror the future backend query:
+            - beginning of the search window
+            - end of the search window
+            - desired meeting duration
+          -->
+          <form class="search-controls" id="availability-form">
+            <label>
+              <span>Beginning</span>
+              <input type="datetime-local" id="startTime" name="startTime" />
+            </label>
+            <label>
+              <span>End</span>
+              <input type="datetime-local" id="endTime" name="endTime" />
+            </label>
+            <label>
+              <span>Duration</span>
+              <select id="duration" name="duration">
+                <option value="30">30 minutes</option>
+                <option value="60" selected>1 hour</option>
+                <option value="90">1 hour 30</option>
+                <option value="120">2 hours</option>
+              </select>
+            </label>
+            <button class="search-button" type="submit">Search</button>
+          </form>
+
+          <!-- Quick presets make the demo easier to interact with. -->
+          <div class="shortcut-row">
+            <button class="shortcut-chip" type="button" data-range="today">
+              Today
+            </button>
+            <button class="shortcut-chip" type="button" data-range="tomorrow">
+              Tomorrow morning
+            </button>
+            <button class="shortcut-chip" type="button" data-range="week">
+              This week
+            </button>
+          </div>
+
+          <!-- Live status message updated by JavaScript after each interaction. -->
+          <p class="status-banner" id="statusBanner" aria-live="polite">
+            Search is currently in demo mode. It updates the summary but does
+            not fetch live room data yet.
+          </p>
+        </section>
+
+        <!-- Map area: left side explains the mock data, right side holds the map. -->
+        <section class="map-section" id="map-section">
+          <!-- Legend / summary card describing how the visual encoding works. -->
+          <aside class="legend-card" id="legend-card">
+            <div>
+              <p class="eyebrow">Campus signal</p>
+              <h3>Availability heat preview</h3>
+            </div>
+            <p>
+              Each circle represents a mocked building cluster. Brighter circles
+              indicate more rooms likely to be available for the chosen meeting
+              duration.
+            </p>
+
+            <div class="legend-scale">
+              <span>Low</span>
+              <div class="gradient-bar" aria-hidden="true"></div>
+              <span>High</span>
+            </div>
+
+            <ul class="metric-list">
+              <li>
+                <strong id="visibleRooms">18</strong>
+                <span>mock rooms shown</span>
+              </li>
+              <li>
+                <strong id="bestZone">Rolex</strong>
+                <span>best availability zone</span>
+              </li>
+            </ul>
+          </aside>
+
+          <!-- The map frame combines a floating explanation card and the actual map. -->
+          <div class="map-frame">
+            <!-- Overlay text introduces the current prototype approach. -->
+            <div class="map-overlay">
+              <p class="eyebrow">EPFL campus</p>
+              <h3>Map-first room discovery</h3>
+              <p>
+                The long-term goal is a true availability heatmap. This first
+                version uses mocked room density markers over OpenStreetMap.
+              </p>
+            </div>
+
+            <!-- Leaflet will mount the interactive map inside this div. -->
+            <div id="map" aria-label="EPFL OpenStreetMap view"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Leaflet JavaScript must load before our own script uses the global L object. -->
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+
+    <!-- App logic: map setup, mock data rendering, and form interactions. -->
+    <script src="./app.js"></script>
+  </body>
+</html>
