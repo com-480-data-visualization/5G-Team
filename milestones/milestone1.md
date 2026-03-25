@@ -1,15 +1,5 @@
-## Milestone 1 (20th March, 5pm)
-
-
-
-**10% of the final grade**
-
-This is a preliminary milestone to let you set up goals for your final project and assess the feasibility of your ideas.
-Please, fill the following sections about your project.
-
-*(max. 2000 characters per section)*
-
-### Dataset
+# Milestone 1 (20th March, 5pm)
+## Dataset
 
 We compiled a [list of rooms at EPFL](/scraper/rooms.txt) by quering the EPFL mapserver.
 
@@ -391,7 +381,7 @@ The abovegiven command yields the following result which forms the base of our d
 
 </details>
 
-### Problematic
+## Problematic
 
 We will visualize the occupancy of EPFL's rooms to provide availability information for a given time period.
 We will visualize the data on an [EPFL map](https://map.epfl.ch/). Going over rooms and clicking them would also provide the availability information. 
@@ -402,14 +392,14 @@ There has been no reliable method of providing the availabity with appealing vis
 
 The target audience would be both personnel who can reserve the rooms if available, and students who might use a room as a study place if not used by a lecturer. 
 
-### Exploratory Data Analysis
+## Exploratory Data Analysis
 
 > Pre-processing of the data set you chose
 > - Show some basic statistics and get insights about the data
 
-### Related work
+## Related work
 
-#### 1. What others have already done with the data?
+### 1. What others have already done with the data?
 Other tools and services already use EPFL room reservation and scheduling data, although they often focus more on functional access to information than on advanced visualization.
 
 * One example is [occupancy.epfl.ch](https://occupancy.epfl.ch/) platform, which allows users to check room occupancy based on course schedules. 
@@ -424,7 +414,7 @@ The interface simplifies the search process but still focuses mostly on lists of
 * Another related project is [Occupancy FLEP](https://occupancy.flep.ch/), a student-built platform that provides real-time information about available rooms across the EPFL campus. Its goal is to help students quickly find study spaces, especially during busy periods. 
 The platform aggregates scheduling information and presents it in a clear interface to reduce the time spent searching for rooms.
 
-#### 2. Why is your approach original?
+### 2. Why is your approach original?
 The originality of our approach lies in the integration of room occupancy data with an interactive spatial visualization of the EPFL campus.
 Instead of presenting availability in a textual schedule or calendar format, our project:
 
@@ -436,7 +426,7 @@ Instead of presenting availability in a textual schedule or calendar format, our
 This spatial visualization transforms room availability data into a navigable environment, helping users understand not only when rooms are free but also where they are located.
 By combining scheduling data with geographic context, the visualization improves usability and situational awareness compared to existing tools.
 
-#### 3. What sources of inspiration influenced the project?
+### 3. What sources of inspiration influenced the project?
 Several types of visualization inspired our approach.
 
 1. Interactive maps
