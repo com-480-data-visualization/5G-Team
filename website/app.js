@@ -54,6 +54,7 @@ function hashCode(text) {
   return [...text].reduce((sum, char, index) => sum + char.charCodeAt(0) * (index + 1), 0);
 }
 
+// TO DO: Fix this, intially crap data just to have something on the map before wiring up the real search logic.
 // Landing-page availability before the user applies a search window.
 // Later, search recalculates score/room counts from the occupancy data instead.
 function buildAvailability(name) {
@@ -64,19 +65,20 @@ function buildAvailability(name) {
 }
 
 // Map fill colors for the building heatmap.
+// Instead of discrete buckets, interpolate smoothly from red (low availability)
+// to green (high availability).
 function getColor(score) {
-  if (score > 0.8) return "#2f8f5b";
-  if (score > 0.6) return "#7db55a";
-  if (score > 0.4) return "#f3b458";
-  return "#dd6b6b";
+  const clamped = clamp(score, 0, 1);
+  const hue = clamped * 120;
+  return `hsl(${hue}, 62%, 42%)`;
 }
 
 // Slightly lighter outline colors so the polygon edges stay readable.
+// We keep the same hue as the fill but increase lightness and reduce saturation.
 function getBorderColor(score) {
-  if (score > 0.8) return "#81c29e";
-  if (score > 0.6) return "#b8db95";
-  if (score > 0.4) return "#ffd39a";
-  return "#f0abab";
+  const clamped = clamp(score, 0, 1);
+  const hue = clamped * 120;
+  return `hsl(${hue}, 46%, 68%)`;
 }
 
 // Parse an OpenStreetMap URL like:
