@@ -55,6 +55,7 @@ let baseBuildingFeatures = [];
 let activeSearchWindow = null;
 let knownBuildingCodes = [];
 let activeBuildingSelection = null;
+let lastThemeToggleAt = 0;
 
 // Apply the selected theme to the <body> element and keep the toggle label
 // synchronized with the actual current mode.
@@ -84,6 +85,21 @@ function toggleTheme() {
   const nextTheme = document.body.dataset.theme === "light" ? "dark" : "light";
   localStorage.setItem(themeStorageKey, nextTheme);
   applyTheme(nextTheme);
+}
+
+// Theme toggle should react reliably on both desktop clicks and touch devices.
+// Some mobile browsers can deliver touch/pointer interactions differently, so we
+// centralize the action here and ignore the follow-up synthetic click if the
+// same tap already triggered a pointer/touch handler.
+function handleThemeToggle() {
+  const now = Date.now();
+
+  if (now - lastThemeToggleAt < 350) {
+    return;
+  }
+
+  lastThemeToggleAt = now;
+  toggleTheme();
 }
 
 function mountBuildingPanelForViewport() {
@@ -699,8 +715,18 @@ closeBuildingPanel.addEventListener("click", () => {
 });
 
 themeToggle.addEventListener("click", () => {
-  toggleTheme();
+  handleThemeToggle();
 });
+
+themeToggle.addEventListener("pointerup", (event) => {
+  if (event.pointerType === "touch" || event.pointerType === "pen") {
+    handleThemeToggle();
+  }
+});
+
+themeToggle.addEventListener("touchend", () => {
+  handleThemeToggle();
+}, { passive: true });
 
 // If the user has not explicitly chosen a theme yet, follow the system theme
 // when it changes. Once a choice is saved, the stored preference wins.
