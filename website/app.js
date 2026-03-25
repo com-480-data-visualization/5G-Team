@@ -16,7 +16,7 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 let buildingLayer;
 
 // LocalStorage key for cached building geometry fetched from OSM.
-const osmCacheKey = "epfl-building-geometry-v2";
+const osmGeometryCacheKey = "epfl-building-geometry-v2";
 
 // The room timeline is drawn as a fixed 24-hour day.
 const timelineHours = Array.from({ length: 24 }, (_, hour) => hour);
@@ -97,52 +97,7 @@ function parseOSMReference(url) {
   };
 }
 
-// Build a bounding box from a list of [lat, lon] coordinates.
-// This is useful both as fallback logic and for fitting the map bounds.
-function computeBoundsFromCoordinates(coords) {
-  if (!coords.length) {
-    return null;
-  }
-
-  return coords.reduce(
-    (acc, [lat, lon]) => ({
-      minlat: Math.min(acc.minlat, lat),
-      maxlat: Math.max(acc.maxlat, lat),
-      minlon: Math.min(acc.minlon, lon),
-      maxlon: Math.max(acc.maxlon, lon),
-    }),
-    {
-      minlat: Infinity,
-      maxlat: -Infinity,
-      minlon: Infinity,
-      maxlon: -Infinity,
-    }
-  );
-}
-
-// Some data exports may already include bounds. If so, use them directly.
-function extractLocalBounds(record) {
-  if (record.bounds) return record.bounds;
-  if (record.bounding_box) return record.bounding_box;
-  if (record.bbox) {
-    const bbox = record.bbox;
-
-    if (Array.isArray(bbox) && bbox.length === 4) {
-      return {
-        minlon: Number(bbox[0]),
-        minlat: Number(bbox[1]),
-        maxlon: Number(bbox[2]),
-        maxlat: Number(bbox[3]),
-      };
-    }
-
-    return bbox;
-  }
-
-  return null;
-}
-
-// Same idea as extractLocalBounds, but for full geometry/GeoJSON.
+// Some data exports may already include full geometry/GeoJSON. If so, use it directly.
 function extractLocalGeometry(record) {
   if (record.geometry?.type && record.geometry?.coordinates) {
     return record.geometry;
@@ -155,89 +110,18 @@ function extractLocalGeometry(record) {
   return null;
 }
 
-// Read previously cached geometry/bounds from localStorage.
-function readBoundsCache() {
+// Read previously cached geometry from localStorage.
+function readGeometryCache() {
   try {
-    return JSON.parse(localStorage.getItem(osmCacheKey) || "{}");
+    return JSON.parse(localStorage.getItem(osmGeometryCacheKey) || "{}");
   } catch {
     return {};
   }
 }
 
 // Persist the geometry cache to localStorage.
-function writeBoundsCache(cache) {
-  localStorage.setItem(osmCacheKey, JSON.stringify(cache));
-}
-
-// Fallback path: derive only the bounds from the OSM full.json payload.
-// The preferred rendering path uses exact geometry, but bounds are still useful
-// if geometry extraction fails for a building.
-async function fetchBoundsFromOSM(osmUrl) {
-  const ref = parseOSMReference(osmUrl);
-  const response = await fetch(`https://www.openstreetmap.org/api/0.6/${ref.type}/${ref.id}/full.json`);
-
-  if (!response.ok) {
-    throw new Error(`OSM request failed for ${ref.type}/${ref.id}`);
-  }
-
-  const data = await response.json();
-  const targetElement = data.elements.find(
-    (element) => element.type === ref.type && String(element.id) === ref.id
-  );
-
-  if (targetElement?.bounds) {
-    return targetElement.bounds;
-  }
-
-  if (ref.type === "way" && targetElement?.nodes) {
-    const nodeMap = new Map(
-      data.elements
-        .filter((element) => element.type === "node")
-        .map((node) => [String(node.id), [node.lat, node.lon]])
-    );
-
-    const coords = targetElement.nodes
-      .map((nodeId) => nodeMap.get(String(nodeId)))
-      .filter(Boolean);
-
-    return computeBoundsFromCoordinates(coords);
-  }
-
-  if (ref.type === "relation" && targetElement?.members) {
-    const memberWayIds = new Set(
-      targetElement.members
-        .filter((member) => member.type === "way")
-        .map((member) => String(member.ref))
-    );
-
-    const nodeMap = new Map(
-      data.elements
-        .filter((element) => element.type === "node")
-        .map((node) => [String(node.id), [node.lat, node.lon]])
-    );
-
-    const coords = data.elements
-      .filter((element) => element.type === "way" && memberWayIds.has(String(element.id)))
-      .flatMap((way) => way.nodes.map((nodeId) => nodeMap.get(String(nodeId))))
-      .filter(Boolean);
-
-    return computeBoundsFromCoordinates(coords);
-  }
-
-  return null;
-}
-
-// Convert GeoJSON geometry back into a simple bounds object.
-function boundsFromGeometry(geometry) {
-  const coords = [];
-
-  if (geometry.type === "Polygon") {
-    geometry.coordinates.flat().forEach((pair) => coords.push([pair[1], pair[0]]));
-  } else if (geometry.type === "MultiPolygon") {
-    geometry.coordinates.flat(2).forEach((pair) => coords.push([pair[1], pair[0]]));
-  }
-
-  return computeBoundsFromCoordinates(coords);
+function writeGeometryCache(cache) {
+  localStorage.setItem(osmGeometryCacheKey, JSON.stringify(cache));
 }
 
 // Fetch the exact OSM geometry and convert it to GeoJSON using osmtogeojson.
@@ -288,42 +172,16 @@ async function resolveBuildingGeometry(record, cache) {
   if (geometry) {
     cache[record.id] = {
       geometry,
-      bounds: boundsFromGeometry(geometry),
     };
   }
 
   return geometry;
 }
 
-// Resolve one building's bounds from local data, cache, geometry, or OSM fallback.
-async function resolveBuildingBounds(record, cache) {
-  const localBounds = extractLocalBounds(record);
-
-  if (localBounds) {
-    return localBounds;
-  }
-
-  if (cache[record.id]?.bounds) {
-    return cache[record.id].bounds;
-  }
-
-  const geometry = await resolveBuildingGeometry(record, cache);
-  const bounds = geometry ? boundsFromGeometry(geometry) : await fetchBoundsFromOSM(record.id);
-
-  if (bounds) {
-    cache[record.id] = {
-      ...cache[record.id],
-      bounds,
-    };
-  }
-
-  return bounds;
-}
-
 // Turn the raw building records into GeoJSON features that Leaflet can render.
 // This is where OSM ids become actual clickable building polygons.
 async function buildFeaturesFromRecords(records) {
-  const cache = readBoundsCache();
+  const cache = readGeometryCache();
   const features = [];
 
   // Sort by descending length so specific codes like BCH are checked before BC.
@@ -334,13 +192,12 @@ async function buildFeaturesFromRecords(records) {
     .sort((left, right) => right.length - left.length);
 
   for (const record of records) {
-    // Prefer exact geometry, but fall back to bounds if geometry is unavailable.
+    // The map now requires exact geometry only.
+    // We intentionally skip old rectangle fallback behavior so every building
+    // footprint matches the real OSM shape.
     const geometry = await resolveBuildingGeometry(record, cache);
-    const bounds = geometry
-      ? boundsFromGeometry(geometry)
-      : await resolveBuildingBounds(record, cache);
 
-    if (!geometry && !bounds) {
+    if (!geometry) {
       continue;
     }
 
@@ -358,24 +215,12 @@ async function buildFeaturesFromRecords(records) {
         id: record.id,
         rooms,
         score,
-        bounds,
       },
-      geometry: geometry || {
-        type: "Polygon",
-        coordinates: [
-          [
-            [bounds.minlon, bounds.minlat],
-            [bounds.maxlon, bounds.minlat],
-            [bounds.maxlon, bounds.maxlat],
-            [bounds.minlon, bounds.maxlat],
-            [bounds.minlon, bounds.minlat],
-          ],
-        ],
-      },
+      geometry,
     });
   }
 
-  writeBoundsCache(cache);
+  writeGeometryCache(cache);
   return features;
 }
 
