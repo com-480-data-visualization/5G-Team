@@ -12856,25 +12856,6 @@
     }
   },
   {
-    "id": "https://www.openstreetmap.org/relation/12671742",
-    "tags": {
-      "addr:city": "Lausanne",
-      "addr:country": "CH",
-      "addr:postcode": "1015",
-      "architect": "Architram",
-      "building": "university",
-      "building:levels": "3",
-      "image": "File:EPFL-BI1001966.JPG",
-      "name": "BI",
-      "nohousenumber": "yes",
-      "roof:levels": "0",
-      "roof:shape": "flat",
-      "type": "multipolygon",
-      "wikidata": "Q124086159",
-      "wikimedia_commons": "Category:EPFL BI"
-    }
-  },
-  {
     "id": "https://www.openstreetmap.org/relation/13616484",
     "tags": {
       "building": "yes",

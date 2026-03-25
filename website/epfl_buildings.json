@@ -60,6 +60,12 @@
     }
   },
   {
+    "id": "https://www.openstreetmap.org/relation/12671742",
+    "properties": {
+      "name": "BI"
+    }
+  },
+  {
     "id": "https://www.openstreetmap.org/relation/409397",
     "properties": {
       "name": "CE"
