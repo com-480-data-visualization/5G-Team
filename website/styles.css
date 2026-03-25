@@ -678,7 +678,7 @@ select {
 
   .map-frame,
   #map {
-    min-height: 560px;
+    min-height: 336px;
   }
 
   .building-panel.panel-detached {

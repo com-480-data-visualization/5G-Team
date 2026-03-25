@@ -826,7 +826,14 @@ function renderBuildings(features) {
   document.getElementById("bestZone").textContent = bestBuilding.properties.name;
   document.getElementById("visibleRooms").title = `${totalRooms} rooms represented across all loaded buildings`;
 
+  // Leaflet computes the bounds from the real rendered geometry.
+  // On mobile we intentionally zoom one extra level in after fitting so the
+  // campus is easier to inspect on a smaller screen.
   map.fitBounds(buildingLayer.getBounds(), { padding: [24, 24] });
+
+  if (mobilePanelMedia.matches) {
+    map.setZoom(map.getZoom() + 1);
+  }
 }
 
 // Fetch the building source file that maps EPFL codes to OSM ids.
