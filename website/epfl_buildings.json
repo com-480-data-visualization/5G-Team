@@ -24,9 +24,21 @@
     }
   },
   {
+    "id": "https://www.openstreetmap.org/way/37073490",
+    "properties": {
+      "name": "BAC"
+    }
+  },
+  {
     "id": "https://www.openstreetmap.org/way/30088194",
     "properties": {
       "name": "BC"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35482041",
+    "properties": {
+      "name": "BCH"
     }
   },
   {
@@ -102,9 +114,15 @@
     }
   },
   {
-    "id": "https://www.openstreetmap.org/way/30333703",
+    "id": "https://www.openstreetmap.org/way/80418195",
     "properties": {
       "name": "CO"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/1492610340",
+    "properties": {
+      "name": "DIA"
     }
   },
   {
@@ -246,7 +264,7 @@
     }
   },
   {
-    "id": "https://www.openstreetmap.org/relation/153242",
+    "id": "https://www.openstreetmap.org/way/35535424",
     "properties": {
       "name": "LE"
     }
@@ -426,6 +444,12 @@
     }
   },
   {
+    "id": "https://www.openstreetmap.org/way/35543930",
+    "properties": {
+      "name": "PSEL"
+    }
+  },
+  {
     "id": "https://www.openstreetmap.org/way/45542227",
     "properties": {
       "name": "QIE"
@@ -495,6 +519,12 @@
     "id": "https://www.openstreetmap.org/way/30404111",
     "properties": {
       "name": "TCV"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/331569",
+    "properties": {
+      "name": "RLC"
     }
   }
 ]

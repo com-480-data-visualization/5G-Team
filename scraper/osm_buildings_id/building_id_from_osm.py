@@ -25,6 +25,29 @@ OUTPUT_DIR = "output"
 OUTPUT_JSON = os.path.join(OUTPUT_DIR, "epfl_buildings.json")
 MISSING_JSON = os.path.join(OUTPUT_DIR, "missing_buildings.json")
 DEBUG_JSON = os.path.join(OUTPUT_DIR, "debug_unmatched.json")
+# For Rolex Learning Center (RLC) we could not find a reliable automatic way to match it, So we inject it manually using the known OSM relation id. This also serves as a sanity check that the manual entry is consistent with the expected OSM URL format.
+MANUAL_BUILDINGS = [
+    {
+        "id": "https://www.openstreetmap.org/relation/331569",
+        "properties": {
+            "name": "RLC"
+        }
+    }
+]
+
+
+def is_manual_rlc_variant(code: str) -> bool:
+    """
+    Treat Rolex sub-block labels as covered by the manual RLC entry.
+
+    Examples:
+    - RLC
+    - RLC A
+    - RLC B
+    - RLC G
+    """
+    normalized = normalize(code)
+    return normalized == "RLC" or normalized.startswith("RLC_")
 
 
 def log_section(title: str) -> None:
@@ -229,17 +252,28 @@ def main() -> None:
     # These codes come from your EPFL-side data source, not from OSM.
     building_codes = load_building_codes()
     wanted_codes: Set[str] = {normalize(code) for code in building_codes}
+
+    # We want to inject RLC manually as one building relation, so remove it from
+    # the automatic matching stage. This also prevents partial RLC sub-labels
+    # such as "RLC A", "RLC B", etc. from competing with the manual entry.
+    wanted_codes = {code for code in wanted_codes if not is_manual_rlc_variant(code)}
+
     log_section("INPUT BUILDING CODES")
     print(f"Loaded {len(building_codes)} requested building codes")
     print("First 20 building codes:")
     print(building_codes[:20])
 
-    # Broad query over EPFL campus area.
-    # We query all building-tagged ways/relations, then filter locally using your code list.
+    # Broad query over the Ecublens administrative area.
+    # This is intentionally wider than the EPFL area so buildings near or outside
+    # the EPFL-tagged area are less likely to be missed.
+    #
+    # We still filter locally using the known EPFL building-code list, so the
+    # wider area should not change the final output format, only the candidate set.
+    # One could also run it only for area["name"="École Polytechnique Fédérale de Lausanne"]->.epfl; but we wanted to make sure we are complete.
     query = r"""
 [out:json][timeout:120];
 
-area["name"="École Polytechnique Fédérale de Lausanne"]->.epfl;
+area["name"="Ecublens"]["boundary"="administrative"]->.epfl;
 
 (
   way(area.epfl)["building"];
@@ -314,11 +348,20 @@ out ids tags center;
     # Preserve the original order from buildings_main_campus.json in the output.
     for original_code in building_codes:
         norm_code = normalize(original_code)
+
+        # RLC and its lettered variants are handled manually below using the
+        # provided global RLC relation, so they should not appear as missing.
+        if is_manual_rlc_variant(norm_code):
+            continue
+
         item = matched.get(norm_code)
         if item is not None:
             result.append(item)
         else:
             missing.append(original_code)
+
+    # Append manual buildings at the very end of the output, as requested.
+    result.extend(MANUAL_BUILDINGS)
 
     write_json(OUTPUT_JSON, result)
     write_json(MISSING_JSON, missing)
