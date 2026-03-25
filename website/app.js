@@ -827,12 +827,12 @@ function renderBuildings(features) {
   document.getElementById("visibleRooms").title = `${totalRooms} rooms represented across all loaded buildings`;
 
   // Leaflet computes the bounds from the real rendered geometry.
-  // On mobile we intentionally zoom one extra level in after fitting so the
+  // On mobile we intentionally zoom in more aggressively after fitting so the
   // campus is easier to inspect on a smaller screen.
   map.fitBounds(buildingLayer.getBounds(), { padding: [24, 24] });
 
   if (mobilePanelMedia.matches) {
-    map.setZoom(map.getZoom() + 1);
+    map.setZoom(map.getZoom() + 2);
   }
 }
 
