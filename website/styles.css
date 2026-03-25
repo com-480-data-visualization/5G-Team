@@ -159,7 +159,8 @@ select {
 
 .search-panel,
 .legend-card,
-.map-overlay {
+.map-overlay,
+.building-panel {
   /* Shared glass-card treatment used throughout the UI. */
   border: 1px solid var(--border);
   background: var(--panel);
@@ -356,6 +357,159 @@ select {
   border-radius: 24px;
 }
 
+.building-panel {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 500;
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  align-content: stretch;
+  gap: 16px;
+  width: min(460px, calc(100% - 36px));
+  max-height: calc(100% - 36px);
+  padding: 18px 20px;
+  border-radius: 24px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.building-panel.is-empty .timeline-shell {
+  display: none;
+}
+
+.building-panel-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.panel-close {
+  border: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.building-panel-copy {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.building-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.building-meta span {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.timeline-shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.timeline-header,
+.timeline-row {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.timeline-header {
+  color: var(--muted);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.timeline-body {
+  display: grid;
+  gap: 12px;
+  overflow: auto;
+  min-height: 0;
+  padding-right: 6px;
+}
+
+.timeline-room-label {
+  display: grid;
+  gap: 4px;
+}
+
+.timeline-room-label strong {
+  font-size: 0.96rem;
+}
+
+.timeline-room-label span {
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.timeline-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 6px;
+  width: 100%;
+}
+
+.timeline-grid {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 132px;
+  width: max-content;
+  min-width: max-content;
+  min-height: 74px;
+  border-radius: 18px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px) 0 0 / 132px 100%,
+    rgba(255, 255, 255, 0.03);
+  overflow: hidden;
+}
+
+.timeline-grid.timeline-hours {
+  min-height: 32px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px) 0 0 / 132px 100%;
+}
+
+.timeline-hour {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 10px;
+  min-width: 132px;
+}
+
+.timeline-slot {
+  min-width: 132px;
+}
+
+.timeline-empty-state {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
   /* Restyles Leaflet popups so they match the dark theme. */
@@ -402,6 +556,13 @@ select {
   .legend-card {
     order: 2;
   }
+
+  .building-panel {
+    position: static;
+    width: 100%;
+    max-height: none;
+    margin: 18px;
+  }
 }
 
 @media (max-width: 720px) {
@@ -413,7 +574,8 @@ select {
   .topbar,
   .search-panel,
   .legend-card,
-  .map-overlay {
+  .map-overlay,
+  .building-panel {
     border-radius: 22px;
   }
 
@@ -433,5 +595,10 @@ select {
   .map-overlay {
     right: 18px;
     max-width: none;
+  }
+
+  .timeline-header,
+  .timeline-row {
+    grid-template-columns: 1fr;
   }
 }

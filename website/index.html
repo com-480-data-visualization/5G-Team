@@ -158,6 +158,31 @@
               </p>
             </div>
 
+            <aside class="building-panel is-empty" id="buildingPanel" aria-live="polite">
+              <div class="building-panel-header">
+                <div>
+                  <p class="eyebrow">Building timeline</p>
+                  <h3 id="buildingPanelTitle">Select a building</h3>
+                </div>
+                <button class="panel-close" id="closeBuildingPanel" type="button" aria-label="Close panel">
+                  ×
+                </button>
+              </div>
+
+              <p class="building-panel-copy" id="buildingPanelCopy">
+                Click a building on the map to inspect its rooms. For now, the panel shows the first matching room and an empty one-day timeline.
+              </p>
+
+              <div class="building-meta" id="buildingMeta">
+                <span>No building selected yet</span>
+              </div>
+
+              <div class="timeline-shell" id="timelineShell">
+                <div class="timeline-header" id="timelineHeader"></div>
+                <div class="timeline-body" id="timelineBody"></div>
+              </div>
+            </aside>
+
             <!-- Leaflet will mount the interactive map inside this div. -->
             <div id="map" aria-label="EPFL OpenStreetMap view"></div>
           </div>
