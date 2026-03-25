@@ -119,12 +119,12 @@
           <aside class="legend-card" id="legend-card">
             <div>
               <p class="eyebrow">Campus signal</p>
-              <h3>Availability heat preview</h3>
+              <h3>Building availability preview</h3>
             </div>
             <p>
-              Each circle represents a mocked building cluster. Brighter circles
+              Each polygon represents one EPFL building code. Brighter fills
               indicate more rooms likely to be available for the chosen meeting
-              duration.
+              duration, while clicks can later open a building-specific view.
             </p>
 
             <div class="legend-scale">
@@ -135,12 +135,12 @@
 
             <ul class="metric-list">
               <li>
-                <strong id="visibleRooms">18</strong>
-                <span>mock rooms shown</span>
+                <strong id="visibleRooms">130</strong>
+                <span>synthetic buildings shown</span>
               </li>
               <li>
                 <strong id="bestZone">Rolex</strong>
-                <span>best availability zone</span>
+                <span>best availability code</span>
               </li>
             </ul>
           </aside>
@@ -153,7 +153,7 @@
               <h3>Map-first room discovery</h3>
               <p>
                 The long-term goal is a true availability heatmap. This first
-                version uses mocked room density markers over OpenStreetMap.
+                version uses clickable building boxes over OpenStreetMap.
               </p>
             </div>
 
