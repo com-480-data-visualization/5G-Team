@@ -22,6 +22,7 @@ const timelineBody = document.getElementById("timelineBody");
 const closeBuildingPanel = document.getElementById("closeBuildingPanel");
 
 let roomsDataset = [];
+let occupancyByRoom = new Map();
 
 function setStatus(message) {
   document.getElementById("statusBanner").textContent = message;
@@ -389,6 +390,52 @@ function createTimelineGrid(isHeader = false) {
   return grid;
 }
 
+function getDayStart() {
+  return new Date("2026-03-24T00:00:00");
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function minutesSinceDayStart(isoString) {
+  const date = new Date(isoString);
+  return Math.round((date.getTime() - getDayStart().getTime()) / 60000);
+}
+
+function getRoomSlots(roomName) {
+  return occupancyByRoom.get(roomName) || [];
+}
+
+function addOccupancySegments(grid, roomName) {
+  const slots = getRoomSlots(roomName);
+
+  if (!slots.length) {
+    const emptyState = document.createElement("div");
+    emptyState.className = "timeline-empty-state";
+    emptyState.textContent = "No occupancy data yet";
+    grid.appendChild(emptyState);
+    return;
+  }
+
+  slots.forEach((slot) => {
+    const [startIso, endIso] = slot;
+    const startMinutes = clamp(minutesSinceDayStart(startIso), 0, 24 * 60);
+    const endMinutes = clamp(minutesSinceDayStart(endIso), 0, 24 * 60);
+
+    if (endMinutes <= startMinutes) {
+      return;
+    }
+
+    const segment = document.createElement("div");
+    segment.className = "timeline-segment timeline-segment-occupied";
+    segment.style.left = `${(startMinutes / (24 * 60)) * 100}%`;
+    segment.style.width = `${((endMinutes - startMinutes) / (24 * 60)) * 100}%`;
+    segment.title = `${startIso.slice(11, 16)} - ${endIso.slice(11, 16)}`;
+    grid.appendChild(segment);
+  });
+}
+
 function createTimelineScroll(isHeader = false) {
   const scroll = document.createElement("div");
   scroll.className = "timeline-scroll";
@@ -447,10 +494,7 @@ function openBuildingPanel(buildingCode, rooms) {
     rowLabel.innerHTML = `<strong>${roomEntry.room}</strong><span>${roomEntry.type}</span>`;
 
     const rowScroll = createTimelineScroll(false);
-    const emptyState = document.createElement("div");
-    emptyState.className = "timeline-empty-state";
-    emptyState.textContent = "No occupancy data yet";
-    rowScroll.firstChild.appendChild(emptyState);
+    addOccupancySegments(rowScroll.firstChild, roomEntry.room);
 
     row.append(rowLabel, rowScroll);
     timelineBody.appendChild(row);
@@ -556,6 +600,35 @@ async function loadRoomsDataset() {
   return response.json();
 }
 
+async function loadRoomOccupancyDataset() {
+  const response = await fetch("./room_occupancy.json");
+
+  if (!response.ok) {
+    throw new Error("Could not load room_occupancy.json");
+  }
+
+  return response.json();
+}
+
+function indexOccupancyByRoom(entries) {
+  const indexed = new Map();
+
+  entries.forEach((entry) => {
+    const roomName = entry?.name?.[0];
+
+    if (!roomName) {
+      return;
+    }
+
+    const slots = Array.isArray(entry.slots)
+      ? entry.slots.filter((slot) => Array.isArray(slot) && slot.length === 2)
+      : [];
+    indexed.set(roomName, slots);
+  });
+
+  return indexed;
+}
+
 function toLocalInputValue(date) {
   const adjusted = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
   return adjusted.toISOString().slice(0, 16);
@@ -621,8 +694,13 @@ async function initializeApp() {
     resetBuildingPanel();
     setStatus("Loading EPFL buildings and room list...");
 
-    const [records, rooms] = await Promise.all([loadBuildingRecords(), loadRoomsDataset()]);
+    const [records, rooms, occupancy] = await Promise.all([
+      loadBuildingRecords(),
+      loadRoomsDataset(),
+      loadRoomOccupancyDataset(),
+    ]);
     roomsDataset = rooms;
+    occupancyByRoom = indexOccupancyByRoom(occupancy);
 
     const features = await buildFeaturesFromRecords(records);
 
@@ -632,12 +710,12 @@ async function initializeApp() {
 
     renderBuildings(features);
     setStatus(
-      `Loaded ${features.length} buildings and ${roomsDataset.length} rooms. Click a building to open its room timeline panel.`
+      `Loaded ${features.length} buildings, ${roomsDataset.length} rooms, and synthesized occupancy data. Click a building to open its room timeline panel.`
     );
   } catch (error) {
     console.error(error);
     setStatus(
-      "Failed to load building or room data. Make sure you run the site through a local server and that epfl_buildings.json and rooms.json are present."
+      "Failed to load building, room, or occupancy data. Make sure you run the site through a local server and that epfl_buildings.json, rooms.json, and room_occupancy.json are present."
     );
   }
 }

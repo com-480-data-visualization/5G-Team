@@ -7,7 +7,7 @@ from typing import Dict, List, Tuple
 
 BASE_DIR = Path(__file__).resolve().parent
 REPO_ROOT = BASE_DIR.parent
-ROOMS_JSON = REPO_ROOT / "scraper" / "rooms" / "rooms.json"
+ROOMS_JSON = REPO_ROOT / "scraper" / "rooms_all" / "rooms.json"
 OUTPUT_JSON = BASE_DIR / "room_occupancy.json"
 
 SYNTHETIC_DATE = "2026-03-24"
@@ -46,14 +46,14 @@ def overlaps(candidate: Tuple[datetime, datetime], existing: List[Tuple[datetime
     return False
 
 
-def build_room_occupancy(room_name: str) -> List[Dict[str, object]]:
+def build_room_occupancy(room_name: str) -> Dict[str, object]:
     """
     Create one occupancy object per room.
 
     Output format:
     - one JSON object per room
-    - `slots` contains several unavailable slot objects
-    - each slot object has one `Start` and one `End`
+    - `slots` contains several unavailable slot arrays
+    - each slot is `[start_iso, end_iso]`
     - intervals for the same room do not overlap
     """
     interval_count = random.randint(1, 5)
@@ -71,10 +71,7 @@ def build_room_occupancy(room_name: str) -> List[Dict[str, object]]:
     return {
         "name": [room_name],
         "slots": [
-            {
-                "Start": start.isoformat(),
-                "End": end.isoformat(),
-            }
+            [start.isoformat(), end.isoformat()]
             for start, end in intervals
         ],
     }
