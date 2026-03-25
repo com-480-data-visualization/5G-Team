@@ -29,6 +29,15 @@ const buildingMeta = document.getElementById("buildingMeta");
 const timelineHeader = document.getElementById("timelineHeader");
 const timelineBody = document.getElementById("timelineBody");
 const closeBuildingPanel = document.getElementById("closeBuildingPanel");
+const mapSection = document.getElementById("map-section");
+const mapFrame = document.querySelector(".map-frame");
+const mobilePanelMedia = window.matchMedia("(max-width: 720px)");
+const buildingPanelDesktopAnchor = document.createComment("building-panel-desktop-anchor");
+
+// The building panel lives inside the map on desktop, but on mobile we move it
+// below the map so it behaves like a normal content card instead of competing
+// with the map viewport.
+mapFrame.insertBefore(buildingPanelDesktopAnchor, buildingPanel);
 
 // Frontend state:
 // - roomsDataset: canonical room list used for building membership
@@ -43,6 +52,21 @@ let baseBuildingFeatures = [];
 let activeSearchWindow = null;
 let knownBuildingCodes = [];
 let activeBuildingSelection = null;
+
+function mountBuildingPanelForViewport() {
+  if (mobilePanelMedia.matches) {
+    if (buildingPanel.parentElement !== mapSection) {
+      mapSection.appendChild(buildingPanel);
+      buildingPanel.classList.add("panel-detached");
+    }
+    return;
+  }
+
+  if (buildingPanel.parentElement !== mapFrame) {
+    mapFrame.insertBefore(buildingPanel, buildingPanelDesktopAnchor.nextSibling);
+    buildingPanel.classList.remove("panel-detached");
+  }
+}
 
 // Single helper for the status line under the search form.
 function setStatus(message) {
@@ -624,6 +648,10 @@ closeBuildingPanel.addEventListener("click", () => {
   resetBuildingPanel();
 });
 
+mobilePanelMedia.addEventListener("change", () => {
+  mountBuildingPanelForViewport();
+});
+
 // If the user changes the search while a building panel is open, rebuild the
 // panel immediately so the room timelines reflect the new searched period.
 function refreshOpenBuildingPanel() {
@@ -850,6 +878,7 @@ document.querySelectorAll(".shortcut-chip").forEach((button) => {
 // 4. render the initial searched heatmap
 async function initializeApp() {
   try {
+    mountBuildingPanelForViewport();
     seedDefaultTimes();
     resetBuildingPanel();
     setStatus("Loading EPFL buildings, rooms, and room occupancy data...");
