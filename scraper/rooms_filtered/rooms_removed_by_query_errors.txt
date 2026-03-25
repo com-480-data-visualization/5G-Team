@@ -1,720 +1,720 @@
-BIO_A 6 202: CONFERENCES	# query_failed: room_not_in_ewa_system
-PH D1 401: SALLE TP	# query_failed: room_not_in_ewa_system
-CSS 1 247: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-PH L1 502: CONFERENCES	# query_failed: room_not_in_ewa_system
-CP1 272: SALLE TP	# query_failed: room_not_in_ewa_system
-INN 326: CONFERENCES	# query_failed: room_not_in_ewa_system
-AAD 1 31: SALLE TP	# query_failed: room_not_in_ewa_system
-STCC 0 7632: AUDITOIRE	# query_failed: room_not_in_ewa_system
-CE 1 254: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-CM 0 12: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-AAC 1 08: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-AU -1 7022: CONFERENCES	# query_failed: room_not_in_ewa_system
-RLC A1 240: CONFERENCES	# query_failed: room_not_in_ewa_system
 PH L1 501: CONFERENCES	# query_failed: room_not_in_ewa_system
+BIO_A 6 202: CONFERENCES	# query_failed: room_not_in_ewa_system
+PH L1 502: CONFERENCES	# query_failed: room_not_in_ewa_system
+INN 326: CONFERENCES	# query_failed: room_not_in_ewa_system
+CP1 272: SALLE TP	# query_failed: room_not_in_ewa_system
+CM 0 12: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+PH D1 401: SALLE TP	# query_failed: room_not_in_ewa_system
+CE 1 254: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+CO 120: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+STCC 0 7632: AUDITOIRE	# query_failed: room_not_in_ewa_system
+CE 2 434: CONFERENCES	# query_failed: room_not_in_ewa_system
+MA C0 584: CONFERENCES	# query_failed: room_not_in_ewa_system
+AU -1 7022: CONFERENCES	# query_failed: room_not_in_ewa_system
+AAD 1 31: SALLE TP	# query_failed: room_not_in_ewa_system
+QIO -1 003: LOCAUX SECOND	# query_failed: room_not_in_ewa_system
+ELA 100: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+AAC 1 08: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+RLC A1 240: CONFERENCES	# query_failed: room_not_in_ewa_system
+CSS 1 247: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 SKIL 1 01: SALLE TP	# query_failed: room_not_in_ewa_system
 H8 1 187.175: CONFERENCES	# query_failed: room_not_in_ewa_system
-ELA 100: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-QIO -1 003: LOCAUX SECOND	# query_failed: room_not_in_ewa_system
-BS 138: CONFERENCES	# query_failed: room_not_in_ewa_system
-CO 120: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 ELA 2: AUDITOIRE	# query_failed: room_not_in_ewa_system
-BP 4344: CONFERENCES	# query_failed: room_not_in_ewa_system
-LE 0 12: CONFERENCES	# query_failed: room_not_in_ewa_system
-RLC D1 481: CONFERENCES	# query_failed: room_not_in_ewa_system
-STCC 0 7532: AUDITOIRE	# query_failed: room_not_in_ewa_system
-MED -1 1521: SALLE TP	# query_failed: room_not_in_ewa_system
-B1 2 257.050: CONFERENCES	# query_failed: room_not_in_ewa_system
-CH H1 625: CONFERENCES	# query_failed: room_not_in_ewa_system
-SV 2615: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 1 255: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-QIF 1 111.7: CONFERENCES	# query_failed: room_not_in_ewa_system
-MA C0 584: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 2 434: CONFERENCES	# query_failed: room_not_in_ewa_system
-MA B1 484: CONFERENCES	# query_failed: room_not_in_ewa_system
-CO 122: TUTORAT	# query_failed: room_not_in_ewa_system
-MED 2 2524: SALLE TP	# query_failed: room_not_in_ewa_system
-CM 1 3: AUDITOIRE	# query_failed: room_not_in_ewa_system
-H8 1 145.175: CONFERENCES	# query_failed: room_not_in_ewa_system
-GC B3 31: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-QIJ 1 118.1: CONFERENCES	# query_failed: room_not_in_ewa_system
-BP 0223: SALLE TP	# query_failed: room_not_in_ewa_system
 BI A0 397: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-CE 1 102.1: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-CP1 280: SALLE TP	# query_failed: room_not_in_ewa_system
-ODY -1 0019.1: CONFERENCES	# query_failed: room_not_in_ewa_system
-G6 2 133.126: CONFERENCES	# query_failed: room_not_in_ewa_system
-MED 2 1120: SALLE TP	# query_failed: room_not_in_ewa_system
-CM 0 10: TUTORAT	# query_failed: room_not_in_ewa_system
-B1 3 257.050: CONFERENCES	# query_failed: room_not_in_ewa_system
+RLC D1 481: CONFERENCES	# query_failed: room_not_in_ewa_system
+BS 138: CONFERENCES	# query_failed: room_not_in_ewa_system
+QIF 1 111.7: CONFERENCES	# query_failed: room_not_in_ewa_system
+MA B1 484: CONFERENCES	# query_failed: room_not_in_ewa_system
+CE 1 255: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+BP 4344: CONFERENCES	# query_failed: room_not_in_ewa_system
+CM 1 3: AUDITOIRE	# query_failed: room_not_in_ewa_system
+QIJ 1 118.1: CONFERENCES	# query_failed: room_not_in_ewa_system
+LE 0 12: CONFERENCES	# query_failed: room_not_in_ewa_system
+STCC 0 7532: AUDITOIRE	# query_failed: room_not_in_ewa_system
+B1 2 257.050: CONFERENCES	# query_failed: room_not_in_ewa_system
+MED 2 2524: SALLE TP	# query_failed: room_not_in_ewa_system
+GC B3 31: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 CO 015: TUTORAT	# query_failed: room_not_in_ewa_system
-QIG -1 109.2: LOCAUX SECOND	# query_failed: room_not_in_ewa_system
+G6 2 133.126: CONFERENCES	# query_failed: room_not_in_ewa_system
+CH H1 625: CONFERENCES	# query_failed: room_not_in_ewa_system
 CP1 490: SALLE TP	# query_failed: room_not_in_ewa_system
+H8 1 145.175: CONFERENCES	# query_failed: room_not_in_ewa_system
+MED -1 1521: SALLE TP	# query_failed: room_not_in_ewa_system
+CO 122: TUTORAT	# query_failed: room_not_in_ewa_system
 ELD 020: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-PH C1 391: SALLE TP	# query_failed: room_not_in_ewa_system
+BP 0223: SALLE TP	# query_failed: room_not_in_ewa_system
+SV 2615: CONFERENCES	# query_failed: room_not_in_ewa_system
+CE 1 102.1: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 MED -1 1522: SALLE TP	# query_failed: room_not_in_ewa_system
-H4 3 133.084: CONFERENCES	# query_failed: room_not_in_ewa_system
+CP1 280: SALLE TP	# query_failed: room_not_in_ewa_system
 BC 05: SALLE TP	# query_failed: room_not_in_ewa_system
+B1 3 257.050: CONFERENCES	# query_failed: room_not_in_ewa_system
+QIG -1 109.2: LOCAUX SECOND	# query_failed: room_not_in_ewa_system
+ODY -1 0019.1: CONFERENCES	# query_failed: room_not_in_ewa_system
+MED 2 1120: SALLE TP	# query_failed: room_not_in_ewa_system
 BS 117.6: CONFERENCES	# query_failed: room_not_in_ewa_system
-ODY -1 0021: TUTORAT	# query_failed: room_not_in_ewa_system
-MED 3 1521: SALLE TP	# query_failed: room_not_in_ewa_system
-BCH 3113: CONFERENCES	# query_failed: room_not_in_ewa_system
-MED 2 2419: SALLE TP	# query_failed: room_not_in_ewa_system
-EXTRA 215: CONFERENCES	# query_failed: room_not_in_ewa_system
-STCC 2 8018: STUDIOS	# query_failed: room_not_in_ewa_system
-BS 117.2: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 3 311: CONFERENCES	# query_failed: room_not_in_ewa_system
-MA B1 506: CONFERENCES	# query_failed: room_not_in_ewa_system
-SV 1837: CONFERENCES	# query_failed: room_not_in_ewa_system
-CP1 354: SALLE TP	# query_failed: room_not_in_ewa_system
-BSP 412: CONFERENCES	# query_failed: room_not_in_ewa_system
-BC 09: CONFERENCES	# query_failed: room_not_in_ewa_system
-ME B1 10: CONFERENCES	# query_failed: room_not_in_ewa_system
 PH B1 398: SALLE TP	# query_failed: room_not_in_ewa_system
-INF 017: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 1 435: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-DLLEL 1 50: CONFERENCES	# query_failed: room_not_in_ewa_system
+CE 3 311: CONFERENCES	# query_failed: room_not_in_ewa_system
+BSP 412: CONFERENCES	# query_failed: room_not_in_ewa_system
+BCH 3113: CONFERENCES	# query_failed: room_not_in_ewa_system
+H4 3 133.084: CONFERENCES	# query_failed: room_not_in_ewa_system
+CM 0 10: TUTORAT	# query_failed: room_not_in_ewa_system
+PH C1 391: SALLE TP	# query_failed: room_not_in_ewa_system
+MA B1 506: CONFERENCES	# query_failed: room_not_in_ewa_system
+ODY -1 0021: TUTORAT	# query_failed: room_not_in_ewa_system
+MED 2 2419: SALLE TP	# query_failed: room_not_in_ewa_system
+STCC 2 8018: STUDIOS	# query_failed: room_not_in_ewa_system
+CP1 354: SALLE TP	# query_failed: room_not_in_ewa_system
+BC 09: CONFERENCES	# query_failed: room_not_in_ewa_system
 BC 411: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-BI A2 537: CONFERENCES	# query_failed: room_not_in_ewa_system
-CL 2 2627: LOCAUX SECOND	# query_failed: room_not_in_ewa_system
-QIE 0 108.1: CONFERENCES	# query_failed: room_not_in_ewa_system
-CP1 476: SALLE TP	# query_failed: room_not_in_ewa_system
-MA B0 426: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-SG 2112: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-GA 0 10: CONFERENCES	# query_failed: room_not_in_ewa_system
-STCC 7 8025: AUDITOIRE	# query_failed: room_not_in_ewa_system
-CE 0 347: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+INF 017: CONFERENCES	# query_failed: room_not_in_ewa_system
+EXTRA 215: CONFERENCES	# query_failed: room_not_in_ewa_system
+CE 1 435: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
 CM 1 100: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+BI A2 537: CONFERENCES	# query_failed: room_not_in_ewa_system
+DLLEL 1 50: CONFERENCES	# query_failed: room_not_in_ewa_system
+MED 3 1521: SALLE TP	# query_failed: room_not_in_ewa_system
+CP1 476: SALLE TP	# query_failed: room_not_in_ewa_system
+CL 2 2627: LOCAUX SECOND	# query_failed: room_not_in_ewa_system
+BS 117.2: CONFERENCES	# query_failed: room_not_in_ewa_system
+SV 1837: CONFERENCES	# query_failed: room_not_in_ewa_system
+QIE 0 108.1: CONFERENCES	# query_failed: room_not_in_ewa_system
+ME B1 10: CONFERENCES	# query_failed: room_not_in_ewa_system
+BS 225: CONFERENCES	# query_failed: room_not_in_ewa_system
+CP1 366: SALLE TP	# query_failed: room_not_in_ewa_system
+STCC 7 8025: AUDITOIRE	# query_failed: room_not_in_ewa_system
+AAB 1 47: CONFERENCES	# query_failed: room_not_in_ewa_system
+CH B0 427: SALLE TP	# query_failed: room_not_in_ewa_system
+BSP 709: CONFERENCES	# query_failed: room_not_in_ewa_system
+CE 1 630: CONFERENCES	# query_failed: room_not_in_ewa_system
+MA B0 426: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+CE 0 347: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+ODY 0 04: CONFERENCES	# query_failed: room_not_in_ewa_system
 BCH 6306: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 BC 07: SALLE TP	# query_failed: room_not_in_ewa_system
 MXG 110: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-CM 1 105: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-BSP 709: CONFERENCES	# query_failed: room_not_in_ewa_system
-AAB 1 47: CONFERENCES	# query_failed: room_not_in_ewa_system
 CE 1 721.1: CONFERENCES	# query_failed: room_not_in_ewa_system
-PH D3 395: CONFERENCES	# query_failed: room_not_in_ewa_system
-CP1 366: SALLE TP	# query_failed: room_not_in_ewa_system
-BS 225: CONFERENCES	# query_failed: room_not_in_ewa_system
-CH B0 427: SALLE TP	# query_failed: room_not_in_ewa_system
-ODY 0 04: CONFERENCES	# query_failed: room_not_in_ewa_system
+GA 0 10: CONFERENCES	# query_failed: room_not_in_ewa_system
+SG 2112: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
 H4 1 204.084: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-B1 6 259.054: REUNION	# query_failed: room_not_in_ewa_system
+PH D3 395: CONFERENCES	# query_failed: room_not_in_ewa_system
 QIF 3 139.7: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 1 630: CONFERENCES	# query_failed: room_not_in_ewa_system
-BAC 003: CONFERENCES	# query_failed: room_not_in_ewa_system
 B1 2 260.050: CONFERENCES	# query_failed: room_not_in_ewa_system
-CH H5 625: CONFERENCES	# query_failed: room_not_in_ewa_system
-BC 321: CONFERENCES	# query_failed: room_not_in_ewa_system
-INF 113: CONFERENCES	# query_failed: room_not_in_ewa_system
 BIO_A 6 106: CONFERENCES	# query_failed: room_not_in_ewa_system
-MED 0 1618: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-PPB 316: CONFERENCES	# query_failed: room_not_in_ewa_system
+BAC 003: CONFERENCES	# query_failed: room_not_in_ewa_system
+TRIH 0 06: CONFERENCES	# query_failed: room_not_in_ewa_system
+BP 1344: CONFERENCES	# query_failed: room_not_in_ewa_system
+B1 6 259.054: REUNION	# query_failed: room_not_in_ewa_system
+CM 1 105: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 GR C0 01: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 PH B2 395: CONFERENCES	# query_failed: room_not_in_ewa_system
-BSP 710: CONFERENCES	# query_failed: room_not_in_ewa_system
-BIO_A 7 101: CONFERENCES	# query_failed: room_not_in_ewa_system
-BC 06: SALLE TP	# query_failed: room_not_in_ewa_system
-TRIH 0 06: CONFERENCES	# query_failed: room_not_in_ewa_system
-SV 1717: CONFERENCES	# query_failed: room_not_in_ewa_system
-AU -2 8099: CONFERENCES	# query_failed: room_not_in_ewa_system
-CM 1 370: CONFERENCES	# query_failed: room_not_in_ewa_system
-BP 1344: CONFERENCES	# query_failed: room_not_in_ewa_system
-ELB 129: CONFERENCES	# query_failed: room_not_in_ewa_system
+BCH 2103: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+MED 0 1618: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+BC 321: CONFERENCES	# query_failed: room_not_in_ewa_system
 CO 118: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+AU -2 8099: CONFERENCES	# query_failed: room_not_in_ewa_system
+SV 1717: CONFERENCES	# query_failed: room_not_in_ewa_system
+BM 5202: AUDITOIRE	# query_failed: room_not_in_ewa_system
+BC 06: SALLE TP	# query_failed: room_not_in_ewa_system
+PPB 316: CONFERENCES	# query_failed: room_not_in_ewa_system
+BIO_A 7 101: CONFERENCES	# query_failed: room_not_in_ewa_system
+CM 1 370: CONFERENCES	# query_failed: room_not_in_ewa_system
+CO 010: TUTORAT	# query_failed: room_not_in_ewa_system
 DIA 005: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 HBL 0 38A: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
-BCH 2103: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-BM 5202: AUDITOIRE	# query_failed: room_not_in_ewa_system
-CO 010: TUTORAT	# query_failed: room_not_in_ewa_system
+BSP 710: CONFERENCES	# query_failed: room_not_in_ewa_system
+ELB 129: CONFERENCES	# query_failed: room_not_in_ewa_system
 CE 2 433: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 1 101: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-PH D1 426: SALLE TP	# query_failed: room_not_in_ewa_system
-RLC D1 661: CONFERENCES	# query_failed: room_not_in_ewa_system
-STCC 1 8423: CONFERENCES	# query_failed: room_not_in_ewa_system
-BS 170: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+INF 113: CONFERENCES	# query_failed: room_not_in_ewa_system
 CE 1 106: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-CL 2 2626: CONFERENCES	# query_failed: room_not_in_ewa_system
-SG 0213: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+RLC D1 661: CONFERENCES	# query_failed: room_not_in_ewa_system
+BIO_A 6 204: CONFERENCES	# query_failed: room_not_in_ewa_system
 BIO_A 6 205: CONFERENCES	# query_failed: room_not_in_ewa_system
-RLC D1 450: CONFERENCES	# query_failed: room_not_in_ewa_system
+CL 2 2626: CONFERENCES	# query_failed: room_not_in_ewa_system
 AAC 1 14: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-BAP 007: CONFERENCES	# query_failed: room_not_in_ewa_system
+STCC 1 8423: CONFERENCES	# query_failed: room_not_in_ewa_system
+RLC D1 450: CONFERENCES	# query_failed: room_not_in_ewa_system
+CH H5 625: CONFERENCES	# query_failed: room_not_in_ewa_system
+PH D1 426: SALLE TP	# query_failed: room_not_in_ewa_system
+SG 0213: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+BS 170: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+MED 3 1523: SALLE TP	# query_failed: room_not_in_ewa_system
+CE 1 101: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+CP1 352: SALLE TP	# query_failed: room_not_in_ewa_system
 BCH 5112: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+CO 011: TUTORAT	# query_failed: room_not_in_ewa_system
+CO 180: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+H8 1 174.158: CONFERENCES	# query_failed: room_not_in_ewa_system
 HBL 0 20A: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
 BIO_A 6 108: CONFERENCES	# query_failed: room_not_in_ewa_system
-BIO_A 6 204: CONFERENCES	# query_failed: room_not_in_ewa_system
-CP1 352: SALLE TP	# query_failed: room_not_in_ewa_system
-CO 180: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-MED 3 1523: SALLE TP	# query_failed: room_not_in_ewa_system
 QIJ 1 117.12: CONFERENCES	# query_failed: room_not_in_ewa_system
-PH B1 404: SALLE TP	# query_failed: room_not_in_ewa_system
-BSP 727: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-H8 1 174.158: CONFERENCES	# query_failed: room_not_in_ewa_system
-ODY -1 0022: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
+BAP 007: CONFERENCES	# query_failed: room_not_in_ewa_system
 BC 051.2: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 1 104: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-CO 011: TUTORAT	# query_failed: room_not_in_ewa_system
-CO 2: AUDITOIRE	# query_failed: room_not_in_ewa_system
-CE 3 308: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 1 711.2: CONFERENCES	# query_failed: room_not_in_ewa_system
+BSP 727: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 GR B3 30: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+CO 2: AUDITOIRE	# query_failed: room_not_in_ewa_system
+PH B1 404: SALLE TP	# query_failed: room_not_in_ewa_system
 B3 5 186.134: CONFERENCES	# query_failed: room_not_in_ewa_system
+ODY -1 0022: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
+CE 3 308: CONFERENCES	# query_failed: room_not_in_ewa_system
 MC A3 208: CONFERENCES	# query_failed: room_not_in_ewa_system
-BCH 3203: CONFERENCES	# query_failed: room_not_in_ewa_system
-PPH 275: CONFERENCES	# query_failed: room_not_in_ewa_system
-BC 011: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-PH D1 397: SALLE TP	# query_failed: room_not_in_ewa_system
+CE 1 711.2: CONFERENCES	# query_failed: room_not_in_ewa_system
 ODY -1 0020: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-ME B3 425: CONFERENCES	# query_failed: room_not_in_ewa_system
-AAD 2 01: SALLE TP	# query_failed: room_not_in_ewa_system
+CE 1 104: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+BCH 3203: CONFERENCES	# query_failed: room_not_in_ewa_system
 RLC D1 482: CONFERENCES	# query_failed: room_not_in_ewa_system
-QIE 0 108.3: CONFERENCES	# query_failed: room_not_in_ewa_system
-BCH 4130: CONFERENCES	# query_failed: room_not_in_ewa_system
+PH D1 397: SALLE TP	# query_failed: room_not_in_ewa_system
 GR A3 31: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-MED 3 1519: SALLE TP	# query_failed: room_not_in_ewa_system
-QIJ 1 118.2: CONFERENCES	# query_failed: room_not_in_ewa_system
-BM 4204: CONFERENCES	# query_failed: room_not_in_ewa_system
-BCH 4104: CONFERENCES	# query_failed: room_not_in_ewa_system
-CO 017: TUTORAT	# query_failed: room_not_in_ewa_system
-AAC 2 31: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-CE 0 248: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-GR A3 32: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-ECAL 1 20.05: SALLE TP	# query_failed: room_not_in_ewa_system
-QIF 3 139.6: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 0 346: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+ME B3 425: CONFERENCES	# query_failed: room_not_in_ewa_system
+PPH 275: CONFERENCES	# query_failed: room_not_in_ewa_system
+BCH 4130: CONFERENCES	# query_failed: room_not_in_ewa_system
 MED 3 1518: SALLE TP	# query_failed: room_not_in_ewa_system
-MA C0 636: TELECOMS	# query_failed: room_not_in_ewa_system
-SAUV 141: CONFERENCES	# query_failed: room_not_in_ewa_system
-INJ 116: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
+AAD 2 01: SALLE TP	# query_failed: room_not_in_ewa_system
+BC 011: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+QIE 0 108.3: CONFERENCES	# query_failed: room_not_in_ewa_system
+QIJ 1 118.2: CONFERENCES	# query_failed: room_not_in_ewa_system
+AAC 2 31: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+CE 0 346: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+QIF 3 139.6: CONFERENCES	# query_failed: room_not_in_ewa_system
+CO 017: TUTORAT	# query_failed: room_not_in_ewa_system
+BM 4204: CONFERENCES	# query_failed: room_not_in_ewa_system
+GR A3 32: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+MED 3 1519: SALLE TP	# query_failed: room_not_in_ewa_system
+CE 0 248: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+BCH 4104: CONFERENCES	# query_failed: room_not_in_ewa_system
 CP1 258: SALLE TP	# query_failed: room_not_in_ewa_system
-CM 1 326: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-SOS2 0 112: CONFERENCES	# query_failed: room_not_in_ewa_system
+INJ 116: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
 ALO 1: AFFECT DIV	# query_failed: room_not_in_ewa_system
-RLC A1 141: CONFERENCES	# query_failed: room_not_in_ewa_system
-GA 2 21: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-DIA 004: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-B1 1 273.051: CONFERENCES	# query_failed: room_not_in_ewa_system
-CO 216: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 2 447: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-SG 0211: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-ART C0 200: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-RLC D1 780: CONFERENCES	# query_failed: room_not_in_ewa_system
-STCC 0 8425: CONFERENCES	# query_failed: room_not_in_ewa_system
-CH A3 30: CONFERENCES	# query_failed: room_not_in_ewa_system
-SV 3615: CONFERENCES	# query_failed: room_not_in_ewa_system
-MC B4 127: CONFERENCES	# query_failed: room_not_in_ewa_system
-CP1 262: SALLE TP	# query_failed: room_not_in_ewa_system
-INN 220: CONFERENCES	# query_failed: room_not_in_ewa_system
-BI A0 518: CONFERENCES	# query_failed: room_not_in_ewa_system
+SAUV 141: CONFERENCES	# query_failed: room_not_in_ewa_system
+SOS2 0 112: CONFERENCES	# query_failed: room_not_in_ewa_system
+ECAL 1 20.05: SALLE TP	# query_failed: room_not_in_ewa_system
+CM 1 326: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+MA C0 636: TELECOMS	# query_failed: room_not_in_ewa_system
 CE 1 257: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
+MC B4 127: CONFERENCES	# query_failed: room_not_in_ewa_system
+SG 0211: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+STCC 0 8425: CONFERENCES	# query_failed: room_not_in_ewa_system
+INN 220: CONFERENCES	# query_failed: room_not_in_ewa_system
+RLC A1 141: CONFERENCES	# query_failed: room_not_in_ewa_system
+B1 1 273.051: CONFERENCES	# query_failed: room_not_in_ewa_system
+ART C0 200: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+CH A3 30: CONFERENCES	# query_failed: room_not_in_ewa_system
+DIA 004: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+CP1 262: SALLE TP	# query_failed: room_not_in_ewa_system
+RLC D1 780: CONFERENCES	# query_failed: room_not_in_ewa_system
+CO 216: CONFERENCES	# query_failed: room_not_in_ewa_system
+GA 2 21: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+SV 3615: CONFERENCES	# query_failed: room_not_in_ewa_system
+CE 2 447: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+STCC 4 7925: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
 CM 2 272: CONFERENCES	# query_failed: room_not_in_ewa_system
 SG 2132: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-BS 107: CONFERENCES	# query_failed: room_not_in_ewa_system
 BCH 4310: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-STCC 4 7925: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-MA A0 364: CONFERENCES	# query_failed: room_not_in_ewa_system
-CM 1 113: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+BI A0 518: CONFERENCES	# query_failed: room_not_in_ewa_system
 CE 1 5: AUDITOIRE	# query_failed: room_not_in_ewa_system
 MA B2 484: CONFERENCES	# query_failed: room_not_in_ewa_system
+BS 107: CONFERENCES	# query_failed: room_not_in_ewa_system
+CM 1 113: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+MA A0 364: CONFERENCES	# query_failed: room_not_in_ewa_system
+MA C0 615: CONFERENCES	# query_failed: room_not_in_ewa_system
 CM 1 5: AUDITOIRE	# query_failed: room_not_in_ewa_system
 PH D1 408: SALLE TP	# query_failed: room_not_in_ewa_system
 PPB 919: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-CE 1 1: AUDITOIRE	# query_failed: room_not_in_ewa_system
-AAB 0 26: CONFERENCES	# query_failed: room_not_in_ewa_system
-MA C0 615: CONFERENCES	# query_failed: room_not_in_ewa_system
-CH B3 30: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-BS 270: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-BCH 4112: CONFERENCES	# query_failed: room_not_in_ewa_system
 GC F1 10: SALLE TP	# query_failed: room_not_in_ewa_system
-BSP 233: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-PO 01: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-SKIL 2 01: SALLE TP	# query_failed: room_not_in_ewa_system
-BIO_A 6 109.2: CONFERENCES	# query_failed: room_not_in_ewa_system
-CO 123: TUTORAT	# query_failed: room_not_in_ewa_system
+BCH 4112: CONFERENCES	# query_failed: room_not_in_ewa_system
+CH B3 30: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+AAB 0 26: CONFERENCES	# query_failed: room_not_in_ewa_system
+CE 1 1: AUDITOIRE	# query_failed: room_not_in_ewa_system
+BS 270: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+CP1 282: SALLE TP	# query_failed: room_not_in_ewa_system
 BI A1 468: CONFERENCES	# query_failed: room_not_in_ewa_system
-ME B0 375: SALLE TP	# query_failed: room_not_in_ewa_system
+PO 01: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+BIO_A 6 109.2: CONFERENCES	# query_failed: room_not_in_ewa_system
+SKIL 2 01: SALLE TP	# query_failed: room_not_in_ewa_system
+CP1 460: SALLE TP	# query_failed: room_not_in_ewa_system
+CO 123: TUTORAT	# query_failed: room_not_in_ewa_system
+BAP 101: CONFERENCES	# query_failed: room_not_in_ewa_system
+BSP 233: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+CM 2 201: CONFERENCES	# query_failed: room_not_in_ewa_system
 SG 3302: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 BP 1122: CONFERENCES	# query_failed: room_not_in_ewa_system
-CP1 282: SALLE TP	# query_failed: room_not_in_ewa_system
-CP1 460: SALLE TP	# query_failed: room_not_in_ewa_system
-CM 2 201: CONFERENCES	# query_failed: room_not_in_ewa_system
-B1 4 282.040: CONFERENCES	# query_failed: room_not_in_ewa_system
-BAP 101: CONFERENCES	# query_failed: room_not_in_ewa_system
-CM 2 262: CONFERENCES	# query_failed: room_not_in_ewa_system
-ELG 024: SALLE TP	# query_failed: room_not_in_ewa_system
-QIE 0 108.2: CONFERENCES	# query_failed: room_not_in_ewa_system
 MC B2 187: CONFERENCES	# query_failed: room_not_in_ewa_system
-H4 3 229.080: CONFERENCES	# query_failed: room_not_in_ewa_system
-RLC D1 480: CONFERENCES	# query_failed: room_not_in_ewa_system
-CO 3: AUDITOIRE	# query_failed: room_not_in_ewa_system
-BCH 3303: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-ELD 124: CONFERENCES	# query_failed: room_not_in_ewa_system
+ELG 024: SALLE TP	# query_failed: room_not_in_ewa_system
+INF 019: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 BP 3321: CONFERENCES	# query_failed: room_not_in_ewa_system
-PH D1 407: SALLE TP	# query_failed: room_not_in_ewa_system
+QIE 0 108.2: CONFERENCES	# query_failed: room_not_in_ewa_system
+B1 4 282.040: CONFERENCES	# query_failed: room_not_in_ewa_system
+ME B0 375: SALLE TP	# query_failed: room_not_in_ewa_system
 SG 0320: SALLE TP	# query_failed: room_not_in_ewa_system
+PH D1 407: SALLE TP	# query_failed: room_not_in_ewa_system
+CM 2 262: CONFERENCES	# query_failed: room_not_in_ewa_system
+BCH 3303: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 PH D1 374: SALLE TP	# query_failed: room_not_in_ewa_system
 PPH 325: CONFERENCES	# query_failed: room_not_in_ewa_system
-ODY -1 0023: CONFERENCES	# query_failed: room_not_in_ewa_system
-BCH 4119: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-ECAL 2 20.14: CONFERENCES	# query_failed: room_not_in_ewa_system
 PH D1 355: SALLE TP	# query_failed: room_not_in_ewa_system
-FBC 0 18: LOCAUX SECOND	# query_failed: room_not_in_ewa_system
-CP1 452: SALLE TP	# query_failed: room_not_in_ewa_system
-AAD 1 01: SALLE TP	# query_failed: room_not_in_ewa_system
-BCH 2113.3: CONFERENCES	# query_failed: room_not_in_ewa_system
-PH H3 30: SALLE TP	# query_failed: room_not_in_ewa_system
-H8 1 183.175: CONFERENCES	# query_failed: room_not_in_ewa_system
-BS 190: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-GC H2 692: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 2 542: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-MC B4 222: CONFERENCES	# query_failed: room_not_in_ewa_system
+CO 3: AUDITOIRE	# query_failed: room_not_in_ewa_system
+H4 3 229.080: CONFERENCES	# query_failed: room_not_in_ewa_system
+RLC D1 480: CONFERENCES	# query_failed: room_not_in_ewa_system
+ODY -1 0023: CONFERENCES	# query_failed: room_not_in_ewa_system
 BI A1 478: CONFERENCES	# query_failed: room_not_in_ewa_system
-CH A0 376: SALLE TP	# query_failed: room_not_in_ewa_system
+FBC 0 18: LOCAUX SECOND	# query_failed: room_not_in_ewa_system
+BCH 2113.3: CONFERENCES	# query_failed: room_not_in_ewa_system
+AAD 1 01: SALLE TP	# query_failed: room_not_in_ewa_system
+ECAL 2 20.14: CONFERENCES	# query_failed: room_not_in_ewa_system
+PH H3 30: SALLE TP	# query_failed: room_not_in_ewa_system
+CP1 452: SALLE TP	# query_failed: room_not_in_ewa_system
+H8 1 183.175: CONFERENCES	# query_failed: room_not_in_ewa_system
 BP 0232: SALLE TP	# query_failed: room_not_in_ewa_system
-TCV 168: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-BCH 1103: SALLE TP	# query_failed: room_not_in_ewa_system
+CE 2 542: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+BCH 4119: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 CE 1 253: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+TCV 168: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+PH D1 425: SALLE TP	# query_failed: room_not_in_ewa_system
+MC B4 222: CONFERENCES	# query_failed: room_not_in_ewa_system
 BI A0 478: CONFERENCES	# query_failed: room_not_in_ewa_system
+CH A0 376: SALLE TP	# query_failed: room_not_in_ewa_system
 MED 0 1418: AUDITOIRE	# query_failed: room_not_in_ewa_system
+GC H2 692: CONFERENCES	# query_failed: room_not_in_ewa_system
+BCH 1103: SALLE TP	# query_failed: room_not_in_ewa_system
+ELD 124: CONFERENCES	# query_failed: room_not_in_ewa_system
 CP1 276: SALLE TP	# query_failed: room_not_in_ewa_system
-GC A3 30: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+MC A1 208: CONFERENCES	# query_failed: room_not_in_ewa_system
+BM 4202: CONFERENCES	# query_failed: room_not_in_ewa_system
 CE 1 102: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+RLC D1 530: CONFERENCES	# query_failed: room_not_in_ewa_system
 CP1 462: SALLE TP	# query_failed: room_not_in_ewa_system
-ELD 040: SALLE TP	# query_failed: room_not_in_ewa_system
+BS 190: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+AAC 0 06: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 PH H3 33: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-MXD 139: CONFERENCES	# query_failed: room_not_in_ewa_system
 MED 2 2519: SALLE TP	# query_failed: room_not_in_ewa_system
+GC A3 30: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+MXD 139: CONFERENCES	# query_failed: room_not_in_ewa_system
 BS 224: CONFERENCES	# query_failed: room_not_in_ewa_system
 RLC D1 681: CONFERENCES	# query_failed: room_not_in_ewa_system
 AI 1150: CONFERENCES	# query_failed: room_not_in_ewa_system
-AAC 1 06: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-PH D1 425: SALLE TP	# query_failed: room_not_in_ewa_system
-CO 171: CONFERENCES	# query_failed: room_not_in_ewa_system
-PH C1 383: SALLE TP	# query_failed: room_not_in_ewa_system
-AAC 0 06: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-INF 019: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 MXC 315: CONFERENCES	# query_failed: room_not_in_ewa_system
-MA C0 594: CONFERENCES	# query_failed: room_not_in_ewa_system
-INF 018: CONFERENCES	# query_failed: room_not_in_ewa_system
-MC A1 208: CONFERENCES	# query_failed: room_not_in_ewa_system
-BM 4202: CONFERENCES	# query_failed: room_not_in_ewa_system
-RLC D1 530: CONFERENCES	# query_failed: room_not_in_ewa_system
-CO 251: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+PH C1 383: SALLE TP	# query_failed: room_not_in_ewa_system
 MED 2 1517: SALLE TP	# query_failed: room_not_in_ewa_system
+ELD 040: SALLE TP	# query_failed: room_not_in_ewa_system
+CO 171: CONFERENCES	# query_failed: room_not_in_ewa_system
+MA C0 594: CONFERENCES	# query_failed: room_not_in_ewa_system
+CO 251: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+ELG 123: CONFERENCES	# query_failed: room_not_in_ewa_system
+BS 105: CONFERENCES	# query_failed: room_not_in_ewa_system
 CO 016: TUTORAT	# query_failed: room_not_in_ewa_system
 RLC E1 240: REUNION	# query_failed: room_not_in_ewa_system
 BS 260: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+AAC 1 06: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+INF 018: CONFERENCES	# query_failed: room_not_in_ewa_system
 MED 3 1119: SALLE TP	# query_failed: room_not_in_ewa_system
-ELG 123: CONFERENCES	# query_failed: room_not_in_ewa_system
-BS 105: CONFERENCES	# query_failed: room_not_in_ewa_system
+PPB 226: CONFERENCES	# query_failed: room_not_in_ewa_system
 ELG 229.2: CONFERENCES	# query_failed: room_not_in_ewa_system
 CE 1 721.2: CONFERENCES	# query_failed: room_not_in_ewa_system
-ME B3 31: AUDITOIRE	# query_failed: room_not_in_ewa_system
 B3 6 186.134: CONFERENCES	# query_failed: room_not_in_ewa_system
-ELG 116: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-MED 3 1424: SALLE TP	# query_failed: room_not_in_ewa_system
-BS 160: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-CE 1 103: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-CE 2 450: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-CP1 466: SALLE TP	# query_failed: room_not_in_ewa_system
-PPB 226: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 2 347: SALLE TP	# query_failed: room_not_in_ewa_system
-MC A1 308: CONFERENCES	# query_failed: room_not_in_ewa_system
+ME B3 31: AUDITOIRE	# query_failed: room_not_in_ewa_system
 HBL 0 21A: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
-ECAL 2 20.15: SALLE TP	# query_failed: room_not_in_ewa_system
-ELD 194.9: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 1 720.2: CONFERENCES	# query_failed: room_not_in_ewa_system
-CH C0 396: SALLE TP	# query_failed: room_not_in_ewa_system
+CE 2 450: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+ELG 116: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+MC A1 308: CONFERENCES	# query_failed: room_not_in_ewa_system
+CE 1 103: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+BS 160: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+CE 2 347: SALLE TP	# query_failed: room_not_in_ewa_system
+MED 3 1424: SALLE TP	# query_failed: room_not_in_ewa_system
+CP1 466: SALLE TP	# query_failed: room_not_in_ewa_system
+PH B1 364: SALLE TP	# query_failed: room_not_in_ewa_system
+MA B0 467: CONFERENCES	# query_failed: room_not_in_ewa_system
 BP 0427: SALLE TP	# query_failed: room_not_in_ewa_system
+ELD 194.9: CONFERENCES	# query_failed: room_not_in_ewa_system
+PH B1 365: SALLE TP	# query_failed: room_not_in_ewa_system
+CH C0 396: SALLE TP	# query_failed: room_not_in_ewa_system
+RLC A1 230: CONFERENCES	# query_failed: room_not_in_ewa_system
 CH C2 396: SALLE TP	# query_failed: room_not_in_ewa_system
 PH B1 397: SALLE TP	# query_failed: room_not_in_ewa_system
-SAUV 263: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-AU -3 9005: CONFERENCES	# query_failed: room_not_in_ewa_system
 CE 1 100: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-PH B1 364: SALLE TP	# query_failed: room_not_in_ewa_system
-PH B1 365: SALLE TP	# query_failed: room_not_in_ewa_system
-PH B1 375: SALLE TP	# query_failed: room_not_in_ewa_system
-MC B3 117: CONFERENCES	# query_failed: room_not_in_ewa_system
+CP1 256: SALLE TP	# query_failed: room_not_in_ewa_system
 CP1 252: SALLE TP	# query_failed: room_not_in_ewa_system
-RLC A1 230: CONFERENCES	# query_failed: room_not_in_ewa_system
+CE 1 720.2: CONFERENCES	# query_failed: room_not_in_ewa_system
+SV 2715: CONFERENCES	# query_failed: room_not_in_ewa_system
+AU -3 9005: CONFERENCES	# query_failed: room_not_in_ewa_system
+PH B1 375: SALLE TP	# query_failed: room_not_in_ewa_system
 STCC 0 8132: AUDITOIRE	# query_failed: room_not_in_ewa_system
 PH C1 401: SALLE TP	# query_failed: room_not_in_ewa_system
-H4 2 232.080: CONFERENCES	# query_failed: room_not_in_ewa_system
-SV 2715: CONFERENCES	# query_failed: room_not_in_ewa_system
-BIO_A 6 107: CONFERENCES	# query_failed: room_not_in_ewa_system
-MA B0 467: CONFERENCES	# query_failed: room_not_in_ewa_system
-BCH 2240: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-B3 2 186.134: CONFERENCES	# query_failed: room_not_in_ewa_system
-CP1 256: SALLE TP	# query_failed: room_not_in_ewa_system
-H8 1 175.175: CONFERENCES	# query_failed: room_not_in_ewa_system
 B3 6 202.122: CONFERENCES	# query_failed: room_not_in_ewa_system
+H4 2 232.080: CONFERENCES	# query_failed: room_not_in_ewa_system
+BCH 2240: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+SG 1138: AUDITOIRE	# query_failed: room_not_in_ewa_system
 CM 1 327: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+MC B3 117: CONFERENCES	# query_failed: room_not_in_ewa_system
+B3 2 186.134: CONFERENCES	# query_failed: room_not_in_ewa_system
+BIO_A 6 107: CONFERENCES	# query_failed: room_not_in_ewa_system
+B1 3 260.050: CONFERENCES	# query_failed: room_not_in_ewa_system
+CP1 378: SALLE TP	# query_failed: room_not_in_ewa_system
+PH D1 334: CONFERENCES	# query_failed: room_not_in_ewa_system
+ECAL 2 20.15: SALLE TP	# query_failed: room_not_in_ewa_system
+SAUV 263: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+CE 1 3: AUDITOIRE	# query_failed: room_not_in_ewa_system
+ECAL 2 20.13: SALLE TP	# query_failed: room_not_in_ewa_system
+TCV 179: CONFERENCES	# query_failed: room_not_in_ewa_system
+GC B3 30: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 SG 2310: SALLE TP	# query_failed: room_not_in_ewa_system
 CE 1 6: AUDITOIRE	# query_failed: room_not_in_ewa_system
-GC B3 30: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-SG 1138: AUDITOIRE	# query_failed: room_not_in_ewa_system
-PH D1 334: CONFERENCES	# query_failed: room_not_in_ewa_system
-ECAL 2 20.13: SALLE TP	# query_failed: room_not_in_ewa_system
-CP1 378: SALLE TP	# query_failed: room_not_in_ewa_system
-CE 1 3: AUDITOIRE	# query_failed: room_not_in_ewa_system
-TCV 179: CONFERENCES	# query_failed: room_not_in_ewa_system
-B1 3 260.050: CONFERENCES	# query_failed: room_not_in_ewa_system
-PH B1 393: SALLE TP	# query_failed: room_not_in_ewa_system
-ME C2 405: CONFERENCES	# query_failed: room_not_in_ewa_system
-QIJ 1 117.04: CONFERENCES	# query_failed: room_not_in_ewa_system
-B1 2 264.040: CONFERENCES	# query_failed: room_not_in_ewa_system
-SV 3715: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
-PPB 019: CONFERENCES	# query_failed: room_not_in_ewa_system
 B1 0 255.045: CONFERENCES	# query_failed: room_not_in_ewa_system
+H8 1 175.175: CONFERENCES	# query_failed: room_not_in_ewa_system
 STCC 2 8020: AUDITOIRE	# query_failed: room_not_in_ewa_system
-QIF 3 139.5: CONFERENCES	# query_failed: room_not_in_ewa_system
-BSP 234: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-MXC 116: CONFERENCES	# query_failed: room_not_in_ewa_system
-HBL 0 18A: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
-AAC 1 32: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 ODY 4 03: CONFERENCES	# query_failed: room_not_in_ewa_system
-BP 0329: SALLE TP	# query_failed: room_not_in_ewa_system
-ODY -1 0024: CONFERENCES	# query_failed: room_not_in_ewa_system
-GR C1 535: SALLE TP	# query_failed: room_not_in_ewa_system
-INJ 326: CONFERENCES	# query_failed: room_not_in_ewa_system
-CP1 290: CONFERENCES	# query_failed: room_not_in_ewa_system
-CH F0 602: CONFERENCES	# query_failed: room_not_in_ewa_system
-SG 2211: SALLE TP	# query_failed: room_not_in_ewa_system
-B1 1 257.050: CONFERENCES	# query_failed: room_not_in_ewa_system
-CM 1 334: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-CM 1 108: CONFERENCES	# query_failed: room_not_in_ewa_system
-BC 051.1: CONFERENCES	# query_failed: room_not_in_ewa_system
-MED 1 1815: CONFERENCES	# query_failed: room_not_in_ewa_system
-MA B0 447: CONFERENCES	# query_failed: room_not_in_ewa_system
-GC F1 11: SALLE TP	# query_failed: room_not_in_ewa_system
-MED 3 1219: SALLE TP	# query_failed: room_not_in_ewa_system
 INN 041: CONFERENCES	# query_failed: room_not_in_ewa_system
-MED 0 2112: DETEC.INCENDIE	# query_failed: room_not_in_ewa_system
+MXC 116: CONFERENCES	# query_failed: room_not_in_ewa_system
+ME C2 405: CONFERENCES	# query_failed: room_not_in_ewa_system
+INJ 326: CONFERENCES	# query_failed: room_not_in_ewa_system
+BSP 234: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+QIJ 1 117.04: CONFERENCES	# query_failed: room_not_in_ewa_system
+QIF 3 139.5: CONFERENCES	# query_failed: room_not_in_ewa_system
+AAC 1 32: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+PH B1 393: SALLE TP	# query_failed: room_not_in_ewa_system
+B1 2 264.040: CONFERENCES	# query_failed: room_not_in_ewa_system
+HBL 0 18A: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
+PPB 019: CONFERENCES	# query_failed: room_not_in_ewa_system
+B1 1 257.050: CONFERENCES	# query_failed: room_not_in_ewa_system
+BP 0329: SALLE TP	# query_failed: room_not_in_ewa_system
+SV 3715: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
+CM 1 108: CONFERENCES	# query_failed: room_not_in_ewa_system
+MED 3 1219: SALLE TP	# query_failed: room_not_in_ewa_system
+MA B0 447: CONFERENCES	# query_failed: room_not_in_ewa_system
+SG 2211: SALLE TP	# query_failed: room_not_in_ewa_system
+GR C1 535: SALLE TP	# query_failed: room_not_in_ewa_system
+CP1 290: CONFERENCES	# query_failed: room_not_in_ewa_system
 INJ 213: CONFERENCES	# query_failed: room_not_in_ewa_system
-JORD 1 102: CONFERENCES	# query_failed: room_not_in_ewa_system
-DLLEL 1 12: CONFERENCES	# query_failed: room_not_in_ewa_system
-MC A0 90.42: LOCAUX SECOND	# query_failed: room_not_in_ewa_system
-AAD 2 31: SALLE TP	# query_failed: room_not_in_ewa_system
-CP1 278: SALLE TP	# query_failed: room_not_in_ewa_system
-TRIC 7.01: SALLE TP	# query_failed: room_not_in_ewa_system
-AAD 0 19: SALLE TP	# query_failed: room_not_in_ewa_system
+ODY -1 0024: CONFERENCES	# query_failed: room_not_in_ewa_system
+MED 1 1815: CONFERENCES	# query_failed: room_not_in_ewa_system
+CH F0 602: CONFERENCES	# query_failed: room_not_in_ewa_system
 AAB 2 39: CONFERENCES	# query_failed: room_not_in_ewa_system
+MED 0 2112: DETEC.INCENDIE	# query_failed: room_not_in_ewa_system
+DLLEL 1 12: CONFERENCES	# query_failed: room_not_in_ewa_system
+BC 051.1: CONFERENCES	# query_failed: room_not_in_ewa_system
+MC A0 90.42: LOCAUX SECOND	# query_failed: room_not_in_ewa_system
+STCC 4 7924: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+INN 211: CONFERENCES	# query_failed: room_not_in_ewa_system
+AAD 0 19: SALLE TP	# query_failed: room_not_in_ewa_system
+CM 1 334: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+TRIC 7.01: SALLE TP	# query_failed: room_not_in_ewa_system
+AAD 2 31: SALLE TP	# query_failed: room_not_in_ewa_system
+GC F1 11: SALLE TP	# query_failed: room_not_in_ewa_system
+CH B3 31: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+JORD 1 102: CONFERENCES	# query_failed: room_not_in_ewa_system
+BCH 4113: CONFERENCES	# query_failed: room_not_in_ewa_system
+B3 6 246.134: CONFERENCES	# query_failed: room_not_in_ewa_system
 CP1 362: SALLE TP	# query_failed: room_not_in_ewa_system
 ME B2 494: CONFERENCES	# query_failed: room_not_in_ewa_system
-CM 1 120: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-INN 011: CONFERENCES	# query_failed: room_not_in_ewa_system
-STCC 4 7924: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-CH B3 31: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-INN 211: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 0 612.1: STUDIOS	# query_failed: room_not_in_ewa_system
-MXC 320: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
-H8 1 178.160: CONFERENCES	# query_failed: room_not_in_ewa_system
-BP 1221: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-AAC 0 20: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-MC A1 274: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-MC A2 194: CONFERENCES	# query_failed: room_not_in_ewa_system
-BCH 4113: CONFERENCES	# query_failed: room_not_in_ewa_system
 PH B1 405: SALLE TP	# query_failed: room_not_in_ewa_system
-BM 3102: CONFERENCES	# query_failed: room_not_in_ewa_system
-B3 6 246.134: CONFERENCES	# query_failed: room_not_in_ewa_system
-MED 3 2215: SALLE TP	# query_failed: room_not_in_ewa_system
-CP1 270: SALLE TP	# query_failed: room_not_in_ewa_system
+CE 0 612.1: STUDIOS	# query_failed: room_not_in_ewa_system
+H8 1 178.160: CONFERENCES	# query_failed: room_not_in_ewa_system
+MC A1 274: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+INN 011: CONFERENCES	# query_failed: room_not_in_ewa_system
+MXC 320: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
+BP 1221: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
 MC A4 307: CONFERENCES	# query_failed: room_not_in_ewa_system
+CP1 278: SALLE TP	# query_failed: room_not_in_ewa_system
+SG 1320: SALLE TP	# query_failed: room_not_in_ewa_system
+DIA 003: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+CP1 270: SALLE TP	# query_failed: room_not_in_ewa_system
+MED 3 2215: SALLE TP	# query_failed: room_not_in_ewa_system
+MC B0 302: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
+BM 3102: CONFERENCES	# query_failed: room_not_in_ewa_system
 RLC D1 581: CONFERENCES	# query_failed: room_not_in_ewa_system
 H8 1 167.175: CONFERENCES	# query_failed: room_not_in_ewa_system
-QIJ 1 117.03: CONFERENCES	# query_failed: room_not_in_ewa_system
-MED 3 1124: SALLE TP	# query_failed: room_not_in_ewa_system
-MA B1 504: CONFERENCES	# query_failed: room_not_in_ewa_system
-MXC 239: CONFERENCES	# query_failed: room_not_in_ewa_system
+MC A2 194: CONFERENCES	# query_failed: room_not_in_ewa_system
+AAC 0 20: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 BS 117.3: CONFERENCES	# query_failed: room_not_in_ewa_system
-G6 3 136.137: CONFERENCES	# query_failed: room_not_in_ewa_system
-AAB 1 02: CONFERENCES	# query_failed: room_not_in_ewa_system
+CM 1 120: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+MXC 239: CONFERENCES	# query_failed: room_not_in_ewa_system
+MED 3 1124: SALLE TP	# query_failed: room_not_in_ewa_system
+QIJ 1 117.03: CONFERENCES	# query_failed: room_not_in_ewa_system
+MA B1 504: CONFERENCES	# query_failed: room_not_in_ewa_system
 QIE 1 107.10: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-BAC 106: CONFERENCES	# query_failed: room_not_in_ewa_system
 STCC 4 8024: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-PPB 918: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-SG 1320: SALLE TP	# query_failed: room_not_in_ewa_system
-CSS -1 020: LOCAUX SECOND	# query_failed: room_not_in_ewa_system
+G6 3 136.137: CONFERENCES	# query_failed: room_not_in_ewa_system
+BAC 106: CONFERENCES	# query_failed: room_not_in_ewa_system
 PH H3 31: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+PPB 918: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+AAB 1 02: CONFERENCES	# query_failed: room_not_in_ewa_system
+MED 2 1519: SALLE TP	# query_failed: room_not_in_ewa_system
+CSS -1 020: LOCAUX SECOND	# query_failed: room_not_in_ewa_system
+SV 3207: CONFERENCES	# query_failed: room_not_in_ewa_system
 CH A0 424: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 PH D1 365: SALLE TP	# query_failed: room_not_in_ewa_system
-DIA 003: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-MED 2 1519: SALLE TP	# query_failed: room_not_in_ewa_system
+H4 1 208.090: CONFERENCES	# query_failed: room_not_in_ewa_system
 STCC 0 8332: AUDITOIRE	# query_failed: room_not_in_ewa_system
 GC A3 31: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-DLLEL 1 14: CONFERENCES	# query_failed: room_not_in_ewa_system
-PH D1 335: SALLE TP	# query_failed: room_not_in_ewa_system
-MC B0 302: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
-MC B1 303: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-CE 0 613.1: STUDIOS	# query_failed: room_not_in_ewa_system
-CM 0 11: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 STCC 0 7326: CONFERENCES	# query_failed: room_not_in_ewa_system
-SV 3207: CONFERENCES	# query_failed: room_not_in_ewa_system
-H4 1 208.090: CONFERENCES	# query_failed: room_not_in_ewa_system
-MA B2 485: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
+PH D1 335: SALLE TP	# query_failed: room_not_in_ewa_system
 H8 1 163.175: CONFERENCES	# query_failed: room_not_in_ewa_system
+DLLEL 1 14: CONFERENCES	# query_failed: room_not_in_ewa_system
+MC B1 303: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+ODY -1 0019.2: CONFERENCES	# query_failed: room_not_in_ewa_system
 BP 0327: SALLE TP	# query_failed: room_not_in_ewa_system
+SAUV 1423: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
+CE 0 613.1: STUDIOS	# query_failed: room_not_in_ewa_system
 PH B1 374: SALLE TP	# query_failed: room_not_in_ewa_system
+CH C0 397: SALLE TP	# query_failed: room_not_in_ewa_system
+MA B2 485: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
 B1 6 257.050: CONFERENCES	# query_failed: room_not_in_ewa_system
 GA 3 31: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 1 515: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-ODY -1 0019.2: CONFERENCES	# query_failed: room_not_in_ewa_system
-DLLEL 1 10: CONFERENCES	# query_failed: room_not_in_ewa_system
-SAUV 1423: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
-ME B0 344: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-CH C3 30: CONFERENCES	# query_failed: room_not_in_ewa_system
-BCH 4105: CONFERENCES	# query_failed: room_not_in_ewa_system
-RLC D1 531: CONFERENCES	# query_failed: room_not_in_ewa_system
-CH F1 614: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
-CH C0 397: SALLE TP	# query_failed: room_not_in_ewa_system
+MED 1 2315: SALLE TP	# query_failed: room_not_in_ewa_system
 CE 1 4: AUDITOIRE	# query_failed: room_not_in_ewa_system
+BCH 4105: CONFERENCES	# query_failed: room_not_in_ewa_system
+CM 0 11: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+DLLEL 1 10: CONFERENCES	# query_failed: room_not_in_ewa_system
+RLC D1 531: CONFERENCES	# query_failed: room_not_in_ewa_system
+CP1 254: SALLE TP	# query_failed: room_not_in_ewa_system
+CH F1 614: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
+CE 1 515: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+CH C3 30: CONFERENCES	# query_failed: room_not_in_ewa_system
+ME B0 344: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+CL 2 2628: CONFERENCES	# query_failed: room_not_in_ewa_system
 BCH 4138: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
+CM 2 260: CONFERENCES	# query_failed: room_not_in_ewa_system
 CM 1 261: CONFERENCES	# query_failed: room_not_in_ewa_system
 FBC 0 04: CONFERENCES	# query_failed: room_not_in_ewa_system
-CM 2 260: CONFERENCES	# query_failed: room_not_in_ewa_system
+CE 1 720.1: CONFERENCES	# query_failed: room_not_in_ewa_system
 PH D1 392: SALLE TP	# query_failed: room_not_in_ewa_system
-CP1 456: SALLE TP	# query_failed: room_not_in_ewa_system
 CO 124: TUTORAT	# query_failed: room_not_in_ewa_system
-H8 2 147.159: CONFERENCES	# query_failed: room_not_in_ewa_system
-GA 3 21: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-STCC 0 7932: AUDITOIRE	# query_failed: room_not_in_ewa_system
+QIE 1 107.9: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+CP1 456: SALLE TP	# query_failed: room_not_in_ewa_system
 PH D1 390: SALLE TP	# query_failed: room_not_in_ewa_system
-MED 1 2315: SALLE TP	# query_failed: room_not_in_ewa_system
-ODY 0 03: CONFERENCES	# query_failed: room_not_in_ewa_system
+H8 2 147.159: CONFERENCES	# query_failed: room_not_in_ewa_system
+STCC 0 7932: AUDITOIRE	# query_failed: room_not_in_ewa_system
 CP1 260: SALLE TP	# query_failed: room_not_in_ewa_system
-CH B2 355: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 CE 1 235: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+CH B2 355: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+BCH 2219: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+ECAL 2 20.12: SALLE TP	# query_failed: room_not_in_ewa_system
+PV 94.0: AFFECT DIV	# query_failed: room_not_in_ewa_system
+GA 3 21: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+ODY 0 03: CONFERENCES	# query_failed: room_not_in_ewa_system
 MXF 1: AUDITOIRE	# query_failed: room_not_in_ewa_system
+I17 0 91.1: STATION HYDROGENE	# query_failed: room_not_in_ewa_system
 HBL 1 PU03: CONFERENCES	# query_failed: room_not_in_ewa_system
 I17 0 91.0: STATION HYDROGENE	# query_failed: room_not_in_ewa_system
-I17 0 91.1: STATION HYDROGENE	# query_failed: room_not_in_ewa_system
-QIE 1 107.9: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-PPB 917: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-CE 1 720.1: CONFERENCES	# query_failed: room_not_in_ewa_system
-ECAL 2 20.12: SALLE TP	# query_failed: room_not_in_ewa_system
-SAUV 1424: CONFERENCES	# query_failed: room_not_in_ewa_system
-PH C1 392: SALLE TP	# query_failed: room_not_in_ewa_system
-CO 380: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-PV 94.0: AFFECT DIV	# query_failed: room_not_in_ewa_system
-BCH 2219: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-PH H3 32: SALLE TP	# query_failed: room_not_in_ewa_system
-CP1 254: SALLE TP	# query_failed: room_not_in_ewa_system
-CL 2 2628: CONFERENCES	# query_failed: room_not_in_ewa_system
-LE 2 205: CONFERENCES	# query_failed: room_not_in_ewa_system
 AI 1104: CONFERENCES	# query_failed: room_not_in_ewa_system
+PH C1 392: SALLE TP	# query_failed: room_not_in_ewa_system
+SAUV 1424: CONFERENCES	# query_failed: room_not_in_ewa_system
+CP1 474: SALLE TP	# query_failed: room_not_in_ewa_system
+CO 380: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
 CM 1 121: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 RLC D1 680: CONFERENCES	# query_failed: room_not_in_ewa_system
-CP1 474: SALLE TP	# query_failed: room_not_in_ewa_system
-PH D1 375: SALLE TP	# query_failed: room_not_in_ewa_system
-CM 0 13: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-BI A2 528: CONFERENCES	# query_failed: room_not_in_ewa_system
-BP 0428: SALLE TP	# query_failed: room_not_in_ewa_system
+PPB 917: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+LE 2 205: CONFERENCES	# query_failed: room_not_in_ewa_system
 CM 1 4: AUDITOIRE	# query_failed: room_not_in_ewa_system
-BC 08: SALLE TP	# query_failed: room_not_in_ewa_system
-CM 1 364: LIBRAIRIE	# query_failed: room_not_in_ewa_system
-H8 1 171.175: CONFERENCES	# query_failed: room_not_in_ewa_system
-MA B0 462: CONFERENCES	# query_failed: room_not_in_ewa_system
-B1 5 257.050: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
 BP 0328: SALLE TP	# query_failed: room_not_in_ewa_system
+PH D1 375: SALLE TP	# query_failed: room_not_in_ewa_system
 H8 1 144.167: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
+BP 0428: SALLE TP	# query_failed: room_not_in_ewa_system
 STCC 2 8017: STUDIOS	# query_failed: room_not_in_ewa_system
-TRIC 7.10: SALLE TP	# query_failed: room_not_in_ewa_system
 MC B1 273: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 AI 1153: CONFERENCES	# query_failed: room_not_in_ewa_system
+BC 08: SALLE TP	# query_failed: room_not_in_ewa_system
 BM 3241: CONFERENCES	# query_failed: room_not_in_ewa_system
-BS 246.2: CONFERENCES	# query_failed: room_not_in_ewa_system
-ZP 0 CAN: AFFECT DIV	# query_failed: room_not_in_ewa_system
-CE 1 530: CONFERENCES	# query_failed: room_not_in_ewa_system
-SKIL 0 01: SALLE TP	# query_failed: room_not_in_ewa_system
-QIE 1 107.11: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-ODY 0 16: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-AI 1142: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 0 348: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-SV 3510: CONFERENCES	# query_failed: room_not_in_ewa_system
-AAC 1 20: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-QIE 1 107.7: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-MA B0 437: CONFERENCES	# query_failed: room_not_in_ewa_system
-BS 117.1: CONFERENCES	# query_failed: room_not_in_ewa_system
-MC A3 308: CONFERENCES	# query_failed: room_not_in_ewa_system
-CM 1 221: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-INR 226: CONFERENCES	# query_failed: room_not_in_ewa_system
+PH H3 32: SALLE TP	# query_failed: room_not_in_ewa_system
+TRIC 7.10: SALLE TP	# query_failed: room_not_in_ewa_system
+CM 0 13: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+MA B0 462: CONFERENCES	# query_failed: room_not_in_ewa_system
+H8 1 171.175: CONFERENCES	# query_failed: room_not_in_ewa_system
+BI A2 528: CONFERENCES	# query_failed: room_not_in_ewa_system
+CM 1 364: LIBRAIRIE	# query_failed: room_not_in_ewa_system
 QIF 1 111.10: CONFERENCES	# query_failed: room_not_in_ewa_system
+ZP 0 CAN: AFFECT DIV	# query_failed: room_not_in_ewa_system
+MA B0 437: CONFERENCES	# query_failed: room_not_in_ewa_system
+BS 246.2: CONFERENCES	# query_failed: room_not_in_ewa_system
+SKIL 0 01: SALLE TP	# query_failed: room_not_in_ewa_system
 BCH 6209: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+QIE 1 107.7: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+CE 1 530: CONFERENCES	# query_failed: room_not_in_ewa_system
+AAC 1 20: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 CE 0 144: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-INR 114: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 0 448: CONFERENCES	# query_failed: room_not_in_ewa_system
-MED -1 1524: SALLE TP	# query_failed: room_not_in_ewa_system
-ELA 1: AUDITOIRE	# query_failed: room_not_in_ewa_system
-CP1 358: SALLE TP	# query_failed: room_not_in_ewa_system
+MC A3 308: CONFERENCES	# query_failed: room_not_in_ewa_system
+AI 1142: CONFERENCES	# query_failed: room_not_in_ewa_system
+BS 117.1: CONFERENCES	# query_failed: room_not_in_ewa_system
+QIE 1 107.11: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+B1 5 257.050: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
 GC D0 383: SALLE TP	# query_failed: room_not_in_ewa_system
-HBL 0 19A: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
-ELB 328: CONFERENCES	# query_failed: room_not_in_ewa_system
+CM 1 221: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+INR 114: CONFERENCES	# query_failed: room_not_in_ewa_system
+MED -1 1524: SALLE TP	# query_failed: room_not_in_ewa_system
+CE 0 448: CONFERENCES	# query_failed: room_not_in_ewa_system
+SV 3510: CONFERENCES	# query_failed: room_not_in_ewa_system
+CE 0 348: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+ODY 0 16: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+CP1 358: SALLE TP	# query_failed: room_not_in_ewa_system
+INR 226: CONFERENCES	# query_failed: room_not_in_ewa_system
+ELA 1: AUDITOIRE	# query_failed: room_not_in_ewa_system
 CH C0 407: SALLE TP	# query_failed: room_not_in_ewa_system
-BS 150: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+ELB 328: CONFERENCES	# query_failed: room_not_in_ewa_system
+ART C0 120: CONFERENCES	# query_failed: room_not_in_ewa_system
+MC B3 303: CONFERENCES	# query_failed: room_not_in_ewa_system
+BSP 524: CONFERENCES	# query_failed: room_not_in_ewa_system
+HBL 0 19A: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
+H4 1 132.092: CONFERENCES	# query_failed: room_not_in_ewa_system
+MC A2 308: CONFERENCES	# query_failed: room_not_in_ewa_system
 MA C1 594: CONFERENCES	# query_failed: room_not_in_ewa_system
 PH D1 398: SALLE TP	# query_failed: room_not_in_ewa_system
-H4 1 132.092: CONFERENCES	# query_failed: room_not_in_ewa_system
-AAD 0 31: SALLE TP	# query_failed: room_not_in_ewa_system
-MC B3 303: CONFERENCES	# query_failed: room_not_in_ewa_system
-ART C0 120: CONFERENCES	# query_failed: room_not_in_ewa_system
+MED -1 1221: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
 B3 4 186.134: CONFERENCES	# query_failed: room_not_in_ewa_system
 QIE 1 107.6: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-MED -1 1221: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
 CH A0 365: SALLE TP	# query_failed: room_not_in_ewa_system
-BSP 524: CONFERENCES	# query_failed: room_not_in_ewa_system
-CM 1 104: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+AAD 0 31: SALLE TP	# query_failed: room_not_in_ewa_system
 AAC 0 31: SALLE TP	# query_failed: room_not_in_ewa_system
-BS 127: CONFERENCES	# query_failed: room_not_in_ewa_system
-MC A2 308: CONFERENCES	# query_failed: room_not_in_ewa_system
 MXH 135: CONFERENCES	# query_failed: room_not_in_ewa_system
-BI A0 468: CONFERENCES	# query_failed: room_not_in_ewa_system
-CO 1: AUDITOIRE	# query_failed: room_not_in_ewa_system
-QIO -1 002: LOCAUX SECOND	# query_failed: room_not_in_ewa_system
-RLC D1 582: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 2 345: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-PH H2 474: CONFERENCES	# query_failed: room_not_in_ewa_system
 PH L1 503: CONFERENCES	# query_failed: room_not_in_ewa_system
-MXG 237: CONFERENCES	# query_failed: room_not_in_ewa_system
-B1 5 282.040: CONFERENCES	# query_failed: room_not_in_ewa_system
+BS 127: CONFERENCES	# query_failed: room_not_in_ewa_system
+RLC D1 582: CONFERENCES	# query_failed: room_not_in_ewa_system
+CO 1: AUDITOIRE	# query_failed: room_not_in_ewa_system
 GC A2 455: CONFERENCES	# query_failed: room_not_in_ewa_system
-H8 1 159.175: CONFERENCES	# query_failed: room_not_in_ewa_system
-CH B0 374: SALLE TP	# query_failed: room_not_in_ewa_system
+CE 2 345: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+BS 150: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+ME B2 424: CONFERENCES	# query_failed: room_not_in_ewa_system
+BI A0 468: CONFERENCES	# query_failed: room_not_in_ewa_system
+QIO -1 002: LOCAUX SECOND	# query_failed: room_not_in_ewa_system
+CM 1 104: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 INJ 120: REUNION	# query_failed: room_not_in_ewa_system
+B1 5 282.040: CONFERENCES	# query_failed: room_not_in_ewa_system
 RLC A1 340: CONFERENCES	# query_failed: room_not_in_ewa_system
+H8 1 159.175: CONFERENCES	# query_failed: room_not_in_ewa_system
+ZP 0 LRESE: STATION HYDROGENE	# query_failed: room_not_in_ewa_system
+PH H2 474: CONFERENCES	# query_failed: room_not_in_ewa_system
+CM 1 2: AUDITOIRE	# query_failed: room_not_in_ewa_system
+CH B0 374: SALLE TP	# query_failed: room_not_in_ewa_system
+MXG 237: CONFERENCES	# query_failed: room_not_in_ewa_system
 ELD 120: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 MXF 312: CONFERENCES	# query_failed: room_not_in_ewa_system
-CM 1 2: AUDITOIRE	# query_failed: room_not_in_ewa_system
-ZP 0 LRESE: STATION HYDROGENE	# query_failed: room_not_in_ewa_system
-PH D1 354: SALLE TP	# query_failed: room_not_in_ewa_system
-CSS 1 205: CONFERENCES	# query_failed: room_not_in_ewa_system
-CH C1 396: SALLE TP	# query_failed: room_not_in_ewa_system
-CM 2 263: CONFERENCES	# query_failed: room_not_in_ewa_system
 BI A0 448: CONFERENCES	# query_failed: room_not_in_ewa_system
-RLC D1 550: CONFERENCES	# query_failed: room_not_in_ewa_system
-B1 0 274.042: CONFERENCES	# query_failed: room_not_in_ewa_system
-BSP 231: AUDITOIRE	# query_failed: room_not_in_ewa_system
-ME B2 424: CONFERENCES	# query_failed: room_not_in_ewa_system
-ECAL 2 20.16: CONFERENCES	# query_failed: room_not_in_ewa_system
-BS 246.1: CONFERENCES	# query_failed: room_not_in_ewa_system
-MED 3 1715: SALLE TP	# query_failed: room_not_in_ewa_system
-AI 1241: CONFERENCES	# query_failed: room_not_in_ewa_system
-HBL 1 38B: CONFERENCES	# query_failed: room_not_in_ewa_system
-PH D1 344: SALLE TP	# query_failed: room_not_in_ewa_system
-AAC 1 37: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+CSS 1 205: CONFERENCES	# query_failed: room_not_in_ewa_system
 BM 5204: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 0 253: CONFERENCES	# query_failed: room_not_in_ewa_system
+AAC 1 37: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+RLC D1 550: CONFERENCES	# query_failed: room_not_in_ewa_system
+PH D1 344: SALLE TP	# query_failed: room_not_in_ewa_system
+B1 0 274.042: CONFERENCES	# query_failed: room_not_in_ewa_system
+BS 246.1: CONFERENCES	# query_failed: room_not_in_ewa_system
+H8 1 191.175: CONFERENCES	# query_failed: room_not_in_ewa_system
+ECAL 2 20.16: CONFERENCES	# query_failed: room_not_in_ewa_system
+AI 1241: CONFERENCES	# query_failed: room_not_in_ewa_system
+BSP 626: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 ME A0 402: SALLE TP	# query_failed: room_not_in_ewa_system
 QIF 1 111.6: CONFERENCES	# query_failed: room_not_in_ewa_system
-H8 1 191.175: CONFERENCES	# query_failed: room_not_in_ewa_system
+CH C1 396: SALLE TP	# query_failed: room_not_in_ewa_system
+PH D1 354: SALLE TP	# query_failed: room_not_in_ewa_system
+MED 3 1715: SALLE TP	# query_failed: room_not_in_ewa_system
+MC A1 272: AUDITOIRE	# query_failed: room_not_in_ewa_system
 CP1 374: SALLE TP	# query_failed: room_not_in_ewa_system
-BCH 2201: AUDITOIRE	# query_failed: room_not_in_ewa_system
 INM 020: STUDIOS	# query_failed: room_not_in_ewa_system
+CM 2 263: CONFERENCES	# query_failed: room_not_in_ewa_system
+BSP 231: AUDITOIRE	# query_failed: room_not_in_ewa_system
+CE 1 531: CONFERENCES	# query_failed: room_not_in_ewa_system
+CE 0 253: CONFERENCES	# query_failed: room_not_in_ewa_system
 CP1 458: SALLE TP	# query_failed: room_not_in_ewa_system
 QIJ 1 117.11: CONFERENCES	# query_failed: room_not_in_ewa_system
 QIJ 1 117.05: CONFERENCES	# query_failed: room_not_in_ewa_system
+HBL 1 38B: CONFERENCES	# query_failed: room_not_in_ewa_system
 CE 1 2: AUDITOIRE	# query_failed: room_not_in_ewa_system
+BCH 2201: AUDITOIRE	# query_failed: room_not_in_ewa_system
 BCH 2218: AUDITOIRE	# query_failed: room_not_in_ewa_system
-ELE 242: CONFERENCES	# query_failed: room_not_in_ewa_system
 CE 1 105: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-CE 1 531: CONFERENCES	# query_failed: room_not_in_ewa_system
 AAC 2 01: SALLE TP	# query_failed: room_not_in_ewa_system
-MED 3 1420: SALLE TP	# query_failed: room_not_in_ewa_system
-BSP 523: CONFERENCES	# query_failed: room_not_in_ewa_system
-INN 033: CONFERENCES	# query_failed: room_not_in_ewa_system
-PH D1 364: SALLE TP	# query_failed: room_not_in_ewa_system
-BSP 626: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-SG 2122: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-B25A 2 101: AUDITOIRE	# query_failed: room_not_in_ewa_system
-H8 1 166.158: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
-AAD 0 01: SALLE TP	# query_failed: room_not_in_ewa_system
-CM 1 106: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-B1 6 272.043: REUNION	# query_failed: room_not_in_ewa_system
 CP1 376: SALLE TP	# query_failed: room_not_in_ewa_system
-MED 2 1124: SALLE TP	# query_failed: room_not_in_ewa_system
+BSP 523: CONFERENCES	# query_failed: room_not_in_ewa_system
+MED 3 1420: SALLE TP	# query_failed: room_not_in_ewa_system
+INN 033: CONFERENCES	# query_failed: room_not_in_ewa_system
 AU -1 7005: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+B25A 2 101: AUDITOIRE	# query_failed: room_not_in_ewa_system
 AI 3142: CONFERENCES	# query_failed: room_not_in_ewa_system
-BP 1338: CONFERENCES	# query_failed: room_not_in_ewa_system
-GA 2 22: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-MC A1 272: AUDITOIRE	# query_failed: room_not_in_ewa_system
-CM 0 9: TUTORAT	# query_failed: room_not_in_ewa_system
-CO 121: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-GR A3 30: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-AI 2142: CONFERENCES	# query_failed: room_not_in_ewa_system
-CH H4 575: CONFERENCES	# query_failed: room_not_in_ewa_system
-CP1 390: CONFERENCES	# query_failed: room_not_in_ewa_system
-MED 2 2423: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-CH B0 375: SALLE TP	# query_failed: room_not_in_ewa_system
+H8 1 166.158: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
+SG 2122: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
 CH G1 495: CONFERENCES	# query_failed: room_not_in_ewa_system
-ELG 120: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-SV 2510: CONFERENCES	# query_failed: room_not_in_ewa_system
+CM 1 106: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+PH D1 364: SALLE TP	# query_failed: room_not_in_ewa_system
+AAD 0 01: SALLE TP	# query_failed: room_not_in_ewa_system
+CO 121: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+GA 2 22: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+MED 2 2423: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+GR A3 30: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 AAC 0 14: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-MED 2 1117: SALLE TP	# query_failed: room_not_in_ewa_system
-AU -1 7020: CONFERENCES	# query_failed: room_not_in_ewa_system
-INM 165: REUNION	# query_failed: room_not_in_ewa_system
+MED 2 1124: SALLE TP	# query_failed: room_not_in_ewa_system
+BP 1338: CONFERENCES	# query_failed: room_not_in_ewa_system
+CH H4 575: CONFERENCES	# query_failed: room_not_in_ewa_system
+CH B0 375: SALLE TP	# query_failed: room_not_in_ewa_system
+CP1 390: CONFERENCES	# query_failed: room_not_in_ewa_system
+ELE 242: CONFERENCES	# query_failed: room_not_in_ewa_system
+CM 0 9: TUTORAT	# query_failed: room_not_in_ewa_system
+B1 6 272.043: REUNION	# query_failed: room_not_in_ewa_system
 CP1 360: SALLE TP	# query_failed: room_not_in_ewa_system
-BI A0 433: CONFERENCES	# query_failed: room_not_in_ewa_system
-ELD 016: CONFERENCES	# query_failed: room_not_in_ewa_system
-BS 117.4: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 2 550: CONFERENCES	# query_failed: room_not_in_ewa_system
+INM 165: REUNION	# query_failed: room_not_in_ewa_system
+AI 2142: CONFERENCES	# query_failed: room_not_in_ewa_system
+ELG 120: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+MED 2 1117: SALLE TP	# query_failed: room_not_in_ewa_system
+SV 2510: CONFERENCES	# query_failed: room_not_in_ewa_system
 INJ 032: CONFERENCES	# query_failed: room_not_in_ewa_system
-BIO_A 6 137.1: CONFERENCES	# query_failed: room_not_in_ewa_system
+BI A0 433: CONFERENCES	# query_failed: room_not_in_ewa_system
+AU -1 7020: CONFERENCES	# query_failed: room_not_in_ewa_system
+BI A2 468: CONFERENCES	# query_failed: room_not_in_ewa_system
 B3 5 246.134: CONFERENCES	# query_failed: room_not_in_ewa_system
-BI A1 448: CONFERENCES	# query_failed: room_not_in_ewa_system
-PH B1 407: SALLE TP	# query_failed: room_not_in_ewa_system
-BS 117.5: CONFERENCES	# query_failed: room_not_in_ewa_system
-PH C1 425: SALLE TP	# query_failed: room_not_in_ewa_system
+BIO_A 6 137.1: CONFERENCES	# query_failed: room_not_in_ewa_system
 CM 1 1: AUDITOIRE	# query_failed: room_not_in_ewa_system
+CE 2 550: CONFERENCES	# query_failed: room_not_in_ewa_system
 MA B2 475: CONFERENCES	# query_failed: room_not_in_ewa_system
 BP 0430: SALLE TP	# query_failed: room_not_in_ewa_system
+ELD 016: CONFERENCES	# query_failed: room_not_in_ewa_system
+PH C1 425: SALLE TP	# query_failed: room_not_in_ewa_system
 BP 3135: SALLE TP	# query_failed: room_not_in_ewa_system
-PS_QN 2 94.6: AFFECT DIV	# query_failed: room_not_in_ewa_system
+BI A1 448: CONFERENCES	# query_failed: room_not_in_ewa_system
+BS 117.5: CONFERENCES	# query_failed: room_not_in_ewa_system
 QIF 3 139.4: CONFERENCES	# query_failed: room_not_in_ewa_system
+BS 117.4: CONFERENCES	# query_failed: room_not_in_ewa_system
+PH B1 407: SALLE TP	# query_failed: room_not_in_ewa_system
+PS_QN 2 94.6: AFFECT DIV	# query_failed: room_not_in_ewa_system
 B1 4 257.050: CONFERENCES	# query_failed: room_not_in_ewa_system
+B1 3 282.040: CONFERENCES	# query_failed: room_not_in_ewa_system
+MXG 312: CONFERENCES	# query_failed: room_not_in_ewa_system
 RLC C1 121: CONFERENCES	# query_failed: room_not_in_ewa_system
-BI A2 468: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 1 256: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
-BIO_A 6 109.1: CONFERENCES	# query_failed: room_not_in_ewa_system
+MXD 118: CONFERENCES	# query_failed: room_not_in_ewa_system
 CE 1 451: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
 H8 1 155.175: CONFERENCES	# query_failed: room_not_in_ewa_system
-MXE 938: SALLE TP	# query_failed: room_not_in_ewa_system
-B1 3 282.040: CONFERENCES	# query_failed: room_not_in_ewa_system
-PH B1 395: SALLE TP	# query_failed: room_not_in_ewa_system
-BP 1334: CONFERENCES	# query_failed: room_not_in_ewa_system
-CE 1 452: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+CE 1 256: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
 QIE 1 107.8: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-RLC D1 580: CONFERENCES	# query_failed: room_not_in_ewa_system
-BC 051.3: CONFERENCES	# query_failed: room_not_in_ewa_system
-ELG 022: SALLE TP	# query_failed: room_not_in_ewa_system
-MXG 312: CONFERENCES	# query_failed: room_not_in_ewa_system
-RLC D1 781: CONFERENCES	# query_failed: room_not_in_ewa_system
-MXD 118: CONFERENCES	# query_failed: room_not_in_ewa_system
-BCH 3118: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-BIO_A 6 137.2: CONFERENCES	# query_failed: room_not_in_ewa_system
+BIO_A 6 109.1: CONFERENCES	# query_failed: room_not_in_ewa_system
+MXE 938: SALLE TP	# query_failed: room_not_in_ewa_system
 SG 0310: SALLE TP	# query_failed: room_not_in_ewa_system
-CH F1 597: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
+INN 128: CONFERENCES	# query_failed: room_not_in_ewa_system
+BP 1334: CONFERENCES	# query_failed: room_not_in_ewa_system
 MED 3 1117: SALLE TP	# query_failed: room_not_in_ewa_system
+BIO_A 6 137.2: CONFERENCES	# query_failed: room_not_in_ewa_system
+RLC D1 580: CONFERENCES	# query_failed: room_not_in_ewa_system
+ELG 022: SALLE TP	# query_failed: room_not_in_ewa_system
+BC 051.3: CONFERENCES	# query_failed: room_not_in_ewa_system
+BCH 3118: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 GC C3 30: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-H8 3 196.160: CONFERENCES	# query_failed: room_not_in_ewa_system
+RLC D1 781: CONFERENCES	# query_failed: room_not_in_ewa_system
+PH B1 395: SALLE TP	# query_failed: room_not_in_ewa_system
 HBL 2 23C: CONFERENCES	# query_failed: room_not_in_ewa_system
+CE 1 452: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+CH F1 597: CONF MULTIMEDIA	# query_failed: room_not_in_ewa_system
 CE 1 225: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
 CP1 274: SALLE TP	# query_failed: room_not_in_ewa_system
-BIO_A 6 105: CONFERENCES	# query_failed: room_not_in_ewa_system
+H8 3 196.160: CONFERENCES	# query_failed: room_not_in_ewa_system
 MA A0 365: CONFERENCES	# query_failed: room_not_in_ewa_system
-SG 2320: SALLE TP	# query_failed: room_not_in_ewa_system
-BI A2 458: CONFERENCES	# query_failed: room_not_in_ewa_system
-MED 3 1122: SALLE TP	# query_failed: room_not_in_ewa_system
-BI A0 398: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-INF 328: CONFERENCES	# query_failed: room_not_in_ewa_system
-INN 128: CONFERENCES	# query_failed: room_not_in_ewa_system
-ART C0 210: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
 CM 1 517: CONFERENCES	# query_failed: room_not_in_ewa_system
-INJ 323: CONFERENCES	# query_failed: room_not_in_ewa_system
-AAC 0 08: SALLE DE COURS	# query_failed: room_not_in_ewa_system
-ME C2 393: CONFERENCES	# query_failed: room_not_in_ewa_system
-SAUV 230: AUDITOIRE	# query_failed: room_not_in_ewa_system
-AAB 0 47: CONFERENCES	# query_failed: room_not_in_ewa_system
-BS 182: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+BIO_A 6 105: CONFERENCES	# query_failed: room_not_in_ewa_system
 BS 990.3: DETEC.INCENDIE	# query_failed: room_not_in_ewa_system
-MC B1 283: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+BI A2 458: CONFERENCES	# query_failed: room_not_in_ewa_system
+ART C0 210: AUDIO-VISUEL	# query_failed: room_not_in_ewa_system
+BS 182: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+AAB 0 47: CONFERENCES	# query_failed: room_not_in_ewa_system
+BI A0 398: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+SG 2320: SALLE TP	# query_failed: room_not_in_ewa_system
 PH C1 404: SALLE TP	# query_failed: room_not_in_ewa_system
+SAUV 230: AUDITOIRE	# query_failed: room_not_in_ewa_system
+INJ 323: CONFERENCES	# query_failed: room_not_in_ewa_system
+MED 3 1122: SALLE TP	# query_failed: room_not_in_ewa_system
+INF 328: CONFERENCES	# query_failed: room_not_in_ewa_system
+ME C2 393: CONFERENCES	# query_failed: room_not_in_ewa_system
+AAC 0 08: SALLE DE COURS	# query_failed: room_not_in_ewa_system
 MA B0 424: SALLE DE COURS	# query_failed: room_not_in_ewa_system
+MC B1 283: SALLE DE COURS	# query_failed: room_not_in_ewa_system
