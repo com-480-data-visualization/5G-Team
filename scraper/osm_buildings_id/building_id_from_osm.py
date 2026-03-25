@@ -34,6 +34,12 @@ MANUAL_BUILDINGS = [
         "properties": {
             "name": "RLC"
         }
+    },
+    {
+        "id": "https://www.openstreetmap.org/way/37065206",
+        "properties": {
+            "name": "BAP"
+        }
     }
 ]
 
@@ -49,7 +55,19 @@ def is_manual_rlc_variant(code: str) -> bool:
     - RLC G
     """
     normalized = normalize(code)
-    return normalized == "RLC" or normalized.startswith("RLC_")
+    return normalized == "RLC" or normalized.startswith("RLC")
+
+
+def is_manual_building(code: str) -> bool:
+    """
+    Return True when a building code is handled by a manual OSM override.
+
+    Current manual overrides:
+    - RLC and its sub-block variants
+    - BAP
+    """
+    normalized = normalize(code)
+    return is_manual_rlc_variant(normalized) or normalized == "BAP"
 
 
 def log_section(title: str) -> None:
@@ -258,7 +276,7 @@ def main() -> None:
     # We want to inject RLC manually as one building relation, so remove it from
     # the automatic matching stage. This also prevents partial RLC sub-labels
     # such as "RLC A", "RLC B", etc. from competing with the manual entry.
-    wanted_codes = {code for code in wanted_codes if not is_manual_rlc_variant(code)}
+    wanted_codes = {code for code in wanted_codes if not is_manual_building(code)}
 
     log_section("INPUT BUILDING CODES")
     print(f"Loaded {len(building_codes)} requested building codes")
@@ -351,9 +369,9 @@ out ids tags center;
     for original_code in building_codes:
         norm_code = normalize(original_code)
 
-        # RLC and its lettered variants are handled manually below using the
-        # provided global RLC relation, so they should not appear as missing.
-        if is_manual_rlc_variant(norm_code):
+        # Manually overridden buildings are appended below and should not appear
+        # as auto-matched misses.
+        if is_manual_building(norm_code):
             continue
 
         item = matched.get(norm_code)
