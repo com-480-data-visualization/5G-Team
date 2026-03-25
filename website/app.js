@@ -68,6 +68,22 @@ function mountBuildingPanelForViewport() {
   }
 }
 
+// On mobile the panel sits below the map as normal page content.
+// After opening a building, bring that detached card into view so the user
+// does not have to manually scroll past the map to find the timeline.
+function revealBuildingPanelIfNeeded() {
+  if (!mobilePanelMedia.matches || !buildingPanel.classList.contains("panel-detached")) {
+    return;
+  }
+
+  requestAnimationFrame(() => {
+    buildingPanel.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  });
+}
+
 // Single helper for the status line under the search form.
 function setStatus(message) {
   document.getElementById("statusBanner").textContent = message;
@@ -630,6 +646,7 @@ function openBuildingPanel(buildingCode, rooms) {
 
   syncTimelineScroll(scrollElements);
   centerTimelineOnSearchWindow(scrollElements);
+  revealBuildingPanelIfNeeded();
 }
 
 // Return the side panel to its initial "select a building" state.
