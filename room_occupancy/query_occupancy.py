@@ -19,6 +19,7 @@ from html import unescape
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+import concurrent.futures
 
 BASE_URL = "https://ewa.epfl.ch/room/Default.aspx?room={room}"
 EVENTS_RE = re.compile(r"v\.events\s*=\s*(\[.*?\]);", re.DOTALL)
@@ -398,16 +399,16 @@ def main() -> int:
     summaries: list[dict[str, Any]] = []
     errors: list[dict[str, str]] = []
 
-    for room in rooms:
+    def process_room(room):
         try:
             html = fetch_room_page(room)
             events = extract_events(html)
         except RuntimeError as exc:
             errors.append({"room": room, "error": str(exc)})
-            continue
+            return
         except json.JSONDecodeError as exc:
             errors.append({"room": room, "error": f"failed to parse events JSON: {exc}"})
-            continue
+            return
 
         summary = summarize(room=room, at=at, events=events, limit=args.limit)
         summary["in_system"] = room_in_system_from_html(html, events)
@@ -417,7 +418,13 @@ def main() -> int:
             occupied_slots = events_for_interval(events, args.from_time, args.to_time)
             summary["occupied_slots"] = [[e.start.isoformat(), e.end.isoformat()] for e in occupied_slots]
 
-        summaries.append(summary)
+        return summary
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
+        results = list(executor.map(process_room, rooms))
+        for summary in results:
+            if summary:
+                summaries.append(summary)
 
     if args.json:
         if len(rooms) == 1 and args.room and summaries:
