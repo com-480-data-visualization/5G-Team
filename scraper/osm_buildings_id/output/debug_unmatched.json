@@ -1,0 +1,496 @@
+[
+  {
+    "id": "https://www.openstreetmap.org/way/35468412",
+    "tags": {
+      "addr:city": "Lausanne",
+      "addr:country": "CH",
+      "addr:postcode": "1015",
+      "building": "university",
+      "building:levels": "4",
+      "nohousenumber": "yes",
+      "roof:levels": "0",
+      "source": "EPFL plan"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35468413",
+    "tags": {
+      "addr:city": "Lausanne",
+      "addr:country": "CH",
+      "addr:postcode": "1015",
+      "building": "university",
+      "building:levels": "4",
+      "nohousenumber": "yes",
+      "source": "EPFL plan"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35543929",
+    "tags": {
+      "addr:city": "Lausanne",
+      "addr:country": "CH",
+      "addr:postcode": "1015",
+      "building": "university",
+      "building:levels": "2",
+      "nohousenumber": "yes",
+      "roof:levels": "0",
+      "source": "EPFL ortho"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/36334128",
+    "tags": {
+      "addr:city": "Lausanne",
+      "addr:country": "CH",
+      "addr:postcode": "1015",
+      "building": "university",
+      "building:levels": "1",
+      "nohousenumber": "yes",
+      "roof:levels": "0",
+      "source": "EPFL plan"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/186641876",
+    "tags": {
+      "bridge": "yes",
+      "building": "roof",
+      "foot": "yes",
+      "layer": "2",
+      "lit": "yes",
+      "surface": "sett"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/191883508",
+    "tags": {
+      "addr:city": "Lausanne",
+      "addr:country": "CH",
+      "addr:postcode": "1015",
+      "building": "university",
+      "building:levels": "1",
+      "nohousenumber": "yes",
+      "roof:shape": "flat",
+      "source": "EPFL plan"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/201759811",
+    "tags": {
+      "building": "parking",
+      "building:levels": "1",
+      "roof:levels": "0"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/385381386",
+    "tags": {
+      "building": "university",
+      "building:levels": "2",
+      "nohousenumber": "yes",
+      "roof:shape": "flat"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/492125155",
+    "tags": {
+      "building": "university",
+      "building:levels": "3",
+      "building:min_level": "2",
+      "layer": "3",
+      "noaddress": "yes",
+      "roof:shape": "flat"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/492125156",
+    "tags": {
+      "building": "university",
+      "building:levels": "3",
+      "building:min_level": "2",
+      "layer": "3",
+      "noaddress": "yes",
+      "roof:shape": "flat"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/492125158",
+    "tags": {
+      "building": "university",
+      "building:levels": "3",
+      "building:min_level": "2",
+      "layer": "3",
+      "noaddress": "yes",
+      "roof:shape": "flat"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/492125160",
+    "tags": {
+      "building": "university",
+      "building:levels": "3",
+      "building:min_level": "2",
+      "layer": "3",
+      "noaddress": "yes",
+      "roof:shape": "flat"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/492573616",
+    "tags": {
+      "building": "roof",
+      "layer": "1",
+      "roof:levels": "0",
+      "roof:shape": "gabled"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/492573618",
+    "tags": {
+      "building": "roof",
+      "layer": "1",
+      "roof:levels": "0",
+      "roof:shape": "gabled"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/582940672",
+    "tags": {
+      "building": "industrial",
+      "building:levels": "1",
+      "check_date": "2025-08-18",
+      "description": "►Vente de vélos d'occasion pour tous les goûts ►Petites réparations au prix des fournitures ►Mise à disposition d'outils pour les bricoleurs ►Cours de mécanique Horaires hors semestre: Je-Ve 12:00 Présentation : https://youtu.be/nqXQ7LixL8w",
+      "name": "Point Vélo",
+      "opening_hours": "Mo-Th 12:00-13:00; Fr 12:00-17:00; SH Tu 12:00-14:00 \"Hors semestre (off semester)\"; SH Th-Fr 12:00-17:00 \"Hors semestre (off semester)\"; Jul 15-Aug 15 Th-Fr 12:00-17:00",
+      "phone": "+41 79 371 36 55",
+      "service:bicycle:pump": "yes",
+      "shop": "bicycle",
+      "website": "https://www.epfl.ch/about/sustainability/fr/accueil/mobilite/pointvelo/"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/590997286",
+    "tags": {
+      "building": "university",
+      "building:levels": "2",
+      "building:min_level": "1",
+      "layer": "1",
+      "nohousenumber": "yes",
+      "roof:shape": "flat"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/590997288",
+    "tags": {
+      "building": "university",
+      "building:levels": "2",
+      "building:min_level": "1",
+      "nohousenumber": "yes",
+      "roof:shape": "flat"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/686343067",
+    "tags": {
+      "building": "grandstand",
+      "capacity": "800",
+      "leisure": "bleachers",
+      "name": "Agora Lombard Odier"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/869054291",
+    "tags": {
+      "addr:city": "Ecublens (VD)",
+      "addr:housenumber": "1",
+      "addr:postcode": "1024",
+      "addr:street": "Route des Noyerettes",
+      "architect": "Kersten Geers and David Van Severen",
+      "building": "commercial",
+      "building:levels": "2",
+      "check_date": "2023-06-26",
+      "image": "File:RTS-P1010112.JPG",
+      "name": "RTS (Radio Télévision Suisse) - Lausanne-Ecublens)",
+      "opening_date": "2025",
+      "wikidata": "Q124100598",
+      "wikimedia_commons": "Category:EPFL RTS"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/869061403",
+    "tags": {
+      "building": "commercial",
+      "building:levels": "4",
+      "check_date": "2026-01-26",
+      "name": "RTS - Emergence Sud"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/869061406",
+    "tags": {
+      "building": "commercial",
+      "building:levels": "4",
+      "check_date": "2026-01-26",
+      "name": "RTS - Emergence Est",
+      "smoking": "no"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/939458510",
+    "tags": {
+      "building": "shed"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/965697691",
+    "tags": {
+      "building": "roof"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/965866284",
+    "tags": {
+      "building": "shed"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/965866290",
+    "tags": {
+      "building": "shed"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/965866291",
+    "tags": {
+      "building": "shed"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/965866292",
+    "tags": {
+      "building": "shed"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/1016957171",
+    "tags": {
+      "amenity": "shelter",
+      "bench": "yes",
+      "bin": "yes",
+      "building": "yes",
+      "shelter_type": "public_transport"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/1059978080",
+    "tags": {
+      "building": "apartments",
+      "generator:place": "roof"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/1342983789",
+    "tags": {
+      "building": "greenhouse",
+      "name": "Serre expérimentale SIE"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/1342983790",
+    "tags": {
+      "building": "greenhouse",
+      "name": "Serre experimentale GR"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/1342983791",
+    "tags": {
+      "building": "greenhouse",
+      "name": "Serre expérimentale GR"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/1410092939",
+    "tags": {
+      "building": "roof",
+      "layer": "1"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/1417042291",
+    "tags": {
+      "addr:city": "Lausanne",
+      "addr:country": "CH",
+      "addr:housename": "ELH",
+      "addr:postcode": "1015",
+      "building": "university",
+      "building:levels": "2",
+      "name": "DELL EL",
+      "roof:levels": "0",
+      "roof:shape": "flat"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/1455724323",
+    "tags": {
+      "access": "yes",
+      "amenity": "bicycle_parking",
+      "bicycle_parking": "shed",
+      "building": "yes",
+      "capacity": "30",
+      "covered": "yes",
+      "fee": "no"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/1455724324",
+    "tags": {
+      "access": "yes",
+      "amenity": "bicycle_parking",
+      "bicycle_parking": "shed",
+      "building": "yes",
+      "capacity": "30",
+      "covered": "yes",
+      "fee": "no"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/1455724327",
+    "tags": {
+      "access": "yes",
+      "amenity": "bicycle_parking",
+      "bicycle_parking": "shed",
+      "building": "yes",
+      "capacity": "80",
+      "covered": "yes",
+      "fee": "no"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/1455724328",
+    "tags": {
+      "access": "yes",
+      "amenity": "bicycle_parking",
+      "bicycle_parking": "shed",
+      "building": "yes",
+      "capacity": "9",
+      "covered": "yes",
+      "fee": "no"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/1455724329",
+    "tags": {
+      "access": "yes",
+      "amenity": "bicycle_parking",
+      "bicycle_parking": "shed",
+      "building": "yes",
+      "capacity": "9",
+      "covered": "yes",
+      "fee": "no"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/1483919460",
+    "tags": {
+      "amenity": "shelter",
+      "building": "yes",
+      "shelter_type": "public_transport"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/331569",
+    "tags": {
+      "addr:city": "Lausanne",
+      "addr:country": "CH",
+      "addr:postcode": "1015",
+      "building": "university",
+      "building:levels": "2",
+      "layer": "1",
+      "name": "Rolex Learning Center",
+      "nohousenumber": "yes",
+      "ref": "RLC",
+      "roof:levels": "0",
+      "roof:shape": "many",
+      "type": "multipolygon",
+      "wikidata": "Q3030047"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/6683878",
+    "tags": {
+      "addr:city": "Lausanne",
+      "addr:postcode": "1015",
+      "addr:street": "Place Maurice Cosandey",
+      "alt_name": "Under One Roof",
+      "building": "university",
+      "building:levels": "2",
+      "building:part": "yes",
+      "image": "File:Batiment ARTLAB vue de l'extérieur.jpg",
+      "name": "PAVILION A",
+      "nohousenumber": "yes",
+      "roof:levels": "0",
+      "roof:shape": "gabled",
+      "type": "multipolygon",
+      "wikidata": "Q124115573",
+      "wikimedia_commons": "Category:EPFL Pavilion A"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/6683879",
+    "tags": {
+      "addr:city": "Lausanne",
+      "addr:postcode": "1015",
+      "addr:street": "Place Maurice Cosandey",
+      "alt_name": "Under One Roof",
+      "building": "university",
+      "building:levels": "2",
+      "building:part": "yes",
+      "name": "PAVILION B",
+      "nohousenumber": "yes",
+      "roof:levels": "0",
+      "roof:shape": "gabled",
+      "type": "multipolygon",
+      "wikidata": "Q124115564"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/6683880",
+    "tags": {
+      "addr:city": "Lausanne",
+      "addr:postcode": "1015",
+      "addr:street": "Place Maurice Cosandey",
+      "alt_name": "Under One Roof",
+      "building": "university",
+      "building:levels": "2",
+      "building:part": "yes",
+      "image": "File:Montreux Jazz Cafe Lausanne EPFL 01.jpg",
+      "name": "PAVILION C",
+      "nohousenumber": "yes",
+      "roof:levels": "0",
+      "roof:shape": "gabled",
+      "type": "multipolygon",
+      "wikidata": "Q124100515",
+      "wikimedia_commons": "Category:EPFL Pavilion C"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/12671742",
+    "tags": {
+      "addr:city": "Lausanne",
+      "addr:country": "CH",
+      "addr:postcode": "1015",
+      "architect": "Architram",
+      "building": "university",
+      "building:levels": "3",
+      "image": "File:EPFL-BI1001966.JPG",
+      "name": "BI",
+      "nohousenumber": "yes",
+      "roof:levels": "0",
+      "roof:shape": "flat",
+      "type": "multipolygon",
+      "wikidata": "Q124086159",
+      "wikimedia_commons": "Category:EPFL BI"
+    }
+  }
+]

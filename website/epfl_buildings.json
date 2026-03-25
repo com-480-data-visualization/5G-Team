@@ -1,0 +1,500 @@
+[
+  {
+    "id": "https://www.openstreetmap.org/way/30334086",
+    "properties": {
+      "name": "AAB"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30334085",
+    "properties": {
+      "name": "AAC"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30334084",
+    "properties": {
+      "name": "AAD"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30334082",
+    "properties": {
+      "name": "AI"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30088194",
+    "properties": {
+      "name": "BC"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30334088",
+    "properties": {
+      "name": "BM"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30334087",
+    "properties": {
+      "name": "BP"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35468436",
+    "properties": {
+      "name": "BS"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/409397",
+    "properties": {
+      "name": "CE"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/409402",
+    "properties": {
+      "name": "CHA"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/409403",
+    "properties": {
+      "name": "CHB"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/409404",
+    "properties": {
+      "name": "CHC"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/409409",
+    "properties": {
+      "name": "CHF"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/409408",
+    "properties": {
+      "name": "CHG"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/409407",
+    "properties": {
+      "name": "CHH"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/409406",
+    "properties": {
+      "name": "CHJ"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35468408",
+    "properties": {
+      "name": "CM"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30333703",
+    "properties": {
+      "name": "CO"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30333702",
+    "properties": {
+      "name": "ELA"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30333699",
+    "properties": {
+      "name": "ELB"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30333693",
+    "properties": {
+      "name": "ELD"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30333692",
+    "properties": {
+      "name": "ELE"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30333348",
+    "properties": {
+      "name": "ELG"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30333347",
+    "properties": {
+      "name": "ELH"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30403026",
+    "properties": {
+      "name": "ELL"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/582941060",
+    "properties": {
+      "name": "GA"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35468407",
+    "properties": {
+      "name": "GCA"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35468406",
+    "properties": {
+      "name": "GCB"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35468405",
+    "properties": {
+      "name": "GCC"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35468404",
+    "properties": {
+      "name": "GCD"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35468397",
+    "properties": {
+      "name": "GCF"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35468396",
+    "properties": {
+      "name": "GCG"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35468394",
+    "properties": {
+      "name": "GCH"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35468403",
+    "properties": {
+      "name": "GRA"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35468402",
+    "properties": {
+      "name": "GRB"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35468401",
+    "properties": {
+      "name": "GRC"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30333346",
+    "properties": {
+      "name": "INF"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30333345",
+    "properties": {
+      "name": "INJ"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/492125154",
+    "properties": {
+      "name": "INM"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30333344",
+    "properties": {
+      "name": "INN"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30333343",
+    "properties": {
+      "name": "INR"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/153242",
+    "properties": {
+      "name": "LE"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35468414",
+    "properties": {
+      "name": "MAA"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35468415",
+    "properties": {
+      "name": "MAB"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35468416",
+    "properties": {
+      "name": "MAC"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/186639272",
+    "properties": {
+      "name": "MEA"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/186639273",
+    "properties": {
+      "name": "MEB"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35468409",
+    "properties": {
+      "name": "MEC"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/407504253",
+    "properties": {
+      "name": "MED"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30333698",
+    "properties": {
+      "name": "MXC"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30333697",
+    "properties": {
+      "name": "MXD"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30333696",
+    "properties": {
+      "name": "MXE"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30333701",
+    "properties": {
+      "name": "MXF"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30333695",
+    "properties": {
+      "name": "MXG"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30333694",
+    "properties": {
+      "name": "MXH"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35538125",
+    "properties": {
+      "name": "ODY"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/409398",
+    "properties": {
+      "name": "PHA"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/409395",
+    "properties": {
+      "name": "PHB"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/409394",
+    "properties": {
+      "name": "PHC"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/409396",
+    "properties": {
+      "name": "PHD"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/409399",
+    "properties": {
+      "name": "PHH"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/409410",
+    "properties": {
+      "name": "PHJ"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/409411",
+    "properties": {
+      "name": "PHK"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/409412",
+    "properties": {
+      "name": "PHL"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/35468418",
+    "properties": {
+      "name": "PO"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30404114",
+    "properties": {
+      "name": "PPB"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30404110",
+    "properties": {
+      "name": "PPH"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30403028",
+    "properties": {
+      "name": "PSEA"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30404104",
+    "properties": {
+      "name": "PSEB"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30404108",
+    "properties": {
+      "name": "PSEC"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/45542228",
+    "properties": {
+      "name": "PSED"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/45542227",
+    "properties": {
+      "name": "QIE"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/45542226",
+    "properties": {
+      "name": "QIF"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/51739569",
+    "properties": {
+      "name": "QIG"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/51739571",
+    "properties": {
+      "name": "QIH"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/51739573",
+    "properties": {
+      "name": "QII"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/51739574",
+    "properties": {
+      "name": "QIJ"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/45542224",
+    "properties": {
+      "name": "QIK"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30334083",
+    "properties": {
+      "name": "SG"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/965866288",
+    "properties": {
+      "name": "STF"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/relation/409405",
+    "properties": {
+      "name": "STT"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30334080",
+    "properties": {
+      "name": "SV"
+    }
+  },
+  {
+    "id": "https://www.openstreetmap.org/way/30404111",
+    "properties": {
+      "name": "TCV"
+    }
+  }
+]

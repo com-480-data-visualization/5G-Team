@@ -1,24 +1,12 @@
 import json
 import os
+from pathlib import Path
 from typing import Dict, List, Optional, Set
 
 import requests
 
-
-BUILDING_CODES = [
-    "PPH", "SPP", "BCH", "BC", "CSB", "GEN", "QIJ", "DLLEL", "FBC", "AAC", "PSEB",
-    "AAB", "BIO_A", "CO", "ALO", "PS_QN", "FO", "SOS2", "GA", "QIG", "BAR", "SPN",
-    "INJ", "MXF", "DIA", "BFFA", "ALP", "TRIH", "EXTRA", "H4", "TCV", "AST", "GO10",
-    "BAF", "TRIE", "PO", "PSEL", "STF", "BAP", "B25A", "SF", "AN", "QIH", "ELL",
-    "PH", "PSEC", "BAH", "AI", "INR", "GR", "INN", "MA", "SS", "ELG", "MXD", "AU",
-    "ZD", "I17", "H8", "QIE", "STT", "QIF", "INF", "ELB", "LE", "ODY", "MED", "AAD",
-    "B1", "TRIC", "ELH", "MXH", "SV", "ELA", "SKIL", "G6", "ECAL", "QIK", "SSH",
-    "RLC", "BS", "QII", "INM", "ELE", "CM", "ART", "PPB", "CH", "PV", "VOR", "CCT",
-    "GEO", "CE", "CSN", "CAPU", "PSEA", "QIO", "BM", "QIN", "ELD", "ZP", "BAC", "BP",
-    "HBL", "CSV", "I23", "SAUV", "CRR", "I19", "CSS", "CL", "VR15", "SCT", "BSP",
-    "STCC", "MC", "JORD", "ME", "NH", "MXC", "CP1", "MXG", "BI", "SG", "PSED", "GC",
-    "MXE", "ZC", "SOS1", "B3",
-]
+BASE_DIR = Path(__file__).resolve().parents[1]
+BUILDINGS_JSON = BASE_DIR / "buildings" / "buildings.json"
 
 OVERPASS_URLS = [
     "https://overpass-api.de/api/interpreter",
@@ -29,6 +17,13 @@ OUTPUT_DIR = "output"
 OUTPUT_JSON = os.path.join(OUTPUT_DIR, "epfl_buildings.json")
 MISSING_JSON = os.path.join(OUTPUT_DIR, "missing_buildings.json")
 DEBUG_JSON = os.path.join(OUTPUT_DIR, "debug_unmatched.json")
+
+
+def load_building_codes() -> List[str]:
+    """Load the building codes generated from the room scraper."""
+
+    with BUILDINGS_JSON.open("r", encoding="utf-8") as file_handle:
+        return json.load(file_handle)
 
 
 def normalize(text: Optional[str]) -> str:
@@ -142,7 +137,8 @@ def find_first_matching_code(tags: Dict[str, str], wanted: Set[str]) -> Optional
 def main() -> None:
     ensure_output_dir()
 
-    wanted_codes: Set[str] = {normalize(code) for code in BUILDING_CODES}
+    building_codes = load_building_codes()
+    wanted_codes: Set[str] = {normalize(code) for code in building_codes}
 
     # Broad query over EPFL campus area.
     # We query all building-tagged ways/relations, then filter locally using your code list.
@@ -201,7 +197,7 @@ out ids tags center;
     result: List[Dict] = []
     missing: List[str] = []
 
-    for original_code in BUILDING_CODES:
+    for original_code in building_codes:
         norm_code = normalize(original_code)
         item = matched.get(norm_code)
         if item is not None:
