@@ -639,15 +639,21 @@ function refreshOpenBuildingPanel() {
 // This wires hover feedback, popup content, and click-to-open behavior.
 function onEachFeature(feature, layer) {
   const { name, score, id, availableRooms, rooms } = feature.properties;
+  const enableMapPopup = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-  layer.bindPopup(`
-    <div class="room-popup">
-      <h4>${name}</h4>
-      <p>Availability in search window: ${availableRooms}/${rooms} rooms</p>
-      <p>Availability score: ${Math.round(score * 100)}%</p>
-      <p><a href="${id}" target="_blank" rel="noreferrer">Open in OpenStreetMap</a></p>
-    </div>
-  `);
+  // On desktop we keep the Leaflet popup as a lightweight map detail.
+  // On touch/mobile we skip it, because popup autopan competes with the
+  // custom building panel and can make the map jump around awkwardly.
+  if (enableMapPopup) {
+    layer.bindPopup(`
+      <div class="room-popup">
+        <h4>${name}</h4>
+        <p>Availability in search window: ${availableRooms}/${rooms} rooms</p>
+        <p>Availability score: ${Math.round(score * 100)}%</p>
+        <p><a href="${id}" target="_blank" rel="noreferrer">Open in OpenStreetMap</a></p>
+      </div>
+    `);
+  }
 
   layer.on("mouseover", () => {
     layer.setStyle({
@@ -661,6 +667,10 @@ function onEachFeature(feature, layer) {
   });
 
   layer.on("click", () => {
+    if (!enableMapPopup) {
+      layer.closePopup();
+    }
+
     const rooms = getRoomsForBuilding(name);
     openBuildingPanel(name, rooms);
     setStatus(
