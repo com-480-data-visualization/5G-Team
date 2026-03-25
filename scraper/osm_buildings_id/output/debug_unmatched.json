@@ -12704,20 +12704,6 @@
     }
   },
   {
-    "id": "https://www.openstreetmap.org/way/1417042291",
-    "tags": {
-      "addr:city": "Lausanne",
-      "addr:country": "CH",
-      "addr:housename": "ELH",
-      "addr:postcode": "1015",
-      "building": "university",
-      "building:levels": "2",
-      "name": "DELLEL",
-      "roof:levels": "0",
-      "roof:shape": "flat"
-    }
-  },
-  {
     "id": "https://www.openstreetmap.org/way/1424133684",
     "tags": {
       "amenity": "shelter",

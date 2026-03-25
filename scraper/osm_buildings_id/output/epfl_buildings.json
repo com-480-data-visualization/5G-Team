@@ -126,6 +126,12 @@
     }
   },
   {
+    "id": "https://www.openstreetmap.org/way/1417042291",
+    "properties": {
+      "name": "DLLEL"
+    }
+  },
+  {
     "id": "https://www.openstreetmap.org/way/30333702",
     "properties": {
       "name": "ELA"
