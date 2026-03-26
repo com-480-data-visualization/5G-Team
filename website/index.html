@@ -47,7 +47,6 @@
         <nav class="topnav" aria-label="Primary">
           <a class="active" href="#map-section">Map</a>
           <a href="#search-panel">Search</a>
-          <a href="#legend-card">Availability</a>
         </nav>
 
         <button class="ghost-button theme-toggle" id="themeToggle" type="button" aria-pressed="false">
@@ -251,39 +250,9 @@
           </p>
         </section>
 
-        <!-- Map area: left side explains the mock data, right side holds the map. -->
+        <!-- Map area: the map frame contains both the map and the room timeline panel. -->
         <section class="map-section" id="map-section">
-          <!-- Legend / summary card describing how the visual encoding works. -->
-          <aside class="legend-card" id="legend-card">
-            <div>
-              <p class="eyebrow">Campus signal</p>
-              <h3>Building availability preview</h3>
-            </div>
-            <p>
-              Each polygon is built from your EPFL OSM dataset. The frontend
-              resolves the OpenStreetMap ids into real building footprints and
-              then colors them by demo availability.
-            </p>
-
-            <div class="legend-scale">
-              <span>Low</span>
-              <div class="gradient-bar" aria-hidden="true"></div>
-              <span>High</span>
-            </div>
-
-            <ul class="metric-list">
-              <li>
-                <strong id="visibleRooms">0</strong>
-                <span>OSM buildings loaded</span>
-              </li>
-              <li>
-                <strong id="bestZone">-</strong>
-                <span>best availability code</span>
-              </li>
-            </ul>
-          </aside>
-
-          <!-- The map frame combines a floating explanation card and the actual map. -->
+          <!-- The map frame combines the room timeline panel and the actual map. -->
           <div class="map-frame">
             <aside class="building-panel is-empty" id="buildingPanel" aria-live="polite">
               <div class="building-panel-header">

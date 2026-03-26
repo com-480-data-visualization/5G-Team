@@ -147,8 +147,7 @@ select {
 }
 
 .brand-group h1,
-.search-heading h2,
-.legend-card h3 {
+.search-heading h2 {
   /* Remove default heading spacing so alignment stays tight. */
   margin: 0;
 }
@@ -222,7 +221,6 @@ select {
 }
 
 .search-panel,
-.legend-card,
 .building-panel {
   /* Shared glass-card treatment used throughout the UI. */
   border: 1px solid var(--border);
@@ -257,7 +255,6 @@ select {
 }
 
 .search-copy,
-.legend-card p,
 .map-overlay p,
 .status-banner {
   /* Shared muted paragraph style for helper text. */
@@ -436,67 +433,9 @@ select {
 }
 
 .map-section {
-  /* Two-column layout: left legend card, right map. */
-  display: grid;
-  grid-template-columns: 320px minmax(0, 1fr);
-  gap: 18px;
+  /* The map area is now a single full-width frame. */
+  display: block;
   min-height: min(78vh, 920px);
-}
-
-.legend-card {
-  /* Holds the explanation and summary metrics for the mock availability view. */
-  display: grid;
-  align-content: start;
-  gap: 18px;
-  padding: 22px;
-  border-radius: 28px;
-}
-
-.legend-scale {
-  /* Horizontal scale for interpreting the color gradient. */
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 12px;
-  color: var(--muted);
-  font-size: 0.92rem;
-}
-
-.gradient-bar {
-  /* Visual legend from low to high availability intensity. */
-  height: 10px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #dd6b6b 0%, #f3b458 45%, #2f8f5b 100%);
-}
-
-.metric-list {
-  /* Removes default list styling and makes metrics stack cleanly. */
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 14px;
-}
-
-.metric-list li {
-  /* Each summary metric appears as its own card-like row. */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 16px;
-  border-radius: 18px;
-  background: var(--metric-bg);
-}
-
-.metric-list strong {
-  /* Emphasized numeric highlight. */
-  font-size: 1.5rem;
-}
-
-.metric-list span {
-  /* Secondary description for each metric. */
-  color: var(--muted);
-  text-align: right;
 }
 
 .map-frame {
@@ -529,7 +468,6 @@ select {
     height: 100%;
   }
 
-  .legend-card,
   .map-frame,
   #map {
     min-height: 0;
@@ -788,10 +726,6 @@ select {
     min-height: auto;
   }
 
-  .legend-card {
-    order: 2;
-  }
-
   .building-panel {
     top: auto;
     right: 12px;
@@ -819,7 +753,6 @@ select {
 
   .topbar,
   .search-panel,
-  .legend-card,
   .building-panel {
     border-radius: 22px;
   }

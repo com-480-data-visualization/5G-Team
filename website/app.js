@@ -957,18 +957,6 @@ function renderBuildings(features) {
     }
   ).addTo(map);
 
-  const bestBuilding = features.reduce((best, current) => {
-    return current.properties.score > best.properties.score ? current : best;
-  });
-
-  const totalRooms = features.reduce((sum, feature) => {
-    return sum + feature.properties.rooms;
-  }, 0);
-
-  document.getElementById("visibleRooms").textContent = features.length;
-  document.getElementById("bestZone").textContent = bestBuilding.properties.name;
-  document.getElementById("visibleRooms").title = `${totalRooms} rooms represented across all loaded buildings`;
-
   // Leaflet computes the bounds from the real rendered geometry.
   // On mobile we still zoom in a bit after fitting so the campus is easier to
   // inspect on a smaller screen, but not so much that the context is lost.
