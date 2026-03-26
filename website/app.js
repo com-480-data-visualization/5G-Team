@@ -4,7 +4,7 @@
 const map = L.map("map", {
   zoomControl: true,
   scrollWheelZoom: true,
-}).setView([0, 0], 2);
+}).setView([46.519978, 6.566638], 17);
 
 // OpenStreetMap base tiles.
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
