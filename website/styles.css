@@ -217,7 +217,7 @@ select {
   /* Vertical stack of the search panel and the map section. */
   display: grid;
   gap: 18px;
-  margin-top: 18px;
+  margin-top: 0px;
   min-height: calc(100vh - 132px);
 }
 
