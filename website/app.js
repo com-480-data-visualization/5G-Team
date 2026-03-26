@@ -1162,9 +1162,7 @@ function seedDefaultTimes() {
 // Then it:
 // 1. recomputes the building heatmap
 // 2. refreshes the currently open building panel, if any
-document.getElementById("availability-form").addEventListener("submit", (event) => {
-  event.preventDefault();
-
+function applyCurrentSearch() {
   const start = document.getElementById("startTime").value;
   const end = document.getElementById("endTime").value;
   const duration = document.getElementById("duration").value;
@@ -1182,10 +1180,15 @@ document.getElementById("availability-form").addEventListener("submit", (event) 
   setStatus(
     `Search applied: ${start} to ${end} for ${duration} minutes. Rooms are now available only if they contain a continuous free interval at least that long within the selected window.`
   );
+}
+
+document.getElementById("availability-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  applyCurrentSearch();
 });
 
-// Preset buttons only update the search form values.
-// The user still has to press Search to apply them to the map.
+// Preset buttons update the form and immediately apply the same search logic
+// so both the heatmap and any already-open building timeline refresh at once.
 document.querySelectorAll(".shortcut-chip").forEach((button) => {
   button.addEventListener("click", () => {
     const now = new Date();
@@ -1223,7 +1226,7 @@ document.querySelectorAll(".shortcut-chip").forEach((button) => {
       endTimePicker.setDate(end, false);
     }
 
-    setStatus(`Preset applied: ${button.textContent}. Press Search to update building availability for that time window.`);
+    applyCurrentSearch();
   });
 });
 
