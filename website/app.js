@@ -1048,9 +1048,14 @@ function centerTimelineOnSearchWindow(scrollElements) {
 function syncTimelineScroll(scrollElements) {
   let syncFrame = null;
   let activeSource = null;
+  let isSyncingProgrammatically = false;
 
   scrollElements.forEach((element) => {
     element.addEventListener("scroll", () => {
+      if (isSyncingProgrammatically) {
+        return;
+      }
+
       if (activeSource && activeSource !== element) {
         return;
       }
@@ -1064,12 +1069,14 @@ function syncTimelineScroll(scrollElements) {
       // Coalesce scroll mirroring into one animation-frame update so touch
       // dragging does not trigger a full fan-out write on every raw event.
       syncFrame = requestAnimationFrame(() => {
+        isSyncingProgrammatically = true;
         scrollElements.forEach((other) => {
           if (other !== element) {
             other.scrollLeft = element.scrollLeft;
           }
         });
 
+        isSyncingProgrammatically = false;
         syncFrame = null;
         activeSource = null;
       });

@@ -617,7 +617,7 @@ select {
   padding-right: 6px;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-  touch-action: auto;
+  touch-action: pan-y;
 }
 
 .timeline-section-heading {
@@ -670,6 +670,14 @@ select {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
   touch-action: auto;
+}
+
+@media (hover: none) and (pointer: coarse) and (min-width: 721px) {
+  /* iPad/tablet touch devices need explicit horizontal intent on each row to
+     keep sideways timeline scrolling responsive. */
+  .timeline-scroll {
+    touch-action: pan-x;
+  }
 }
 
 .timeline-grid {
