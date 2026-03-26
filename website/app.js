@@ -1160,7 +1160,7 @@ function seedDefaultTimes() {
   start.setHours(start.getHours() + 1);
 
   const end = new Date(start);
-  end.setHours(end.getHours() + 2);
+  end.setHours(end.getHours() + 1);
 
   document.getElementById("startTime").value = formatEuropeanDateTimeInput(start);
   document.getElementById("endTime").value = formatEuropeanDateTimeInput(end);
@@ -1204,14 +1204,18 @@ document.querySelectorAll(".shortcut-chip").forEach((button) => {
     const start = new Date(now);
     const range = button.dataset.range;
 
-    if (range === "today") {
-      start.setHours(14, 0, 0, 0);
+    if (range === "now") {
+      start.setMinutes(0, 0, 0);
+      start.setHours(start.getHours() + 1);
     } else if (range === "tomorrow") {
       start.setDate(start.getDate() + 1);
       start.setHours(9, 0, 0, 0);
+    } else if (range === "tomorrow-afternoon") {
+      start.setDate(start.getDate() + 1);
+      start.setHours(14, 0, 0, 0);
     } else {
-      start.setDate(start.getDate() + 2);
-      start.setHours(10, 0, 0, 0);
+      start.setMinutes(0, 0, 0);
+      start.setHours(start.getHours() + 1);
     }
 
     const end = new Date(start);
