@@ -1430,7 +1430,7 @@ function indexOccupancyByRoom(payload) {
   // const rooms = Array.isArray(payload?.rooms) ? payload.rooms : [];
 
   payload.forEach((entry) => {
-    const roomName = entry?.name;
+    const roomName = entry?.room;
     const date = entry?.date;
 
     if (!roomName || !date) {
