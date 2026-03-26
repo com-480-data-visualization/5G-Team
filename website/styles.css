@@ -456,18 +456,21 @@ select {
 }
 
 @media (min-width: 1101px) {
-  /* Desktop: make the map row consume remaining viewport height so cards reach
-     the bottom of the screen even after removing the topbar. */
+  /* Desktop layout: keep the full search panel on the left and let the map
+     occupy the wider right column. */
   .content {
     height: calc(100vh - 28px);
-    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-columns: 420px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
   }
 
-  .map-section {
-    min-height: 0;
-    height: 100%;
+  .search-panel {
+    align-self: stretch;
+    overflow: auto;
   }
 
+  .map-section,
   .map-frame,
   #map {
     min-height: 0;
