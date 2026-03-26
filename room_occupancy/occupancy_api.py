@@ -9,7 +9,8 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost", "https://ftpsens.epfl.ch"],
+    # allow_origins=["http://localhost", "https://ftpsens.epfl.ch", "https://com-480-data-visualization.github.io/5G-Team/"],
+    allow_origins=["*"], # TODO: Fix
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
