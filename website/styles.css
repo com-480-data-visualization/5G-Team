@@ -617,7 +617,7 @@ select {
   padding-right: 6px;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-  touch-action: pan-y;
+  touch-action: auto;
 }
 
 .timeline-section-heading {
@@ -669,7 +669,7 @@ select {
   width: 100%;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
-  touch-action: pan-x;
+  touch-action: auto;
 }
 
 .timeline-grid {

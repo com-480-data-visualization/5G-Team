@@ -1046,14 +1046,34 @@ function centerTimelineOnSearchWindow(scrollElements) {
 
 // Keep the hour header and all room rows horizontally synchronized.
 function syncTimelineScroll(scrollElements) {
+  let syncFrame = null;
+  let activeSource = null;
+
   scrollElements.forEach((element) => {
     element.addEventListener("scroll", () => {
-      scrollElements.forEach((other) => {
-        if (other !== element) {
-          other.scrollLeft = element.scrollLeft;
-        }
+      if (activeSource && activeSource !== element) {
+        return;
+      }
+
+      activeSource = element;
+
+      if (syncFrame !== null) {
+        return;
+      }
+
+      // Coalesce scroll mirroring into one animation-frame update so touch
+      // dragging does not trigger a full fan-out write on every raw event.
+      syncFrame = requestAnimationFrame(() => {
+        scrollElements.forEach((other) => {
+          if (other !== element) {
+            other.scrollLeft = element.scrollLeft;
+          }
+        });
+
+        syncFrame = null;
+        activeSource = null;
       });
-    });
+    }, { passive: true });
   });
 }
 
