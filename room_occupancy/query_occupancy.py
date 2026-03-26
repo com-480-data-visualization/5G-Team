@@ -673,24 +673,37 @@ def main() -> int:
                 summaries.append(summary)
 
     if args.json:
-        if len(rooms) == 1 and args.room and summaries:
-            # Single room query format
-            summary = summaries[0]
-            output = {
-                "name": [summary["room"]],
-                "slots": summary.get("occupied_slots", [])
-            }
-            output_data = json.dumps(output, indent=2)
-        else:
-            # Multiple rooms format
-            results = []
-            for summary in summaries:
-                results.append({
-                    "name": [summary["room"]],
-                    "slots": summary.get("occupied_slots", [])
-                })
-            output_data = json.dumps(results, indent=2)
-        
+        output_rooms: list[dict[str, Any]] = []
+        for summary in summaries:
+            interval_events = summary.get("interval", {}).get("events", [])
+            events_by_date: dict[str, list[list[str]]] = {}
+
+            for event in interval_events:
+                date_key = str(event["start"])[:10]
+                if date_key not in events_by_date:
+                    events_by_date[date_key] = []
+                events_by_date[date_key].append(
+                    [
+                        str(event["title"]),
+                        str(event["start"]),
+                        str(event["end"]),
+                    ]
+                )
+
+            output_dates = [
+                {"date": date_key, "events": events_by_date[date_key]}
+                for date_key in sorted(events_by_date)
+            ]
+
+            output_rooms.append(
+                {
+                    "name": summary["room"],
+                    "dates": output_dates,
+                }
+            )
+
+        output_data = json.dumps({"rooms": output_rooms}, indent=2)
+
         # Write to file
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(output_data, encoding="utf-8")
