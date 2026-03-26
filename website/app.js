@@ -1026,6 +1026,67 @@ function createTimelineScroll(isHeader = false) {
   return scroll;
 }
 
+// Touch devices struggle with the nested "vertical body + horizontal row"
+// scrolling pattern. We resolve that by explicitly routing the gesture:
+// horizontal drags move the row, vertical drags move the surrounding timeline.
+function enableTouchTimelineGestures(scrollElements) {
+  const coarsePointer = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
+  if (!coarsePointer) {
+    return;
+  }
+
+  scrollElements.forEach((scrollElement) => {
+    let touchState = null;
+
+    scrollElement.addEventListener("touchstart", (event) => {
+      const touch = event.touches[0];
+      const timelineContainer = scrollElement.closest(".timeline-shell")?.querySelector(".timeline-body");
+
+      touchState = {
+        startX: touch.clientX,
+        startY: touch.clientY,
+        startLeft: scrollElement.scrollLeft,
+        startTop: timelineContainer?.scrollTop || 0,
+        mode: null,
+        timelineContainer,
+      };
+    }, { passive: true });
+
+    scrollElement.addEventListener("touchmove", (event) => {
+      if (!touchState) {
+        return;
+      }
+
+      const touch = event.touches[0];
+      const deltaX = touch.clientX - touchState.startX;
+      const deltaY = touch.clientY - touchState.startY;
+
+      if (!touchState.mode) {
+        touchState.mode = Math.abs(deltaX) >= Math.abs(deltaY) ? "horizontal" : "vertical";
+      }
+
+      if (touchState.mode === "horizontal") {
+        event.preventDefault();
+        scrollElement.scrollLeft = touchState.startLeft - deltaX;
+        return;
+      }
+
+      if (touchState.timelineContainer) {
+        event.preventDefault();
+        touchState.timelineContainer.scrollTop = touchState.startTop - deltaY;
+      }
+    }, { passive: false });
+
+    const clearTouchState = () => {
+      touchState = null;
+    };
+
+    scrollElement.addEventListener("touchend", clearTouchState, { passive: true });
+    scrollElement.addEventListener("touchcancel", clearTouchState, { passive: true });
+  });
+}
+
 // Keep the searched period in view by centering the horizontal timeline near
 // the middle of the requested time window.
 function centerTimelineOnSearchWindow(scrollElements) {
@@ -1195,6 +1256,7 @@ function openBuildingPanel(buildingCode, rooms) {
   }
 
   syncTimelineScroll(scrollElements);
+  enableTouchTimelineGestures(scrollElements);
   centerTimelineOnSearchWindow(scrollElements);
   revealBuildingPanelIfNeeded();
 }
