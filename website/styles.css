@@ -241,6 +241,17 @@ select {
   margin-bottom: 20px;
 }
 
+.search-heading-meta {
+  /* Groups helper text and the theme toggle in the search panel header. */
+  display: grid;
+  justify-items: end;
+  gap: 12px;
+}
+
+.search-heading-meta .theme-toggle {
+  width: fit-content;
+}
+
 .search-copy,
 .legend-card p,
 .map-overlay p,
@@ -727,6 +738,10 @@ select {
 
   .search-controls {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .search-heading-meta {
+    justify-items: start;
   }
 
   .map-section {

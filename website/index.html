@@ -35,8 +35,7 @@
     <!-- Main application shell containing the full page UI. -->
     <div class="app-shell">
       <!-- Top navigation bar inspired by dashboard products like Dawarich. -->
-      <header class="topbar">
-        <!-- Branding block: app mark plus project title. -->
+      <!-- <header class="topbar">
         <div class="brand-group">
           <div class="brand-mark">E</div>
           <div>
@@ -45,18 +44,16 @@
           </div>
         </div>
 
-        <!-- Simple in-page navigation for jumping between major sections. -->
         <nav class="topnav" aria-label="Primary">
           <a class="active" href="#map-section">Map</a>
           <a href="#search-panel">Search</a>
           <a href="#legend-card">Availability</a>
         </nav>
 
-        <!-- Theme toggle lets the user switch between dark and light palettes. -->
         <button class="ghost-button theme-toggle" id="themeToggle" type="button" aria-pressed="false">
           Light mode
         </button>
-      </header>
+      </header> -->
 
       <main class="content">
         <!-- Search section: this is where the future room query will begin. -->
@@ -67,11 +64,16 @@
               <p class="eyebrow">Meeting availability</p>
               <h2>Find free rooms across the EPFL campus</h2>
             </div>
-            <p class="search-copy">
-              Enter a start date, end date, and meeting duration. The current
-              prototype keeps the form UI and map flow in place while the real
-              room-availability backend is still to be connected.
-            </p>
+            <div class="search-heading-meta">
+              <p class="search-copy">
+                Enter a start date, end date, and meeting duration. The current
+                prototype keeps the form UI and map flow in place while the real
+                room-availability backend is still to be connected.
+              </p>
+              <button class="ghost-button theme-toggle" id="themeToggle" type="button" aria-pressed="false">
+                Light mode
+              </button>
+            </div>
           </div>
 
           <!--
