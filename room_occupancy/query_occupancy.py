@@ -43,7 +43,7 @@ class RoomEvent:
     raw: dict[str, Any]
 
 
-def fetch_room_page(room: str, timeout: float = 30.0, opener: OpenerDirector | None = None) -> str:
+def fetch_room_page(room: str, timeout: float = 60.0, opener: OpenerDirector | None = None, max_retries: int = 3) -> str:
     url = BASE_URL.format(room=room)
     request = Request(
         url,
@@ -52,13 +52,22 @@ def fetch_room_page(room: str, timeout: float = 30.0, opener: OpenerDirector | N
         },
     )
 
-    try:
-        with (opener.open(request, timeout=timeout) if opener else urlopen(request, timeout=timeout)) as response:
-            return response.read().decode("utf-8", errors="replace")
-    except HTTPError as exc:
-        raise RuntimeError(f"HTTP error while requesting {url}: {exc.code}") from exc
-    except URLError as exc:
-        raise RuntimeError(f"Network error while requesting {url}: {exc.reason}") from exc
+    last_error: Exception | None = None
+    for attempt in range(max_retries):
+        try:
+            with (opener.open(request, timeout=timeout) if opener else urlopen(request, timeout=timeout)) as response:
+                return response.read().decode("utf-8", errors="replace")
+        except HTTPError as exc:
+            raise RuntimeError(f"HTTP error while requesting {url}: {exc.code}") from exc
+        except (URLError, TimeoutError) as exc:
+            last_error = exc
+            if attempt < max_retries - 1:
+                import time
+                time.sleep(1 + attempt)
+    
+    if last_error:
+        raise RuntimeError(f"Network error after {max_retries} retries for {url}: {last_error}") from last_error
+    raise RuntimeError(f"Failed to fetch {url}")
 
 
 def extract_daypilot_state(html: str) -> dict[str, str]:
@@ -152,8 +161,9 @@ def post_daypilot_callback(
     header: dict[str, Any],
     start: datetime,
     end: datetime,
-    timeout: float = 30.0,
+    timeout: float = 60.0,
     opener: OpenerDirector | None = None,
+    max_retries: int = 3,
 ) -> str:
     form_data = {
         "__EVENTTARGET": "",
@@ -180,13 +190,22 @@ def post_daypilot_callback(
         },
     )
 
-    try:
-        with (opener.open(request, timeout=timeout) if opener else urlopen(request, timeout=timeout)) as response:
-            return response.read().decode("utf-8", errors="replace")
-    except HTTPError as exc:
-        raise RuntimeError(f"HTTP error while posting callback for {room}: {exc.code}") from exc
-    except URLError as exc:
-        raise RuntimeError(f"Network error while posting callback for {room}: {exc.reason}") from exc
+    last_error: Exception | None = None
+    for attempt in range(max_retries):
+        try:
+            with (opener.open(request, timeout=timeout) if opener else urlopen(request, timeout=timeout)) as response:
+                return response.read().decode("utf-8", errors="replace")
+        except HTTPError as exc:
+            raise RuntimeError(f"HTTP error while posting callback for {room}: {exc.code}") from exc
+        except (URLError, TimeoutError) as exc:
+            last_error = exc
+            if attempt < max_retries - 1:
+                import time
+                time.sleep(1 + attempt)
+    
+    if last_error:
+        raise RuntimeError(f"Network error after {max_retries} retries posting callback for {room}: {last_error}") from last_error
+    raise RuntimeError(f"Failed to post callback for {room}")
 
 
 def sanitize_json_escapes(payload: str) -> str:
@@ -647,7 +666,7 @@ def main() -> int:
 
         return summary
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         results = list(executor.map(process_room, rooms))
         for summary in results:
             if summary:
