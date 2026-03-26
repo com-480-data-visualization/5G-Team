@@ -43,6 +43,11 @@ MANUAL_BUILDINGS = [
     }
 ]
 
+# Some very short EPFL codes collide with ordinary French words in OSM names.
+# Example: `LE` can appear as the article "Le" in names like "Le vieux Pressoir".
+# For these codes we only trust exact whole-value matches, not token fallback.
+AMBIGUOUS_TOKEN_CODES = {"LE"}
+
 
 def is_manual_rlc_variant(code: str) -> bool:
     """
@@ -125,6 +130,20 @@ def split_tag_value(value: str) -> List[str]:
     return [p.strip() for p in parts if p.strip()]
 
 
+def token_candidate_is_safe(token_norm: str, raw_piece: str) -> bool:
+    """
+    Return True when a token extracted from a larger label is safe to use.
+
+    We still allow exact whole-piece matches such as "LE", but we reject token
+    fallback for ambiguous short codes when they only appear inside a longer
+    phrase like "Le vieux Pressoir".
+    """
+    if token_norm not in AMBIGUOUS_TOKEN_CODES:
+        return True
+
+    return normalize(raw_piece) == token_norm
+
+
 def extract_candidate_codes(tags: Dict[str, str]) -> Set[str]:
     """
     Extract all possible building-code candidates from an OSM tag dictionary.
@@ -161,7 +180,7 @@ def extract_candidate_codes(tags: Dict[str, str]) -> Set[str]:
             tokenized = raw_piece.replace("_", " ").replace("-", " ").split()
             for token in tokenized:
                 token_norm = normalize(token)
-                if token_norm:
+                if token_norm and token_candidate_is_safe(token_norm, raw_piece):
                     candidates.add(token_norm)
 
     return candidates
