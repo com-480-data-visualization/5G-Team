@@ -496,7 +496,7 @@ select {
   grid-template-rows: auto auto auto minmax(0, 1fr);
   align-content: stretch;
   gap: 16px;
-  width: clamp(360px, 48vw, 760px);
+  width: clamp(320px, 34vw, 560px);
   max-width: calc(100% - 36px);
   max-height: calc(100% - 36px);
   padding: 18px 20px;
@@ -508,9 +508,35 @@ select {
 .building-panel.is-empty {
   /* The empty state is just an instructional card, so it should size itself
      from the viewport instead of reusing the much wider timeline layout. */
-  width: clamp(320px, 32vw, 520px);
-  max-width: min(calc(100% - 36px), 520px);
+  width: clamp(280px, 24vw, 380px);
+  max-width: min(calc(100% - 36px), 380px);
   max-height: fit-content;
+}
+
+@media (min-width: 1101px) and (max-width: 1500px) {
+  /* On laptop-sized non-mobile screens, slim the floating panel down so the
+     initial timeline viewport shows roughly two hours instead of three. */
+  .building-panel {
+    width: clamp(300px, 28vw, 420px);
+  }
+
+  .building-panel.is-empty {
+    width: clamp(260px, 20vw, 320px);
+    max-width: min(calc(100% - 36px), 320px);
+  }
+}
+
+@media (min-width: 1501px) {
+  /* On large external monitors, widen the floating panel again so the initial
+     timeline viewport expands back toward roughly three visible hours. */
+  .building-panel {
+    width: clamp(420px, 40vw, 760px);
+  }
+
+  .building-panel.is-empty {
+    width: clamp(320px, 26vw, 460px);
+    max-width: min(calc(100% - 36px), 460px);
+  }
 }
 
 .building-panel.is-empty .timeline-shell {
