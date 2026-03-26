@@ -1439,9 +1439,6 @@ function indexOccupancyByRoom(payload) {
 
     const events = [];
     (Array.isArray(entry?.events) ? entry.events : []).forEach((event) => {
-    if (!Array.isArray(event) || event.length < 3) {
-      return;
-    }
 
     if(!event?.start || !event?.end || !event?.title){
         return;
