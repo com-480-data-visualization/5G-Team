@@ -1125,6 +1125,46 @@ function formatEuropeanDateTimeInput(date) {
   return `${day}/${month}/${year} ${hour}:${minute}`;
 }
 
+// If the requested meeting duration is longer than the chosen search window,
+// automatically extend the end time so the window is at least that long.
+function ensureRangeCanFitDuration() {
+  const startInput = document.getElementById("startTime");
+  const endInput = document.getElementById("endTime");
+  const startDate = parseEuropeanDateTimeInput(startInput.value);
+  const endDate = parseEuropeanDateTimeInput(endInput.value);
+  const durationMinutes = getSearchDurationMinutes();
+
+  if (
+    Number.isNaN(startDate.getTime()) ||
+    Number.isNaN(endDate.getTime()) ||
+    durationMinutes <= 0 ||
+    endDate <= startDate
+  ) {
+    return null;
+  }
+
+  const rangeMinutes = Math.round((endDate.getTime() - startDate.getTime()) / 60000);
+
+  if (rangeMinutes >= durationMinutes) {
+    return null;
+  }
+
+  const adjustedEnd = new Date(startDate.getTime() + durationMinutes * 60000);
+  const adjustedEndValue = formatEuropeanDateTimeInput(adjustedEnd);
+
+  endInput.value = adjustedEndValue;
+
+  if (endTimePicker) {
+    endTimePicker.setDate(adjustedEnd, false);
+  }
+
+  return {
+    adjustedEnd,
+    adjustedEndValue,
+    previousEndValue: formatEuropeanDateTimeInput(endDate),
+  };
+}
+
 // Keep end time convenient: whenever a valid start is chosen, prefill end to
 // the same day and one hour later.
 function syncEndWithStartPlusOneHour() {
@@ -1220,9 +1260,10 @@ function seedDefaultTimes() {
 // 2. refreshes the currently open building panel, if any
 function applyCurrentSearch() {
   const start = document.getElementById("startTime").value;
-  const end = document.getElementById("endTime").value;
   const duration = document.getElementById("duration").value;
   const roomType = document.getElementById("roomType").selectedOptions[0]?.textContent || "All room types";
+  const rangeAdjustment = ensureRangeCanFitDuration();
+  const end = document.getElementById("endTime").value;
   const searchWindow = getSearchWindowFromForm();
 
   if (!searchWindow) {
@@ -1234,8 +1275,12 @@ function applyCurrentSearch() {
   renderBuildings(applyAvailabilityToFeatures(baseBuildingFeatures, activeSearchWindow));
   refreshOpenBuildingPanel();
 
+  const adjustmentMessage = rangeAdjustment
+    ? ` End time was automatically extended from ${rangeAdjustment.previousEndValue} to ${rangeAdjustment.adjustedEndValue} so the search range is at least ${duration} minutes long.`
+    : "";
+
   setStatus(
-    `Search applied: ${start} to ${end} for ${duration} minutes, filtered to ${roomType}. Rooms are now available only if they contain a continuous free interval at least that long within the selected window.`
+    `Search applied: ${start} to ${end} for ${duration} minutes, filtered to ${roomType}. Rooms are now available only if they contain a continuous free interval at least that long within the selected window.${adjustmentMessage}`
   );
 }
 
