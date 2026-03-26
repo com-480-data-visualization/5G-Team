@@ -615,6 +615,9 @@ select {
   overflow: auto;
   min-height: 0;
   padding-right: 6px;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 
 .timeline-section-heading {
@@ -664,6 +667,9 @@ select {
   overflow-y: hidden;
   padding-bottom: 6px;
   width: 100%;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
 }
 
 .timeline-grid {
@@ -728,6 +734,7 @@ select {
   bottom: 10px;
   border-radius: 12px;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .timeline-segment-available {
@@ -768,6 +775,14 @@ select {
   font-size: 0.84rem;
   line-height: 1.35;
   pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  /* On desktop we re-enable direct interaction on segments so hover tooltips
+     still work, while touch devices keep smooth scrolling priority. */
+  .timeline-segment {
+    pointer-events: auto;
+  }
 }
 
 .leaflet-popup-content-wrapper,
