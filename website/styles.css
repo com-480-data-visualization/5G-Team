@@ -401,6 +401,7 @@ select {
 .search-button {
   /* Primary call to action. */
   align-self: end;
+  grid-column: 1 / -1;
   width: 100%;
   padding: 16px 20px;
   background: linear-gradient(135deg, var(--accent), #8d84ff);

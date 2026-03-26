@@ -348,6 +348,11 @@ function normalizeRoomKey(value) {
     .replace(/[^a-z0-9]/g, "");
 }
 
+const ROOM_TYPE_GROUPS = {
+  conference: new Set(["CONFERENCES", "CONF MULTIMEDIA"]),
+  study: new Set(["SALLE TP", "SALLE DE COURS"]),
+};
+
 // Extract the room's building code by taking the longest matching known code.
 // This avoids prefix collisions such as BC matching BCH, or MA matching MAC.
 function extractBuildingCodeFromRoom(roomName) {
@@ -368,14 +373,33 @@ function roomBelongsToBuilding(roomName, buildingCode) {
   return extractBuildingCodeFromRoom(roomName) === normalizedBuilding;
 }
 
+// Read the currently selected room-type filter from the search form.
+function getSelectedRoomType() {
+  return document.getElementById("roomType").value || "all";
+}
+
+// Map the selected search category to the raw EPFL room type labels.
+function roomMatchesSelectedType(roomType) {
+  const selectedRoomType = getSelectedRoomType();
+
+  if (selectedRoomType === "all") {
+    return true;
+  }
+
+  return ROOM_TYPE_GROUPS[selectedRoomType]?.has(roomType) || false;
+}
+
 // Build the room list shown in the side panel for one building.
 // rooms.json defines the canonical room names/types, and room_occupancy.json is
-// used as a filter so we only keep rooms that actually have timeline data.
+// used as a filter so we only keep rooms that actually have timeline data. The
+// active room-type dropdown is applied here so the map and open timeline stay
+// aligned around the same subset of rooms.
 function getRoomsForBuilding(buildingCode) {
   return roomsDataset
     .filter((entry) => Array.isArray(entry) && entry.length >= 2)
     .map(([room, type]) => ({ room, type }))
     .filter((entry) => roomBelongsToBuilding(entry.room, buildingCode))
+    .filter((entry) => roomMatchesSelectedType(entry.type))
     .filter((entry) => occupancyByRoom.has(normalizeRoomKey(entry.room)));
 }
 
@@ -1188,6 +1212,7 @@ function applyCurrentSearch() {
   const start = document.getElementById("startTime").value;
   const end = document.getElementById("endTime").value;
   const duration = document.getElementById("duration").value;
+  const roomType = document.getElementById("roomType").selectedOptions[0]?.textContent || "All room types";
   const searchWindow = getSearchWindowFromForm();
 
   if (!searchWindow) {
@@ -1200,7 +1225,7 @@ function applyCurrentSearch() {
   refreshOpenBuildingPanel();
 
   setStatus(
-    `Search applied: ${start} to ${end} for ${duration} minutes. Rooms are now available only if they contain a continuous free interval at least that long within the selected window.`
+    `Search applied: ${start} to ${end} for ${duration} minutes, filtered to ${roomType}. Rooms are now available only if they contain a continuous free interval at least that long within the selected window.`
   );
 }
 

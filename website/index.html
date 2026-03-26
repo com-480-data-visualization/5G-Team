@@ -80,6 +80,7 @@
             - beginning of the search window
             - end of the search window
             - desired meeting duration
+            - desired room type
           -->
           <form class="search-controls" id="availability-form">
             <label>
@@ -225,6 +226,14 @@
                 <option value="1410">23 hours 30 minutes</option>
                 <option value="1425">23 hours 45 minutes</option>
                 <option value="1440">24 hours</option>
+              </select>
+            </label>
+            <label>
+              <span>Room Type</span>
+              <select id="roomType" name="roomType">
+                <option value="all" selected>All room types</option>
+                <option value="conference">Conference Room</option>
+                <option value="study">Study Room</option>
               </select>
             </label>
             <button class="search-button" type="submit">Search</button>
