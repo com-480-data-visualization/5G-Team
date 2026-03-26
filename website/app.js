@@ -58,6 +58,7 @@ let activeBuildingSelection = null;
 let lastThemeToggleAt = 0;
 let startTimePicker = null;
 let endTimePicker = null;
+let activeSegmentTooltip = null;
 
 // Apply the selected theme to the <body> element and keep the toggle label
 // synchronized with the actual current mode.
@@ -485,7 +486,7 @@ function minutesSinceDayStart(isoString) {
   return Math.round((date.getTime() - getTimelineDayStart().getTime()) / 60000);
 }
 
-// Lookup all occupancy slots for one room by its normalized room id.
+// Lookup all occupancy events for one room by its normalized room id.
 function getRoomSlots(roomName) {
   return occupancyByRoom.get(normalizeRoomKey(roomName)) || [];
 }
@@ -535,12 +536,13 @@ function normalizeSlots(roomName) {
   }
 
   return slots
-    .map(([startIso, endIso]) => ({
-      startIso,
-      endIso,
-      startDateKey: startIso.slice(0, 10),
-      startMinutes: clamp(minutesSinceDayStart(startIso), 0, 24 * 60),
-      endMinutes: clamp(minutesSinceDayStart(endIso), 0, 24 * 60),
+    .map((slot) => ({
+      title: slot.title,
+      startIso: slot.startIso,
+      endIso: slot.endIso,
+      startDateKey: slot.startIso.slice(0, 10),
+      startMinutes: clamp(minutesSinceDayStart(slot.startIso), 0, 24 * 60),
+      endMinutes: clamp(minutesSinceDayStart(slot.endIso), 0, 24 * 60),
     }))
     // Only draw occupancy blocks for the currently visible timeline day.
     // If a room has data on other days but nothing on this day, that means
@@ -565,9 +567,9 @@ function getLongestFreeIntervalInWindow(roomName, searchWindow) {
   }
 
   const slots = getRoomSlots(roomName)
-    .map(([startIso, endIso]) => ({
-      start: new Date(startIso),
-      end: new Date(endIso),
+    .map((slot) => ({
+      start: new Date(slot.startIso),
+      end: new Date(slot.endIso),
     }))
     .filter((slot) => slot.end > searchWindow.start && slot.start < searchWindow.end)
     .sort((left, right) => left.start.getTime() - right.start.getTime());
@@ -674,9 +676,41 @@ function buildPlanEpflUrl(label) {
   return `https://plan.epfl.ch/?room==${encodeURIComponent(label)}`;
 }
 
+function hideSegmentTooltip() {
+  if (!activeSegmentTooltip) {
+    return;
+  }
+
+  activeSegmentTooltip.remove();
+  activeSegmentTooltip = null;
+}
+
+// Show the full event title in a floating tooltip when the inline label is
+// truncated inside a narrow occupied segment.
+function showSegmentTooltip(target, text) {
+  hideSegmentTooltip();
+
+  const tooltip = document.createElement("div");
+  tooltip.className = "timeline-segment-tooltip";
+  tooltip.textContent = text;
+  document.body.appendChild(tooltip);
+
+  const targetRect = target.getBoundingClientRect();
+  const tooltipRect = tooltip.getBoundingClientRect();
+  const top = Math.max(12, targetRect.top - tooltipRect.height - 8);
+  const left = Math.min(
+    window.innerWidth - tooltipRect.width - 12,
+    Math.max(12, targetRect.left)
+  );
+
+  tooltip.style.top = `${top}px`;
+  tooltip.style.left = `${left}px`;
+  activeSegmentTooltip = tooltip;
+}
+
 // Draw one colored block in a timeline row.
 // Blocks are positioned as percentages of the full 24-hour width.
-function appendSegment(grid, startMinutes, endMinutes, className, title) {
+function appendSegment(grid, startMinutes, endMinutes, className, title, labelText = "") {
   if (endMinutes <= startMinutes) {
     return;
   }
@@ -688,6 +722,27 @@ function appendSegment(grid, startMinutes, endMinutes, className, title) {
   if (title) {
     segment.title = title;
   }
+
+  // Occupied blocks can show the event title directly on the segment so the
+  // user understands why the room is unavailable without relying on hover only.
+  if (labelText) {
+    const label = document.createElement("span");
+    label.className = "timeline-segment-label";
+    label.textContent = labelText;
+    segment.appendChild(label);
+
+    const maybeShowFullLabel = () => {
+      if (label.scrollWidth <= label.clientWidth) {
+        return;
+      }
+
+      showSegmentTooltip(label, labelText);
+    };
+
+    segment.addEventListener("mouseenter", maybeShowFullLabel);
+    segment.addEventListener("mouseleave", hideSegmentTooltip);
+  }
+
   grid.appendChild(segment);
 }
 
@@ -728,7 +783,8 @@ function addTimelineSegments(grid, roomName) {
       slot.startMinutes,
       slot.endMinutes,
       "timeline-segment-occupied",
-      `${slot.startIso.slice(11, 16)} - ${slot.endIso.slice(11, 16)} occupied`
+      `${slot.startIso.slice(11, 16)} - ${slot.endIso.slice(11, 16)} occupied${slot.title ? `: ${slot.title}` : ""}`,
+      slot.title || ""
     );
     cursor = slot.endMinutes;
   });
@@ -1056,23 +1112,44 @@ async function loadRoomOccupancyDataset() {
   return response.json();
 }
 
-// Convert the occupancy JSON array into a map:
-// normalized room name -> list of [start, end] slots
-// This makes room timeline lookups fast.
-function indexOccupancyByRoom(entries) {
+// Convert the nested occupancy JSON structure into a map:
+// normalized room name -> list of { title, startIso, endIso } events
+// This keeps availability calculations fast while preserving event titles for
+// the timeline's occupied blocks.
+function indexOccupancyByRoom(payload) {
   const indexed = new Map();
 
-  entries.forEach((entry) => {
-    const roomName = entry?.name?.[0];
+  const rooms = Array.isArray(payload?.rooms) ? payload.rooms : [];
+
+  rooms.forEach((entry) => {
+    const roomName = entry?.name;
 
     if (!roomName) {
       return;
     }
 
-    const slots = Array.isArray(entry.slots)
-      ? entry.slots.filter((slot) => Array.isArray(slot) && slot.length === 2)
-      : [];
-    indexed.set(normalizeRoomKey(roomName), slots);
+    const events = [];
+
+    (Array.isArray(entry.dates) ? entry.dates : []).forEach((dateEntry) => {
+      (Array.isArray(dateEntry?.events) ? dateEntry.events : []).forEach((event) => {
+        if (!Array.isArray(event) || event.length < 3) {
+          return;
+        }
+
+        const [title, startIso, endIso] = event;
+        if (!startIso || !endIso) {
+          return;
+        }
+
+        events.push({
+          title: title || "",
+          startIso,
+          endIso,
+        });
+      });
+    });
+
+    indexed.set(normalizeRoomKey(roomName), events);
   });
 
   return indexed;
