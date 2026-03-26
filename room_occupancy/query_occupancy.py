@@ -14,17 +14,25 @@ from pathlib import Path
 import re
 import sys
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from html import unescape
 from typing import Any
+from http.cookiejar import CookieJar
+from urllib.parse import urlencode
 from urllib.error import HTTPError, URLError
-from urllib.request import Request, urlopen
+from urllib.request import Request, urlopen, build_opener, HTTPCookieProcessor, OpenerDirector
 import concurrent.futures
 
 BASE_URL = "https://ewa.epfl.ch/room/Default.aspx?room={room}"
+CALLBACK_URL = "https://ewa.epfl.ch/room/Default.aspx"
+DAYPILOT_CALLBACK_ID = "ctl00$ContentPlaceHolder1$DayPilotCalendar1"
 EVENTS_RE = re.compile(r"v\.events\s*=\s*(\[.*?\]);", re.DOTALL)
 TAG_RE = re.compile(r"<[^>]+>")
 VIEWSTATE_RE = re.compile(r'id="__VIEWSTATE"[^>]*value="([^"]+)"')
+VIEWSTATEGENERATOR_RE = re.compile(r'id="__VIEWSTATEGENERATOR"[^>]*value="([^"]+)"')
+EVENTVALIDATION_RE = re.compile(r'id="__EVENTVALIDATION"[^>]*value="([^"]+)"')
+DAYPILOT_COLUMNS_RE = re.compile(r"v\.columns\s*=\s*(\[.*?\]);", re.DOTALL)
+DAYPILOT_HASHES_RE = re.compile(r"v\.hashes\s*=\s*(\{.*?\});", re.DOTALL)
 
 
 @dataclass(frozen=True)
@@ -35,17 +43,8 @@ class RoomEvent:
     raw: dict[str, Any]
 
 
-def fetch_room_page(
-    room: str, 
-    timeout: float = 30.0,
-    start: datetime | None = None,
-    end: datetime | None = None,
-) -> str:
+def fetch_room_page(room: str, timeout: float = 30.0, opener: OpenerDirector | None = None) -> str:
     url = BASE_URL.format(room=room)
-    
-    # Add time range parameters to URL if provided
-    if start is not None and end is not None:
-        url += f"&start={start.isoformat()}&end={end.isoformat()}"
     request = Request(
         url,
         headers={
@@ -54,12 +53,140 @@ def fetch_room_page(
     )
 
     try:
-        with urlopen(request, timeout=timeout) as response:
+        with (opener.open(request, timeout=timeout) if opener else urlopen(request, timeout=timeout)) as response:
             return response.read().decode("utf-8", errors="replace")
     except HTTPError as exc:
         raise RuntimeError(f"HTTP error while requesting {url}: {exc.code}") from exc
     except URLError as exc:
         raise RuntimeError(f"Network error while requesting {url}: {exc.reason}") from exc
+
+
+def extract_daypilot_state(html: str) -> dict[str, str]:
+    viewstate_match = VIEWSTATE_RE.search(html)
+    if not viewstate_match:
+        raise RuntimeError("Could not extract __VIEWSTATE from room page.")
+
+    state: dict[str, str] = {
+        "__VIEWSTATE": viewstate_match.group(1),
+    }
+
+    viewstate_generator_match = VIEWSTATEGENERATOR_RE.search(html)
+    if viewstate_generator_match:
+        state["__VIEWSTATEGENERATOR"] = viewstate_generator_match.group(1)
+
+    eventvalidation_match = EVENTVALIDATION_RE.search(html)
+    if eventvalidation_match:
+        state["__EVENTVALIDATION"] = eventvalidation_match.group(1)
+
+    return state
+
+
+def extract_daypilot_header(html: str) -> dict[str, Any]:
+    columns_match = DAYPILOT_COLUMNS_RE.search(html)
+    hashes_match = DAYPILOT_HASHES_RE.search(html)
+    if not columns_match or not hashes_match:
+        raise RuntimeError("Could not extract DayPilot columns/hashes from room page.")
+
+    def extract_js_value(name: str) -> str:
+        match = re.search(rf"v\.{name}\s*=\s*(.*?);", html)
+        if not match:
+            raise RuntimeError(f"Could not extract DayPilot field: {name}")
+        return match.group(1).strip()
+
+    def parse_js_string(value: str) -> str:
+        if len(value) >= 2 and value[0] == "'" and value[-1] == "'":
+            return value[1:-1]
+        raise RuntimeError(f"Expected JS string literal, got: {value}")
+
+    columns = parse_events_payload(columns_match.group(1))
+    hashes = parse_events_payload(hashes_match.group(1))
+    tag_fields = parse_events_payload(extract_js_value("tagFields"))
+
+    return {
+        "control": "dpc",
+        "id": "ContentPlaceHolder1_DayPilotCalendar1",
+        "clientState": {},
+        "columns": columns,
+        "days": int(extract_js_value("days")),
+        "startDate": parse_js_string(extract_js_value("startDate")),
+        "cellDuration": int(extract_js_value("cellDuration")),
+        "heightSpec": parse_js_string(extract_js_value("heightSpec")),
+        "businessBeginsHour": int(extract_js_value("businessBeginsHour")),
+        "businessEndsHour": int(extract_js_value("businessEndsHour")),
+        "viewType": parse_js_string(extract_js_value("viewType")),
+        "dayBeginsHour": int(extract_js_value("dayBeginsHour")),
+        "dayEndsHour": int(extract_js_value("dayEndsHour")),
+        "headerLevels": int(extract_js_value("headerLevels")),
+        "backColor": parse_js_string(extract_js_value("cellBackColor")),
+        "nonBusinessBackColor": parse_js_string(extract_js_value("cellBackColorNonBusiness")),
+        "eventHeaderVisible": extract_js_value("eventHeaderVisible") == "true",
+        "timeFormat": parse_js_string(extract_js_value("timeFormat")),
+        "showAllDayEvents": extract_js_value("showAllDayEvents") == "true",
+        "tagFields": tag_fields,
+        "hourNameBackColor": parse_js_string(extract_js_value("hourNameBackColor")),
+        "hourFontFamily": parse_js_string(extract_js_value("hourFontFamily")),
+        "hourFontSize": parse_js_string(extract_js_value("hourFontSize")),
+        "hourFontColor": parse_js_string(extract_js_value("hourFontColor")),
+        "selected": "",
+        "hashes": hashes,
+    }
+
+
+def build_daypilot_callback_param(start: datetime, end: datetime, header: dict[str, Any]) -> str:
+    payload = {
+        "action": "Command",
+        "parameters": {"command": "navigate"},
+        "data": {
+            "start": start.replace(microsecond=0).isoformat(),
+            "end": end.replace(microsecond=0).isoformat(),
+            "days": int(header.get("days", 7)),
+        },
+        "header": header,
+    }
+    return "JSON" + json.dumps(payload, separators=(",", ":"))
+
+
+def post_daypilot_callback(
+    room: str,
+    state: dict[str, str],
+    header: dict[str, Any],
+    start: datetime,
+    end: datetime,
+    timeout: float = 30.0,
+    opener: OpenerDirector | None = None,
+) -> str:
+    form_data = {
+        "__EVENTTARGET": "",
+        "__EVENTARGUMENT": "",
+        "__VIEWSTATE": state["__VIEWSTATE"],
+        "__CALLBACKID": DAYPILOT_CALLBACK_ID,
+        "__CALLBACKPARAM": build_daypilot_callback_param(start, end, header),
+    }
+
+    if "__VIEWSTATEGENERATOR" in state:
+        form_data["__VIEWSTATEGENERATOR"] = state["__VIEWSTATEGENERATOR"]
+    if "__EVENTVALIDATION" in state:
+        form_data["__EVENTVALIDATION"] = state["__EVENTVALIDATION"]
+
+    encoded_form = urlencode(form_data).encode("utf-8")
+    request = Request(
+        CALLBACK_URL,
+        data=encoded_form,
+        headers={
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) OccupancyScript/1.0",
+            "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
+            "Referer": BASE_URL.format(room=room),
+            "X-Requested-With": "XMLHttpRequest",
+        },
+    )
+
+    try:
+        with (opener.open(request, timeout=timeout) if opener else urlopen(request, timeout=timeout)) as response:
+            return response.read().decode("utf-8", errors="replace")
+    except HTTPError as exc:
+        raise RuntimeError(f"HTTP error while posting callback for {room}: {exc.code}") from exc
+    except URLError as exc:
+        raise RuntimeError(f"Network error while posting callback for {room}: {exc.reason}") from exc
 
 
 def sanitize_json_escapes(payload: str) -> str:
@@ -112,17 +239,7 @@ def parse_events_payload(payload: str) -> list[dict[str, Any]]:
         return json.loads(repaired)
 
 
-def extract_events(html: str) -> list[RoomEvent]:
-    match = EVENTS_RE.search(html)
-    if not match:
-        raise RuntimeError(
-            "Could not find event payload (`v.events`) in room page. "
-            "The page format may have changed."
-        )
-
-    payload = match.group(1)
-    raw_events = parse_events_payload(payload)
-
+def room_events_from_items(raw_events: list[dict[str, Any]]) -> list[RoomEvent]:
     events: list[RoomEvent] = []
     for item in raw_events:
         start = datetime.fromisoformat(item["Start"])
@@ -135,6 +252,107 @@ def extract_events(html: str) -> list[RoomEvent]:
 
     events.sort(key=lambda event: event.start)
     return events
+
+
+def extract_events(html: str) -> list[RoomEvent]:
+    match = EVENTS_RE.search(html)
+    if not match:
+        raise RuntimeError(
+            "Could not find event payload (`v.events`) in room page. "
+            "The page format may have changed."
+        )
+
+    payload = match.group(1)
+    raw_events = parse_events_payload(payload)
+
+    return room_events_from_items(raw_events)
+
+
+def parse_callback_events(callback_response: str) -> list[RoomEvent]:
+    _, separator, payload = callback_response.partition("|")
+    if not separator:
+        raise RuntimeError("Unexpected callback response format (missing protocol separator).")
+
+    payload = payload.strip()
+    start = payload.find("{")
+    if start < 0:
+        raise RuntimeError("Could not find JSON object in callback response.")
+
+    depth = 0
+    in_string = False
+    escaped = False
+    end_index = -1
+
+    for index, ch in enumerate(payload[start:], start=start):
+        if in_string:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_string = False
+            continue
+
+        if ch == '"':
+            in_string = True
+            continue
+
+        if ch == "{":
+            depth += 1
+            continue
+
+        if ch == "}":
+            depth -= 1
+            if depth == 0:
+                end_index = index
+                break
+
+    if end_index < 0:
+        raise RuntimeError("Could not extract complete JSON object from callback response.")
+
+    candidate = payload[start : end_index + 1]
+    parsed = parse_events_payload(candidate)
+    raw_events = parsed.get("Events", []) if isinstance(parsed, dict) else []
+    if not isinstance(raw_events, list):
+        raise RuntimeError("Unexpected callback payload: Events is not a list.")
+    return room_events_from_items(raw_events)
+
+
+def events_via_callback(
+    room: str,
+    html: str,
+    start: datetime,
+    end: datetime,
+    opener: OpenerDirector | None = None,
+) -> list[RoomEvent]:
+    state = extract_daypilot_state(html)
+    header = extract_daypilot_header(html)
+    days_per_page = max(1, int(header.get("days", 7)))
+
+    all_events: list[RoomEvent] = []
+    cursor = start
+    while cursor < end:
+        window_end = min(cursor + timedelta(days=days_per_page), end)
+        callback_payload = post_daypilot_callback(
+            room=room,
+            state=state,
+            header=header,
+            start=cursor,
+            end=window_end,
+            opener=opener,
+        )
+        all_events.extend(parse_callback_events(callback_payload))
+        cursor = window_end
+
+    # De-duplicate events that can appear in adjacent windows.
+    unique: dict[tuple[str, str, str], RoomEvent] = {}
+    for event in all_events:
+        key = (event.start.isoformat(), event.end.isoformat(), event.title)
+        unique[key] = event
+
+    deduped = list(unique.values())
+    deduped.sort(key=lambda event: event.start)
+    return deduped
 
 
 def room_in_system_from_html(html: str, events: list[RoomEvent]) -> bool:
@@ -400,9 +618,18 @@ def main() -> int:
     errors: list[dict[str, str]] = []
 
     def process_room(room):
+        opener = build_opener(HTTPCookieProcessor(CookieJar()))
         try:
-            html = fetch_room_page(room)
+            html = fetch_room_page(room, opener=opener)
             events = extract_events(html)
+            if args.from_time and args.to_time:
+                events = events_via_callback(
+                    room=room,
+                    html=html,
+                    start=args.from_time,
+                    end=args.to_time,
+                    opener=opener,
+                )
         except RuntimeError as exc:
             errors.append({"room": room, "error": str(exc)})
             return
