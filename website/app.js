@@ -56,6 +56,8 @@ let activeSearchWindow = null;
 let knownBuildingCodes = [];
 let activeBuildingSelection = null;
 let lastThemeToggleAt = 0;
+let startTimePicker = null;
+let endTimePicker = null;
 
 // Apply the selected theme to the <body> element and keep the toggle label
 // synchronized with the actual current mode.
@@ -452,8 +454,8 @@ function getSearchWindowFromForm() {
     return null;
   }
 
-  const start = new Date(startValue);
-  const end = new Date(endValue);
+  const start = parseEuropeanDateTimeInput(startValue);
+  const end = parseEuropeanDateTimeInput(endValue);
 
   if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end <= start) {
     return null;
@@ -1032,10 +1034,83 @@ function indexOccupancyByRoom(entries) {
   return indexed;
 }
 
-// Convert a Date object into the exact string required by datetime-local inputs.
-function toLocalInputValue(date) {
-  const adjusted = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-  return adjusted.toISOString().slice(0, 16);
+// Parse a fixed "DD/MM/YYYY HH:MM" input string into a local Date object.
+// This avoids browser-locale-dependent parsing and guarantees 24-hour handling.
+function parseEuropeanDateTimeInput(value) {
+  const match = String(value || "").trim().match(
+    /^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})$/
+  );
+
+  if (!match) {
+    return new Date(Number.NaN);
+  }
+
+  const [, dayText, monthText, yearText, hourText, minuteText] = match;
+  const day = Number.parseInt(dayText, 10);
+  const month = Number.parseInt(monthText, 10);
+  const year = Number.parseInt(yearText, 10);
+  const hour = Number.parseInt(hourText, 10);
+  const minute = Number.parseInt(minuteText, 10);
+
+  const date = new Date(year, month - 1, day, hour, minute, 0, 0);
+
+  // Reject impossible dates like 31/02/2026 14:00 instead of letting the Date
+  // constructor silently roll them into another month.
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day ||
+    date.getHours() !== hour ||
+    date.getMinutes() !== minute
+  ) {
+    return new Date(Number.NaN);
+  }
+
+  return date;
+}
+
+// Render a local Date object in the fixed "DD/MM/YYYY HH:MM" format used by
+// the search inputs so the UI stays European and 24-hour everywhere.
+function formatEuropeanDateTimeInput(date) {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = String(date.getFullYear());
+  const hour = String(date.getHours()).padStart(2, "0");
+  const minute = String(date.getMinutes()).padStart(2, "0");
+
+  return `${day}/${month}/${year} ${hour}:${minute}`;
+}
+
+// Attach a custom date/time picker that still stores values in the same
+// European 24-hour text format used by the form and validation logic.
+function initializeDateTimePickers() {
+  if (typeof flatpickr !== "function") {
+    return;
+  }
+
+  const buildPicker = (selector) =>
+    flatpickr(selector, {
+      enableTime: true,
+      time_24hr: true,
+      allowInput: true,
+      dateFormat: "d/m/Y H:i",
+      minuteIncrement: 5,
+      disableMobile: true,
+      parseDate: parseEuropeanDateTimeInput,
+      formatDate: formatEuropeanDateTimeInput,
+    });
+
+  startTimePicker = buildPicker("#startTime");
+  endTimePicker = buildPicker("#endTime");
+
+  // The explicit calendar buttons open the matching picker on demand.
+  document.querySelectorAll(".datetime-trigger").forEach((button) => {
+    button.addEventListener("click", () => {
+      const targetId = button.dataset.pickerTarget;
+      const picker = targetId === "startTime" ? startTimePicker : endTimePicker;
+      picker?.open();
+    });
+  });
 }
 
 // Give the search form a sensible initial time range.
@@ -1049,8 +1124,8 @@ function seedDefaultTimes() {
   const end = new Date(start);
   end.setHours(end.getHours() + 2);
 
-  document.getElementById("startTime").value = toLocalInputValue(start);
-  document.getElementById("endTime").value = toLocalInputValue(end);
+  document.getElementById("startTime").value = formatEuropeanDateTimeInput(start);
+  document.getElementById("endTime").value = formatEuropeanDateTimeInput(end);
 }
 
 // Search submission turns the current form values into the active search window.
@@ -1066,7 +1141,7 @@ document.getElementById("availability-form").addEventListener("submit", (event) 
   const searchWindow = getSearchWindowFromForm();
 
   if (!searchWindow) {
-    setStatus("Search window is invalid. Please choose a beginning before the end.");
+    setStatus("Search window is invalid. Use DD/MM/YYYY HH:MM and choose a beginning before the end.");
     return;
   }
 
@@ -1103,8 +1178,8 @@ document.querySelectorAll(".shortcut-chip").forEach((button) => {
       end.setHours(18, 0, 0, 0);
     }
 
-    document.getElementById("startTime").value = toLocalInputValue(start);
-    document.getElementById("endTime").value = toLocalInputValue(end);
+    document.getElementById("startTime").value = formatEuropeanDateTimeInput(start);
+    document.getElementById("endTime").value = formatEuropeanDateTimeInput(end);
     setStatus(`Preset applied: ${button.textContent}. Press Search to update building availability for that time window.`);
   });
 });
@@ -1118,6 +1193,7 @@ async function initializeApp() {
   try {
     applyTheme(resolveInitialTheme());
     mountBuildingPanelForViewport();
+    initializeDateTimePickers();
     seedDefaultTimes();
     resetBuildingPanel();
     setStatus("Loading EPFL buildings, rooms, and room occupancy data...");

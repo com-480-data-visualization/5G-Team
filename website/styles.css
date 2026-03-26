@@ -264,6 +264,17 @@ select {
   gap: 8px;
 }
 
+.datetime-picker {
+  /* Input and calendar button share one field shell. */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  border-radius: 18px;
+  border: 1px solid var(--field-border);
+  background: var(--panel-soft);
+  overflow: hidden;
+}
+
 .search-controls span {
   /* Small caption above each control. */
   font-size: 0.92rem;
@@ -282,11 +293,81 @@ select {
   outline: none;
 }
 
+.datetime-picker input {
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+}
+
+.datetime-trigger {
+  /* Explicit picker button for users who expect a calendar affordance. */
+  align-self: stretch;
+  padding: 0 16px;
+  border: 0;
+  border-left: 1px solid var(--field-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+}
+
 .search-controls input:focus,
 .search-controls select:focus {
   /* Stronger focus treatment helps keyboard navigation and accessibility. */
   border-color: var(--focus-border);
   box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.datetime-picker:focus-within {
+  border-color: var(--focus-border);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.datetime-picker input:focus {
+  box-shadow: none;
+}
+
+.datetime-trigger:hover,
+.datetime-trigger:focus-visible {
+  color: var(--text);
+}
+
+.flatpickr-calendar {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.flatpickr-months .flatpickr-month,
+.flatpickr-current-month .flatpickr-monthDropdown-months,
+.flatpickr-current-month input.cur-year,
+.flatpickr-weekdays,
+.flatpickr-weekday,
+.flatpickr-time input,
+.flatpickr-time .flatpickr-time-separator,
+.flatpickr-time .flatpickr-am-pm {
+  color: var(--text);
+}
+
+.flatpickr-day {
+  color: var(--text);
+}
+
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay {
+  color: var(--muted);
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected:hover,
+.flatpickr-day.startRange:hover,
+.flatpickr-day.endRange:hover {
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 .search-button {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
   <head>
     <!-- Basic document metadata and responsive viewport settings. -->
     <meta charset="UTF-8" />
@@ -20,6 +20,12 @@
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin=""
+    />
+
+    <!-- Flatpickr provides a consistent calendar/time picker with 24-hour time. -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
     />
 
     <!-- Project-specific styles for layout, colors, spacing, and responsiveness. -->
@@ -77,11 +83,47 @@
           <form class="search-controls" id="availability-form">
             <label>
               <span>Beginning</span>
-              <input type="datetime-local" id="startTime" name="startTime" />
+              <!-- Keep a fixed European format in the field, but pair it with a
+                   custom picker so the user still gets a calendar/time button. -->
+              <div class="datetime-picker">
+                <input
+                  type="text"
+                  id="startTime"
+                  name="startTime"
+                  inputmode="numeric"
+                  placeholder="DD/MM/YYYY HH:MM"
+                  autocomplete="off"
+                />
+                <button
+                  class="datetime-trigger"
+                  type="button"
+                  data-picker-target="startTime"
+                  aria-label="Open beginning date and time picker"
+                >
+                  📅
+                </button>
+              </div>
             </label>
             <label>
               <span>End</span>
-              <input type="datetime-local" id="endTime" name="endTime" />
+              <div class="datetime-picker">
+                <input
+                  type="text"
+                  id="endTime"
+                  name="endTime"
+                  inputmode="numeric"
+                  placeholder="DD/MM/YYYY HH:MM"
+                  autocomplete="off"
+                />
+                <button
+                  class="datetime-trigger"
+                  type="button"
+                  data-picker-target="endTime"
+                  aria-label="Open end date and time picker"
+                >
+                  📅
+                </button>
+              </div>
             </label>
             <label>
               <span>Duration</span>
@@ -282,6 +324,9 @@
 
     <!-- osmtogeojson converts raw OSM API responses into correct GeoJSON footprints. -->
     <script src="https://unpkg.com/osmtogeojson@3.0.0-beta.5/osmtogeojson.js"></script>
+
+    <!-- Flatpickr powers the consistent European date/time picker UI. -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <!-- App logic: map setup, mock data rendering, and form interactions. -->
     <script src="./app.js"></script>
