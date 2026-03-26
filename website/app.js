@@ -384,6 +384,26 @@ function formatHour(hour) {
   return `${String(hour).padStart(2, "0")}:00`;
 }
 
+// Draw the active search-window boundaries on top of a timeline grid so the
+// user can immediately see where the requested interval begins and ends.
+function appendSearchWindowMarkers(grid) {
+  if (!activeSearchWindow) {
+    return;
+  }
+
+  const markers = [
+    minutesWithinDay(activeSearchWindow.start),
+    minutesWithinDay(activeSearchWindow.end),
+  ];
+
+  markers.forEach((minutes) => {
+    const marker = document.createElement("div");
+    marker.className = "timeline-search-marker";
+    marker.style.left = `${(clamp(minutes, 0, 24 * 60) / (24 * 60)) * 100}%`;
+    grid.appendChild(marker);
+  });
+}
+
 // Create either:
 // - the header grid with hour labels
 // - or a room grid that receives colored segments later
@@ -397,6 +417,8 @@ function createTimelineGrid(isHeader = false) {
     cell.textContent = isHeader ? formatHour(hour) : "";
     grid.appendChild(cell);
   });
+
+  appendSearchWindowMarkers(grid);
 
   return grid;
 }

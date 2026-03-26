@@ -656,6 +656,19 @@ select {
   min-width: 180px;
 }
 
+.timeline-search-marker {
+  /* Highlight the selected search range with two vertical guide lines. */
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 0 1px rgba(111, 124, 255, 0.18);
+  pointer-events: none;
+  z-index: 2;
+}
+
 .timeline-empty-state {
   position: absolute;
   inset: 0;
