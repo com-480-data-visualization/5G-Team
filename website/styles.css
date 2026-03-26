@@ -30,6 +30,8 @@
   --timeline-occupied-bg: rgba(255, 104, 104, 0.6);
   --timeline-occupied-border: rgba(255, 146, 146, 0.55);
   --timeline-occupied-inner: rgba(255, 255, 255, 0.05);
+  --timeline-search-marker: rgba(255, 255, 255, 0.45);
+  --timeline-search-marker-shadow: rgba(111, 124, 255, 0.18);
   --brand-text: #0d1020;
   --button-text-strong: #0d1020;
   --popup-bg: #151a22;
@@ -70,6 +72,8 @@ body[data-theme="light"] {
   --timeline-occupied-bg: rgba(218, 87, 87, 0.52);
   --timeline-occupied-border: rgba(208, 78, 78, 0.42);
   --timeline-occupied-inner: rgba(255, 255, 255, 0.22);
+  --timeline-search-marker: rgba(23, 32, 51, 0.42);
+  --timeline-search-marker-shadow: rgba(23, 32, 51, 0.12);
   --brand-text: #ffffff;
   --button-text-strong: #ffffff;
   --popup-bg: #ffffff;
@@ -672,8 +676,8 @@ select {
   bottom: 0;
   width: 2px;
   margin-left: -1px;
-  background: rgba(255, 255, 255, 0.45);
-  box-shadow: 0 0 0 1px rgba(111, 124, 255, 0.18);
+  background: var(--timeline-search-marker);
+  box-shadow: 0 0 0 1px var(--timeline-search-marker-shadow);
   pointer-events: none;
   z-index: 2;
 }
