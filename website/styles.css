@@ -507,6 +507,15 @@ select {
   padding-right: 6px;
 }
 
+.timeline-section-heading {
+  color: var(--muted);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding-top: 4px;
+}
+
 .timeline-room-label {
   display: grid;
   gap: 4px;

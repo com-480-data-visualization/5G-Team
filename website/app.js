@@ -462,6 +462,14 @@ function getSearchWindowFromForm() {
   return { start, end };
 }
 
+// Read the requested meeting duration from the form in minutes.
+function getSearchDurationMinutes() {
+  const rawValue = document.getElementById("duration").value;
+  const duration = Number.parseInt(rawValue, 10);
+
+  return Number.isFinite(duration) && duration > 0 ? duration : 0;
+}
+
 // Convert a timestamp into minutes within its own day so it can be positioned
 // on the 24-hour timeline grid.
 function minutesWithinDay(date) {
@@ -494,33 +502,59 @@ function normalizeSlots(roomName) {
     .sort((left, right) => left.startMinutes - right.startMinutes);
 }
 
-// Check whether a room has any occupancy block that intersects the searched window.
-// If one interval overlaps, the room is considered unavailable for that search.
-function roomIsAvailableInWindow(roomName, searchWindow) {
-  if (!searchWindow) {
+// Check whether a room has a continuous free interval inside the searched
+// window that is at least as long as the requested meeting duration.
+function roomIsAvailableInWindow(roomName, searchWindow, durationMinutes) {
+  if (!searchWindow || durationMinutes <= 0) {
     return true;
   }
 
-  const slots = getRoomSlots(roomName);
+  const requestedDurationMs = durationMinutes * 60000;
+  const windowDurationMs = searchWindow.end.getTime() - searchWindow.start.getTime();
 
-  return !slots.some(([startIso, endIso]) => {
-    const slotStart = new Date(startIso);
-    const slotEnd = new Date(endIso);
-    return searchWindow.start < slotEnd && searchWindow.end > slotStart;
-  });
+  if (windowDurationMs < requestedDurationMs) {
+    return false;
+  }
+
+  const slots = getRoomSlots(roomName)
+    .map(([startIso, endIso]) => ({
+      start: new Date(startIso),
+      end: new Date(endIso),
+    }))
+    .filter((slot) => slot.end > searchWindow.start && slot.start < searchWindow.end)
+    .sort((left, right) => left.start.getTime() - right.start.getTime());
+
+  let freeCursor = searchWindow.start.getTime();
+
+  for (const slot of slots) {
+    const occupiedStart = Math.max(slot.start.getTime(), searchWindow.start.getTime());
+    const occupiedEnd = Math.min(slot.end.getTime(), searchWindow.end.getTime());
+
+    if (occupiedStart - freeCursor >= requestedDurationMs) {
+      return true;
+    }
+
+    freeCursor = Math.max(freeCursor, occupiedEnd);
+  }
+
+  return searchWindow.end.getTime() - freeCursor >= requestedDurationMs;
 }
 
 // Build a new feature list for the active search window.
 // The map colors come from this computed score, not from a fixed landing-page value.
 function applyAvailabilityToFeatures(features, searchWindow) {
+  const durationMinutes = getSearchDurationMinutes();
+
   return features.map((feature) => {
     // Find every occupancy-backed room in this building.
     const rooms = getRoomsForBuilding(feature.properties.name);
     const totalRooms = rooms.length;
 
-    // A room is considered available if none of its occupied slots overlap the
-    // selected search interval.
-    const availableRooms = rooms.filter((room) => roomIsAvailableInWindow(room.room, searchWindow));
+    // A room is considered available if it contains at least one free interval
+    // inside the selected search window that is long enough for the meeting.
+    const availableRooms = rooms.filter((room) =>
+      roomIsAvailableInWindow(room.room, searchWindow, durationMinutes)
+    );
     const score = totalRooms ? availableRooms.length / totalRooms : 0;
 
     return {
@@ -533,6 +567,27 @@ function applyAvailabilityToFeatures(features, searchWindow) {
       },
     };
   });
+}
+
+// Split the building's rooms into the two timeline sections the panel shows.
+// Each room keeps its full metadata; only the grouping and display order change.
+function splitRoomsByAvailability(rooms, searchWindow, durationMinutes) {
+  const available = [];
+  const unavailable = [];
+
+  rooms.forEach((roomEntry) => {
+    if (roomIsAvailableInWindow(roomEntry.room, searchWindow, durationMinutes)) {
+      available.push(roomEntry);
+      return;
+    }
+
+    unavailable.push(roomEntry);
+  });
+
+  available.sort((left, right) => left.room.localeCompare(right.room));
+  unavailable.sort((left, right) => left.room.localeCompare(right.room));
+
+  return { available, unavailable };
 }
 
 // Draw one colored block in a timeline row.
@@ -650,15 +705,21 @@ function openBuildingPanel(buildingCode, rooms) {
   buildingPanel.classList.remove("is-empty");
   buildingPanelTitle.textContent = buildingCode;
   buildingPanelCopy.textContent =
-    "Prototype timeline for one full day. The empty track is ready for future availability data; horizontally scroll to inspect the rest of the day.";
+    "Rooms are grouped by whether they contain a continuous free interval long enough for the selected meeting duration within the searched time range.";
 
+  const durationMinutes = getSearchDurationMinutes();
+  const { available, unavailable } = splitRoomsByAvailability(
+    rooms,
+    activeSearchWindow,
+    durationMinutes
+  );
   const roomCount = rooms.length;
 
   buildingMeta.innerHTML = "";
   [
     `${roomCount} room${roomCount === 1 ? "" : "s"} found`,
-    roomCount ? "Showing all matching rooms" : "No room found",
-    "Day view, empty availability",
+    `${available.length} available`,
+    `${unavailable.length} unavailable`,
   ].forEach((label) => {
     const chip = document.createElement("span");
     chip.textContent = label;
@@ -675,23 +736,54 @@ function openBuildingPanel(buildingCode, rooms) {
 
   // The header scroll plus every row scroll are synchronized together.
   const scrollElements = [headerScroll];
-  const visibleRooms = rooms.length ? rooms : [{ room: "No room found", type: "No matching room in room_occupancy.json" }];
 
-  visibleRooms.forEach((roomEntry) => {
+  // The timeline should always present rooms in two explicit blocks so the
+  // user can scan qualifying rooms first, then the ones that do not fit.
+  const sections = rooms.length
+    ? [
+        { title: "Available", entries: available },
+        { title: "Unavailable", entries: unavailable },
+      ]
+    : [];
+
+  sections.forEach((section) => {
+    const sectionHeading = document.createElement("div");
+    sectionHeading.className = "timeline-section-heading";
+    sectionHeading.textContent = section.title;
+    timelineBody.appendChild(sectionHeading);
+
+    section.entries.forEach((roomEntry) => {
+      const row = document.createElement("div");
+      row.className = "timeline-row";
+
+      const rowLabel = document.createElement("div");
+      rowLabel.className = "timeline-room-label";
+      rowLabel.innerHTML = `<strong>${roomEntry.room}</strong><span>${roomEntry.type}</span>`;
+
+      const rowScroll = createTimelineScroll(false);
+      addTimelineSegments(rowScroll.firstChild, roomEntry.room);
+
+      row.append(rowLabel, rowScroll);
+      timelineBody.appendChild(row);
+      scrollElements.push(rowScroll);
+    });
+  });
+
+  if (!rooms.length) {
     const row = document.createElement("div");
     row.className = "timeline-row";
 
     const rowLabel = document.createElement("div");
     rowLabel.className = "timeline-room-label";
-    rowLabel.innerHTML = `<strong>${roomEntry.room}</strong><span>${roomEntry.type}</span>`;
+    rowLabel.innerHTML = "<strong>No room found</strong><span>No matching room in room_occupancy.json</span>";
 
     const rowScroll = createTimelineScroll(false);
-    addTimelineSegments(rowScroll.firstChild, roomEntry.room);
+    addTimelineSegments(rowScroll.firstChild, "No room found");
 
     row.append(rowLabel, rowScroll);
     timelineBody.appendChild(row);
     scrollElements.push(rowScroll);
-  });
+  }
 
   syncTimelineScroll(scrollElements);
   centerTimelineOnSearchWindow(scrollElements);
@@ -934,7 +1026,7 @@ document.getElementById("availability-form").addEventListener("submit", (event) 
   refreshOpenBuildingPanel();
 
   setStatus(
-    `Search applied: ${start} to ${end} for ${duration} minutes. Building colors now reflect room availability only within that time window.`
+    `Search applied: ${start} to ${end} for ${duration} minutes. Rooms are now available only if they contain a continuous free interval at least that long within the selected window.`
   );
 });
 
