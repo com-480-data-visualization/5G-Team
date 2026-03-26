@@ -564,14 +564,17 @@ function applyAvailabilityToFeatures(features, searchWindow) {
   return features.map((feature) => {
     // Find every occupancy-backed room in this building.
     const rooms = getRoomsForBuilding(feature.properties.name);
-    const totalRooms = rooms.length;
-
-    // A room is considered available if it contains at least one free interval
-    // inside the selected search window that is long enough for the meeting.
-    const availableRooms = rooms.filter((room) =>
-      roomIsAvailableInWindow(room.room, searchWindow, durationMinutes)
+    const { available, unavailable } = splitRoomsByAvailability(
+      rooms,
+      searchWindow,
+      durationMinutes
     );
-    const score = totalRooms ? availableRooms.length / totalRooms : 0;
+    const totalRooms = available.length + unavailable.length;
+
+    // The heatmap is binary: each room is either available or unavailable for
+    // the selected search window and requested duration. The score is therefore
+    // available / (available + unavailable).
+    const score = totalRooms ? available.length / totalRooms : 0;
 
     return {
       ...feature,
@@ -579,7 +582,7 @@ function applyAvailabilityToFeatures(features, searchWindow) {
         ...feature.properties,
         score,
         rooms: totalRooms,
-        availableRooms: availableRooms.length,
+        availableRooms: available.length,
       },
     };
   });
@@ -614,6 +617,12 @@ function splitRoomsByAvailability(rooms, searchWindow, durationMinutes) {
   unavailable.sort(byLongestAvailability);
 
   return { available, unavailable };
+}
+
+// Build a direct EPFL campus plan link for the selected building.
+// We keep the displayed building label, including spaces, in the room query.
+function buildPlanEpflUrl(buildingName) {
+  return `https://plan.epfl.ch/?room==${encodeURIComponent(buildingName)}`;
 }
 
 // Draw one colored block in a timeline row.
@@ -874,7 +883,7 @@ function refreshOpenBuildingPanel() {
 // Leaflet feature callback for each building polygon.
 // This wires hover feedback, popup content, and click-to-open behavior.
 function onEachFeature(feature, layer) {
-  const { name, score, id, availableRooms, rooms } = feature.properties;
+  const { name, availableRooms, rooms } = feature.properties;
   const enableMapPopup = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
   // On desktop we keep the Leaflet popup as a lightweight map detail.
@@ -885,8 +894,7 @@ function onEachFeature(feature, layer) {
       <div class="room-popup">
         <h4>${name}</h4>
         <p>Availability in search window: ${availableRooms}/${rooms} rooms</p>
-        <p>Availability score: ${Math.round(score * 100)}%</p>
-        <p><a href="${id}" target="_blank" rel="noreferrer">Open in OpenStreetMap</a></p>
+        <p><a href="${buildPlanEpflUrl(name)}" target="_blank" rel="noreferrer">Open on plan.epfl.ch</a></p>
       </div>
     `);
   }
