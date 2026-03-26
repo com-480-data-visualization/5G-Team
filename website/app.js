@@ -504,6 +504,43 @@ function normalizeSlots(roomName) {
 
 // Check whether a room has a continuous free interval inside the searched
 // window that is at least as long as the requested meeting duration.
+function getLongestFreeIntervalInWindow(roomName, searchWindow) {
+  if (!searchWindow) {
+    return Number.POSITIVE_INFINITY;
+  }
+
+  const windowStartMs = searchWindow.start.getTime();
+  const windowEndMs = searchWindow.end.getTime();
+
+  if (windowEndMs <= windowStartMs) {
+    return 0;
+  }
+
+  const slots = getRoomSlots(roomName)
+    .map(([startIso, endIso]) => ({
+      start: new Date(startIso),
+      end: new Date(endIso),
+    }))
+    .filter((slot) => slot.end > searchWindow.start && slot.start < searchWindow.end)
+    .sort((left, right) => left.start.getTime() - right.start.getTime());
+
+  let freeCursor = windowStartMs;
+  let longestFreeIntervalMs = 0;
+
+  for (const slot of slots) {
+    const occupiedStart = Math.max(slot.start.getTime(), windowStartMs);
+    const occupiedEnd = Math.min(slot.end.getTime(), windowEndMs);
+
+    longestFreeIntervalMs = Math.max(longestFreeIntervalMs, occupiedStart - freeCursor);
+
+    freeCursor = Math.max(freeCursor, occupiedEnd);
+  }
+
+  return Math.max(longestFreeIntervalMs, windowEndMs - freeCursor);
+}
+
+// Check whether a room has a continuous free interval inside the searched
+// window that is at least as long as the requested meeting duration.
 function roomIsAvailableInWindow(roomName, searchWindow, durationMinutes) {
   if (!searchWindow || durationMinutes <= 0) {
     return true;
@@ -516,28 +553,7 @@ function roomIsAvailableInWindow(roomName, searchWindow, durationMinutes) {
     return false;
   }
 
-  const slots = getRoomSlots(roomName)
-    .map(([startIso, endIso]) => ({
-      start: new Date(startIso),
-      end: new Date(endIso),
-    }))
-    .filter((slot) => slot.end > searchWindow.start && slot.start < searchWindow.end)
-    .sort((left, right) => left.start.getTime() - right.start.getTime());
-
-  let freeCursor = searchWindow.start.getTime();
-
-  for (const slot of slots) {
-    const occupiedStart = Math.max(slot.start.getTime(), searchWindow.start.getTime());
-    const occupiedEnd = Math.min(slot.end.getTime(), searchWindow.end.getTime());
-
-    if (occupiedStart - freeCursor >= requestedDurationMs) {
-      return true;
-    }
-
-    freeCursor = Math.max(freeCursor, occupiedEnd);
-  }
-
-  return searchWindow.end.getTime() - freeCursor >= requestedDurationMs;
+  return getLongestFreeIntervalInWindow(roomName, searchWindow) >= requestedDurationMs;
 }
 
 // Build a new feature list for the active search window.
@@ -571,21 +587,31 @@ function applyAvailabilityToFeatures(features, searchWindow) {
 
 // Split the building's rooms into the two timeline sections the panel shows.
 // Each room keeps its full metadata; only the grouping and display order change.
+// Inside each section, rooms with longer continuous free intervals rank first.
 function splitRoomsByAvailability(rooms, searchWindow, durationMinutes) {
   const available = [];
   const unavailable = [];
 
   rooms.forEach((roomEntry) => {
+    const longestFreeIntervalMs = getLongestFreeIntervalInWindow(roomEntry.room, searchWindow);
+    const rankedRoom = {
+      ...roomEntry,
+      longestFreeIntervalMs,
+    };
+
     if (roomIsAvailableInWindow(roomEntry.room, searchWindow, durationMinutes)) {
-      available.push(roomEntry);
+      available.push(rankedRoom);
       return;
     }
 
-    unavailable.push(roomEntry);
+    unavailable.push(rankedRoom);
   });
 
-  available.sort((left, right) => left.room.localeCompare(right.room));
-  unavailable.sort((left, right) => left.room.localeCompare(right.room));
+  const byLongestAvailability = (left, right) =>
+    right.longestFreeIntervalMs - left.longestFreeIntervalMs || left.room.localeCompare(right.room);
+
+  available.sort(byLongestAvailability);
+  unavailable.sort(byLongestAvailability);
 
   return { available, unavailable };
 }
