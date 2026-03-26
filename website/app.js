@@ -1081,6 +1081,28 @@ function formatEuropeanDateTimeInput(date) {
   return `${day}/${month}/${year} ${hour}:${minute}`;
 }
 
+// Keep end time convenient: whenever a valid start is chosen, prefill end to
+// the same day and one hour later.
+function syncEndWithStartPlusOneHour() {
+  const startInput = document.getElementById("startTime");
+  const endInput = document.getElementById("endTime");
+  const startDate = parseEuropeanDateTimeInput(startInput.value);
+
+  if (Number.isNaN(startDate.getTime())) {
+    return;
+  }
+
+  const endDate = new Date(startDate);
+  endDate.setHours(endDate.getHours() + 1);
+
+  if (endTimePicker) {
+    endTimePicker.setDate(endDate, false);
+    return;
+  }
+
+  endInput.value = formatEuropeanDateTimeInput(endDate);
+}
+
 // Attach a custom date/time picker that still stores values in the same
 // European 24-hour text format used by the form and validation logic.
 function initializeDateTimePickers() {
@@ -1102,6 +1124,22 @@ function initializeDateTimePickers() {
 
   startTimePicker = buildPicker("#startTime");
   endTimePicker = buildPicker("#endTime");
+
+  startTimePicker.config.onChange.push(() => {
+    syncEndWithStartPlusOneHour();
+  });
+
+  startTimePicker.config.onClose.push(() => {
+    syncEndWithStartPlusOneHour();
+  });
+
+  document.getElementById("startTime").addEventListener("change", () => {
+    syncEndWithStartPlusOneHour();
+  });
+
+  document.getElementById("startTime").addEventListener("blur", () => {
+    syncEndWithStartPlusOneHour();
+  });
 
   // The explicit calendar buttons open the matching picker on demand.
   document.querySelectorAll(".datetime-trigger").forEach((button) => {
@@ -1126,6 +1164,10 @@ function seedDefaultTimes() {
 
   document.getElementById("startTime").value = formatEuropeanDateTimeInput(start);
   document.getElementById("endTime").value = formatEuropeanDateTimeInput(end);
+
+  if (endTimePicker) {
+    endTimePicker.setDate(end, false);
+  }
 }
 
 // Search submission turns the current form values into the active search window.
