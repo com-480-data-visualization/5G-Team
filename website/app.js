@@ -1202,26 +1202,35 @@ document.querySelectorAll(".shortcut-chip").forEach((button) => {
   button.addEventListener("click", () => {
     const now = new Date();
     const start = new Date(now);
-    const end = new Date(now);
     const range = button.dataset.range;
 
     if (range === "today") {
       start.setHours(14, 0, 0, 0);
-      end.setHours(17, 0, 0, 0);
     } else if (range === "tomorrow") {
       start.setDate(start.getDate() + 1);
-      end.setDate(end.getDate() + 1);
       start.setHours(9, 0, 0, 0);
-      end.setHours(12, 0, 0, 0);
     } else {
       start.setDate(start.getDate() + 2);
-      end.setDate(end.getDate() + 7);
       start.setHours(10, 0, 0, 0);
-      end.setHours(18, 0, 0, 0);
     }
+
+    const end = new Date(start);
+    end.setHours(end.getHours() + 1);
+
+    // Presets always use a 1-hour meeting duration for faster future-date setup.
+    document.getElementById("duration").value = "60";
 
     document.getElementById("startTime").value = formatEuropeanDateTimeInput(start);
     document.getElementById("endTime").value = formatEuropeanDateTimeInput(end);
+
+    if (startTimePicker) {
+      startTimePicker.setDate(start, false);
+    }
+
+    if (endTimePicker) {
+      endTimePicker.setDate(end, false);
+    }
+
     setStatus(`Preset applied: ${button.textContent}. Press Search to update building availability for that time window.`);
   });
 });
