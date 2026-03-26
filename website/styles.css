@@ -264,9 +264,10 @@ select {
 }
 
 .search-controls {
-  /* Four-column grid: start, end, duration, submit button. */
+  /* Two-column grid so start/end stay together and duration/search form
+     a second row in the narrower desktop sidebar layout. */
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -400,6 +401,7 @@ select {
 .search-button {
   /* Primary call to action. */
   align-self: end;
+  width: 100%;
   padding: 16px 20px;
   background: linear-gradient(135deg, var(--accent), #8d84ff);
   color: var(--button-text-strong);
