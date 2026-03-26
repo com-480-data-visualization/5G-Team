@@ -18,6 +18,7 @@ let buildingLayer;
 // LocalStorage key for cached building geometry fetched from OSM.
 const osmGeometryCacheKey = "epfl-building-geometry-v2";
 const themeStorageKey = "epfl-room-finder-theme";
+const languageStorageKey = "epfl-room-finder-language";
 
 // The room timeline is drawn as a fixed 24-hour day.
 const timelineHours = Array.from({ length: 24 }, (_, hour) => hour);
@@ -31,6 +32,7 @@ const timelineHeader = document.getElementById("timelineHeader");
 const timelineBody = document.getElementById("timelineBody");
 const closeBuildingPanel = document.getElementById("closeBuildingPanel");
 const themeToggle = document.getElementById("themeToggle");
+const languageToggle = document.getElementById("languageToggle");
 const mapSection = document.getElementById("map-section");
 const mapFrame = document.querySelector(".map-frame");
 const mobilePanelMedia = window.matchMedia("(max-width: 720px)");
@@ -59,12 +61,187 @@ let lastThemeToggleAt = 0;
 let startTimePicker = null;
 let endTimePicker = null;
 let activeSegmentTooltip = null;
+let currentLanguage = "en";
+
+const translations = {
+  en: {
+    search_eyebrow: "Meeting availability",
+    search_title: "Find free rooms across the EPFL campus",
+    start_label: "Beginning",
+    end_label: "End",
+    duration_label: "Duration",
+    room_type_label: "Room Type",
+    search_button: "Search",
+    shortcut_now: "Now",
+    shortcut_tomorrow_morning: "Tomorrow morning",
+    shortcut_tomorrow_afternoon: "Tomorrow afternoon",
+    building_timeline: "Building timeline",
+    close_panel: "Close panel",
+    theme_light: "Light mode",
+    theme_dark: "Dark mode",
+    room_type_all: "All room types",
+    room_type_conference: "Conference Room",
+    room_type_study: "Study Room",
+    room_header: "Room",
+    available: "Available",
+    unavailable: "Unavailable",
+    none: "None",
+    no_occupancy: "No occupancy data yet",
+    no_room_found: "No room found",
+    no_matching_room: "No matching room in room_occupancy.json",
+    select_building: "Select a building",
+    click_building_copy:
+      "Click a building on the map to inspect its rooms. For now, the panel shows the first matching room and an empty one-day timeline.",
+    no_building_selected: "No building selected yet",
+    selected_panel_copy:
+      "Rooms are grouped by whether they contain a continuous free interval long enough for the selected meeting duration within the searched time range.",
+    open_on_plan: "Open on plan.epfl.ch",
+    availability_in_window: "Availability in search window: {available}/{rooms} rooms",
+    selected_building_status:
+      "Selected building {name}. The room timeline is centered on your searched time window.",
+    invalid_search_window:
+      "Search window is invalid. Use DD/MM/YYYY HH:MM and choose a beginning before the end.",
+    search_applied:
+      "Search applied: {start} to {end} for {duration}, filtered to {roomType}. Rooms are now available only if they contain a continuous free interval at least that long within the selected window.{adjustment}",
+    end_adjusted:
+      " End time was automatically extended from {previousEnd} to {adjustedEnd} so the search range is at least {duration} long.",
+    loading_data: "Loading EPFL buildings, rooms, and room occupancy data...",
+    loaded_data:
+      "Loaded {buildings} buildings, {rooms} known rooms, and {occupancy} occupancy-backed rooms. Use Search to update the heatmap for a specific time window.",
+    failed_data:
+      "Failed to load building, room, or occupancy data. Make sure you run the site through a local server and that epfl_buildings.json, rooms.json, and room_occupancy.json are present.",
+    language_changed: "Language switched to English.",
+    available_slot: "{start} - {end} available",
+    occupied_slot: "{start} - {end} occupied{title}",
+  },
+  fr: {
+    search_eyebrow: "Disponibilite des salles",
+    search_title: "Trouvez des salles libres sur le campus de l'EPFL",
+    start_label: "Debut",
+    end_label: "Fin",
+    duration_label: "Duree",
+    room_type_label: "Type de salle",
+    search_button: "Rechercher",
+    shortcut_now: "Maintenant",
+    shortcut_tomorrow_morning: "Demain matin",
+    shortcut_tomorrow_afternoon: "Demain apres-midi",
+    building_timeline: "Planning du batiment",
+    close_panel: "Fermer le panneau",
+    theme_light: "Mode clair",
+    theme_dark: "Mode sombre",
+    room_type_all: "Tous les types de salle",
+    room_type_conference: "Salle de conference",
+    room_type_study: "Salle d'etude",
+    room_header: "Salle",
+    available: "Disponible",
+    unavailable: "Indisponible",
+    none: "Aucune",
+    no_occupancy: "Pas encore de donnees d'occupation",
+    no_room_found: "Aucune salle trouvee",
+    no_matching_room: "Aucune salle correspondante dans room_occupancy.json",
+    select_building: "Selectionnez un batiment",
+    click_building_copy:
+      "Cliquez sur un batiment sur la carte pour inspecter ses salles. Pour l'instant, le panneau affiche la premiere salle correspondante et une timeline vide sur une journee.",
+    no_building_selected: "Aucun batiment selectionne",
+    selected_panel_copy:
+      "Les salles sont regroupees selon qu'elles contiennent un intervalle libre continu suffisamment long pour la duree de reunion choisie dans la plage horaire recherchee.",
+    open_on_plan: "Ouvrir sur plan.epfl.ch",
+    availability_in_window: "Disponibilite dans la plage recherchee : {available}/{rooms} salles",
+    selected_building_status:
+      "Batiment {name} selectionne. La timeline des salles est centree sur la plage horaire recherchee.",
+    invalid_search_window:
+      "La plage de recherche est invalide. Utilisez JJ/MM/AAAA HH:MM et choisissez un debut avant la fin.",
+    search_applied:
+      "Recherche appliquee : de {start} a {end} pour {duration}, filtree sur {roomType}. Une salle est maintenant consideree comme disponible uniquement si elle contient un intervalle libre continu d'au moins cette duree dans la plage selectionnee.{adjustment}",
+    end_adjusted:
+      " L'heure de fin a ete automatiquement etendue de {previousEnd} a {adjustedEnd} afin que la plage de recherche dure au moins {duration}.",
+    loading_data: "Chargement des batiments EPFL, des salles et des donnees d'occupation...",
+    loaded_data:
+      "{buildings} batiments, {rooms} salles connues et {occupancy} salles avec occupation ont ete charges. Utilisez Rechercher pour mettre a jour la carte thermique pour une plage horaire precise.",
+    failed_data:
+      "Le chargement des batiments, des salles ou des donnees d'occupation a echoue. Verifiez que vous utilisez un serveur local et que epfl_buildings.json, rooms.json et room_occupancy.json sont presents.",
+    language_changed: "Langue changee en francais.",
+    available_slot: "{start} - {end} disponible",
+    occupied_slot: "{start} - {end} occupe{title}",
+  },
+};
+
+function t(key, vars = {}) {
+  const languagePack = translations[currentLanguage] || translations.en;
+  const template = languagePack[key] || translations.en[key] || key;
+  return Object.entries(vars).reduce(
+    (text, [name, value]) => text.replaceAll(`{${name}}`, String(value)),
+    template
+  );
+}
+
+function formatDurationLabel(minutes) {
+  const totalMinutes = Number.parseInt(minutes, 10);
+  const hours = Math.floor(totalMinutes / 60);
+  const remainder = totalMinutes % 60;
+
+  if (currentLanguage === "fr") {
+    if (!hours) {
+      return `${totalMinutes} minute${totalMinutes > 1 ? "s" : ""}`;
+    }
+    if (!remainder) {
+      return `${hours} heure${hours > 1 ? "s" : ""}`;
+    }
+    return `${hours} heure${hours > 1 ? "s" : ""} ${remainder} minute${remainder > 1 ? "s" : ""}`;
+  }
+
+  if (!hours) {
+    return `${totalMinutes} minutes`;
+  }
+  if (!remainder) {
+    return `${hours} hour${hours > 1 ? "s" : ""}`;
+  }
+  return `${hours} hour${hours > 1 ? "s" : ""} ${remainder} minutes`;
+}
+
+function formatRoomCountLabel(count) {
+  if (currentLanguage === "fr") {
+    return `${count} salle${count > 1 ? "s" : ""} trouvee${count > 1 ? "s" : ""}`;
+  }
+  return `${count} room${count === 1 ? "" : "s"} found`;
+}
+
+function formatAvailabilityCountLabel(count, key) {
+  if (currentLanguage === "fr") {
+    return `${count} ${t(key).toLowerCase()}${count > 1 ? "s" : ""}`;
+  }
+  return `${count} ${t(key).toLowerCase()}`;
+}
+
+function refreshStaticTranslations() {
+  document.documentElement.lang = currentLanguage === "fr" ? "fr" : "en-GB";
+  document.getElementById("searchEyebrow").textContent = t("search_eyebrow");
+  document.getElementById("searchTitle").textContent = t("search_title");
+  document.getElementById("startTimeLabel").textContent = t("start_label");
+  document.getElementById("endTimeLabel").textContent = t("end_label");
+  document.getElementById("durationLabel").textContent = t("duration_label");
+  document.getElementById("roomTypeLabel").textContent = t("room_type_label");
+  document.getElementById("searchButton").textContent = t("search_button");
+  document.getElementById("shortcutNow").textContent = t("shortcut_now");
+  document.getElementById("shortcutTomorrowMorning").textContent = t("shortcut_tomorrow_morning");
+  document.getElementById("shortcutTomorrowAfternoon").textContent = t("shortcut_tomorrow_afternoon");
+  document.getElementById("buildingTimelineEyebrow").textContent = t("building_timeline");
+  closeBuildingPanel.setAttribute("aria-label", t("close_panel"));
+
+  document.querySelectorAll("#duration option").forEach((option) => {
+    option.textContent = formatDurationLabel(option.value);
+  });
+
+  document.querySelector('#roomType option[value="all"]').textContent = t("room_type_all");
+  document.querySelector('#roomType option[value="conference"]').textContent = t("room_type_conference");
+  document.querySelector('#roomType option[value="study"]').textContent = t("room_type_study");
+}
 
 // Apply the selected theme to the <body> element and keep the toggle label
 // synchronized with the actual current mode.
 function applyTheme(theme) {
   document.body.dataset.theme = theme;
-  themeToggle.textContent = theme === "light" ? "Dark mode" : "Light mode";
+  themeToggle.textContent = theme === "light" ? t("theme_dark") : t("theme_light");
   themeToggle.setAttribute("aria-pressed", String(theme === "light"));
 }
 
@@ -82,12 +259,44 @@ function resolveInitialTheme() {
   return systemDarkModeMedia.matches ? "dark" : "light";
 }
 
+function resolveInitialLanguage() {
+  const storedLanguage = localStorage.getItem(languageStorageKey);
+  return storedLanguage === "fr" ? "fr" : "en";
+}
+
 // Toggle between light and dark mode and persist the user's choice so the
 // page keeps the same look after a refresh.
 function toggleTheme() {
   const nextTheme = document.body.dataset.theme === "light" ? "dark" : "light";
   localStorage.setItem(themeStorageKey, nextTheme);
   applyTheme(nextTheme);
+}
+
+function applyLanguage(language) {
+  currentLanguage = language === "fr" ? "fr" : "en";
+  localStorage.setItem(languageStorageKey, currentLanguage);
+  languageToggle.textContent = currentLanguage === "en" ? "FR" : "EN";
+  languageToggle.setAttribute(
+    "aria-label",
+    currentLanguage === "en" ? "Switch language to French" : "Passer la langue en anglais"
+  );
+  refreshStaticTranslations();
+  applyTheme(document.body.dataset.theme || resolveInitialTheme());
+
+  if (activeBuildingSelection) {
+    openBuildingPanel(activeBuildingSelection, getRoomsForBuilding(activeBuildingSelection));
+  } else {
+    resetBuildingPanel();
+  }
+
+  if (baseBuildingFeatures.length) {
+    renderBuildings(applyAvailabilityToFeatures(baseBuildingFeatures, activeSearchWindow));
+  }
+}
+
+function toggleLanguage() {
+  applyLanguage(currentLanguage === "en" ? "fr" : "en");
+  setStatus(t("language_changed"));
 }
 
 // Theme toggle should react reliably on both desktop clicks and touch devices.
@@ -760,7 +969,7 @@ function addTimelineSegments(grid, roomName) {
   if (!allRoomSlots.length) {
     const emptyState = document.createElement("div");
     emptyState.className = "timeline-empty-state";
-    emptyState.textContent = "No occupancy data yet";
+    emptyState.textContent = t("no_occupancy");
     grid.appendChild(emptyState);
     return;
   }
@@ -774,7 +983,10 @@ function addTimelineSegments(grid, roomName) {
       cursor,
       slot.startMinutes,
       "timeline-segment-available",
-      `${formatHour(Math.floor(cursor / 60))} - ${slot.startIso.slice(11, 16)} available`
+      t("available_slot", {
+        start: formatHour(Math.floor(cursor / 60)),
+        end: slot.startIso.slice(11, 16),
+      })
     );
 
     // Occupied block itself.
@@ -783,7 +995,11 @@ function addTimelineSegments(grid, roomName) {
       slot.startMinutes,
       slot.endMinutes,
       "timeline-segment-occupied",
-      `${slot.startIso.slice(11, 16)} - ${slot.endIso.slice(11, 16)} occupied${slot.title ? `: ${slot.title}` : ""}`,
+      t("occupied_slot", {
+        start: slot.startIso.slice(11, 16),
+        end: slot.endIso.slice(11, 16),
+        title: slot.title ? `: ${slot.title}` : "",
+      }),
       slot.title || ""
     );
     cursor = slot.endMinutes;
@@ -795,7 +1011,10 @@ function addTimelineSegments(grid, roomName) {
     cursor,
     24 * 60,
     "timeline-segment-available",
-    `${formatHour(Math.floor(cursor / 60))} - 24:00 available`
+    t("available_slot", {
+      start: formatHour(Math.floor(cursor / 60)),
+      end: "24:00",
+    })
   );
 }
 
@@ -844,8 +1063,7 @@ function openBuildingPanel(buildingCode, rooms) {
   activeBuildingSelection = buildingCode;
   buildingPanel.classList.remove("is-empty");
   buildingPanelTitle.textContent = buildingCode;
-  buildingPanelCopy.textContent =
-    "Rooms are grouped by whether they contain a continuous free interval long enough for the selected meeting duration within the searched time range.";
+  buildingPanelCopy.textContent = t("selected_panel_copy");
 
   const durationMinutes = getSearchDurationMinutes();
   const { available, unavailable } = splitRoomsByAvailability(
@@ -857,9 +1075,9 @@ function openBuildingPanel(buildingCode, rooms) {
 
   buildingMeta.innerHTML = "";
   [
-    `${roomCount} room${roomCount === 1 ? "" : "s"} found`,
-    `${available.length} available`,
-    `${unavailable.length} unavailable`,
+    formatRoomCountLabel(roomCount),
+    formatAvailabilityCountLabel(available.length, "available"),
+    formatAvailabilityCountLabel(unavailable.length, "unavailable"),
   ].forEach((label) => {
     const chip = document.createElement("span");
     chip.textContent = label;
@@ -870,7 +1088,7 @@ function openBuildingPanel(buildingCode, rooms) {
   timelineBody.innerHTML = "";
 
   const headerLabel = document.createElement("div");
-  headerLabel.textContent = "Room";
+  headerLabel.textContent = t("room_header");
   const headerScroll = createTimelineScroll(true);
   timelineHeader.append(headerLabel, headerScroll);
 
@@ -881,8 +1099,8 @@ function openBuildingPanel(buildingCode, rooms) {
   // user can scan qualifying rooms first, then the ones that do not fit.
   const sections = rooms.length
     ? [
-        { title: "Available", entries: available },
-        { title: "Unavailable", entries: unavailable },
+        { title: t("available"), entries: available },
+        { title: t("unavailable"), entries: unavailable },
       ]
     : [];
 
@@ -897,7 +1115,7 @@ function openBuildingPanel(buildingCode, rooms) {
     if (!section.entries.length) {
       const emptyRow = document.createElement("div");
       emptyRow.className = "timeline-section-empty";
-      emptyRow.textContent = "None";
+      emptyRow.textContent = t("none");
       timelineBody.appendChild(emptyRow);
       return;
     }
@@ -939,7 +1157,7 @@ function openBuildingPanel(buildingCode, rooms) {
 
     const rowLabel = document.createElement("div");
     rowLabel.className = "timeline-room-label";
-    rowLabel.innerHTML = "<strong>No room found</strong><span>No matching room in room_occupancy.json</span>";
+    rowLabel.innerHTML = `<strong>${t("no_room_found")}</strong><span>${t("no_matching_room")}</span>`;
 
     const rowScroll = createTimelineScroll(false);
     addTimelineSegments(rowScroll.firstChild, "No room found");
@@ -958,10 +1176,9 @@ function openBuildingPanel(buildingCode, rooms) {
 function resetBuildingPanel() {
   activeBuildingSelection = null;
   buildingPanel.classList.add("is-empty");
-  buildingPanelTitle.textContent = "Select a building";
-  buildingPanelCopy.textContent =
-    "Click a building on the map to inspect its rooms. For now, the panel shows the first matching room and an empty one-day timeline.";
-  buildingMeta.innerHTML = "<span>No building selected yet</span>";
+  buildingPanelTitle.textContent = t("select_building");
+  buildingPanelCopy.textContent = t("click_building_copy");
+  buildingMeta.innerHTML = `<span>${t("no_building_selected")}</span>`;
   timelineHeader.innerHTML = "";
   timelineBody.innerHTML = "";
 }
@@ -972,6 +1189,10 @@ closeBuildingPanel.addEventListener("click", () => {
 
 themeToggle.addEventListener("click", () => {
   handleThemeToggle();
+});
+
+languageToggle.addEventListener("click", () => {
+  toggleLanguage();
 });
 
 themeToggle.addEventListener("pointerup", (event) => {
@@ -1022,8 +1243,8 @@ function onEachFeature(feature, layer) {
     layer.bindPopup(`
       <div class="room-popup">
         <h4>${name}</h4>
-        <p>Availability in search window: ${availableRooms}/${rooms} rooms</p>
-        <p><a href="${buildPlanEpflUrl(name)}" target="_blank" rel="noreferrer">Open on plan.epfl.ch</a></p>
+        <p>${t("availability_in_window", { available: availableRooms, rooms })}</p>
+        <p><a href="${buildPlanEpflUrl(name)}" target="_blank" rel="noreferrer">${t("open_on_plan")}</a></p>
       </div>
     `);
   }
@@ -1046,9 +1267,7 @@ function onEachFeature(feature, layer) {
 
     const rooms = getRoomsForBuilding(name);
     openBuildingPanel(name, rooms);
-    setStatus(
-      `Selected building ${name}. The room timeline is centered on your searched time window.`
-    );
+    setStatus(t("selected_building_status", { name }));
   });
 }
 
@@ -1344,7 +1563,7 @@ function applyCurrentSearch() {
   const searchWindow = getSearchWindowFromForm();
 
   if (!searchWindow) {
-    setStatus("Search window is invalid. Use DD/MM/YYYY HH:MM and choose a beginning before the end.");
+    setStatus(t("invalid_search_window"));
     return;
   }
 
@@ -1353,12 +1572,20 @@ function applyCurrentSearch() {
   refreshOpenBuildingPanel();
 
   const adjustmentMessage = rangeAdjustment
-    ? ` End time was automatically extended from ${rangeAdjustment.previousEndValue} to ${rangeAdjustment.adjustedEndValue} so the search range is at least ${duration} minutes long.`
+    ? t("end_adjusted", {
+        previousEnd: rangeAdjustment.previousEndValue,
+        adjustedEnd: rangeAdjustment.adjustedEndValue,
+        duration: formatDurationLabel(duration),
+      })
     : "";
 
-  setStatus(
-    `Search applied: ${start} to ${end} for ${duration} minutes, filtered to ${roomType}. Rooms are now available only if they contain a continuous free interval at least that long within the selected window.${adjustmentMessage}`
-  );
+  setStatus(t("search_applied", {
+    start,
+    end,
+    duration: formatDurationLabel(duration),
+    roomType,
+    adjustment: adjustmentMessage,
+  }));
 }
 
 document.getElementById("availability-form").addEventListener("submit", (event) => {
@@ -1416,12 +1643,13 @@ document.querySelectorAll(".shortcut-chip").forEach((button) => {
 // 4. render the initial searched heatmap
 async function initializeApp() {
   try {
+    applyLanguage(resolveInitialLanguage());
     applyTheme(resolveInitialTheme());
     mountBuildingPanelForViewport();
     initializeDateTimePickers();
     seedDefaultTimes();
     resetBuildingPanel();
-    setStatus("Loading EPFL buildings, rooms, and room occupancy data...");
+    setStatus(t("loading_data"));
 
     const [records, rooms, occupancy] = await Promise.all([
       loadBuildingRecords(),
@@ -1439,14 +1667,14 @@ async function initializeApp() {
     }
 
     renderBuildings(applyAvailabilityToFeatures(baseBuildingFeatures, activeSearchWindow));
-    setStatus(
-      `Loaded ${baseBuildingFeatures.length} buildings, ${roomsDataset.length} known rooms, and ${occupancyByRoom.size} occupancy-backed rooms. Use Search to update the heatmap for a specific time window.`
-    );
+    setStatus(t("loaded_data", {
+      buildings: baseBuildingFeatures.length,
+      rooms: roomsDataset.length,
+      occupancy: occupancyByRoom.size,
+    }));
   } catch (error) {
     console.error(error);
-    setStatus(
-      "Failed to load building, room, or occupancy data. Make sure you run the site through a local server and that epfl_buildings.json, rooms.json, and room_occupancy.json are present."
-    );
+    setStatus(t("failed_data"));
   }
 }
 
