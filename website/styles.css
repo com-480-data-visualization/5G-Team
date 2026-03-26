@@ -521,6 +521,17 @@ select {
   gap: 4px;
 }
 
+.timeline-room-link {
+  display: inline-block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.timeline-room-link:hover strong,
+.timeline-room-link:focus-visible strong {
+  text-decoration: underline;
+}
+
 .timeline-room-label strong {
   font-size: 0.96rem;
 }

@@ -619,10 +619,11 @@ function splitRoomsByAvailability(rooms, searchWindow, durationMinutes) {
   return { available, unavailable };
 }
 
-// Build a direct EPFL campus plan link for the selected building.
-// We keep the displayed building label, including spaces, in the room query.
-function buildPlanEpflUrl(buildingName) {
-  return `https://plan.epfl.ch/?room==${encodeURIComponent(buildingName)}`;
+// Build a direct EPFL campus plan link for a building or room label.
+// We keep the displayed text, including spaces, in the room query and let URL
+// encoding preserve it safely in the outgoing link.
+function buildPlanEpflUrl(label) {
+  return `https://plan.epfl.ch/?room==${encodeURIComponent(label)}`;
 }
 
 // Draw one colored block in a timeline row.
@@ -793,7 +794,21 @@ function openBuildingPanel(buildingCode, rooms) {
 
       const rowLabel = document.createElement("div");
       rowLabel.className = "timeline-room-label";
-      rowLabel.innerHTML = `<strong>${roomEntry.room}</strong><span>${roomEntry.type}</span>`;
+
+      const roomLink = document.createElement("a");
+      roomLink.className = "timeline-room-link";
+      roomLink.href = buildPlanEpflUrl(roomEntry.room);
+      roomLink.target = "_blank";
+      roomLink.rel = "noreferrer";
+
+      const roomName = document.createElement("strong");
+      roomName.textContent = roomEntry.room;
+      roomLink.appendChild(roomName);
+
+      const roomType = document.createElement("span");
+      roomType.textContent = roomEntry.type;
+
+      rowLabel.append(roomLink, roomType);
 
       const rowScroll = createTimelineScroll(false);
       addTimelineSegments(rowScroll.firstChild, roomEntry.room);
