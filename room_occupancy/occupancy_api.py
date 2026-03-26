@@ -2,8 +2,19 @@ import os
 from fastapi import FastAPI, HTTPException, Header, Request, Query
 from pymongo import MongoClient
 from pymongo.errors import OperationFailure
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost", "https://ftpsens.epfl.ch"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 mongo_uri = os.environ["MONGO_URI"]
 api_key = os.environ["API_KEY"]

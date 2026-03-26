@@ -1411,7 +1411,7 @@ async function loadRoomsDataset() {
 
 // Fetch occupancy records for the rooms that have timeline data.
 async function loadRoomOccupancyDataset() {
-  const response = await fetch("./room_occupancy.json");
+    const response = await fetch("https://ftpsens.epfl.ch/occupancy");
 
   if (!response.ok) {
     throw new Error("Could not load room_occupancy.json");
@@ -1427,34 +1427,33 @@ async function loadRoomOccupancyDataset() {
 function indexOccupancyByRoom(payload) {
   const indexed = new Map();
 
-  const rooms = Array.isArray(payload?.rooms) ? payload.rooms : [];
+  // const rooms = Array.isArray(payload?.rooms) ? payload.rooms : [];
 
-  rooms.forEach((entry) => {
+  payload.forEach((entry) => {
     const roomName = entry?.name;
+    const date = entry?.date;
 
-    if (!roomName) {
+    if (!roomName || !date) {
       return;
     }
 
     const events = [];
+    (Array.isArray(entry?.events) ? entry.events : []).forEach((event) => {
+    if (!Array.isArray(event) || event.length < 3) {
+      return;
+    }
 
-    (Array.isArray(entry.dates) ? entry.dates : []).forEach((dateEntry) => {
-      (Array.isArray(dateEntry?.events) ? dateEntry.events : []).forEach((event) => {
-        if (!Array.isArray(event) || event.length < 3) {
-          return;
-        }
+    if(!event?.start || !event?.end || !event?.title){
+        return;
+    }
 
-        const [title, startIso, endIso] = event;
-        if (!startIso || !endIso) {
-          return;
-        }
+    const [title, startIso, endIso] = [event.title, event.start, event.end];
 
-        events.push({
-          title: title || "",
-          startIso,
-          endIso,
-        });
-      });
+    events.push({
+      title: title || "",
+      startIso,
+      endIso,
+    });
     });
 
     indexed.set(normalizeRoomKey(roomName), events);
