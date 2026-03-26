@@ -1,0 +1,43 @@
+services:
+
+  mongo:
+    build:
+      context: .
+      dockerfile: Dockerfile.db
+    container_name: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: 5gteam-admin
+      MONGO_INITDB_ROOT_PASSWORD: reeeeeee
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    command: ["mongod", "--bind_ip_all", "--auth"]
+    expose:
+      - "27017"
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: mongo-api
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: mongodb://mongo:27017/appdb?authSource=appdb
+      WRITE_API_KEY: strong_write_password
+    ports:
+      - "80:8080"
+
+  occupancy:
+    build:
+      context: .
+      dockerfile: Dockerfile.occupancy
+    container_name: occupancy-container
+    restart: unless-stopped
+    depends_on:
+      - api
+
+volumes:
+  mongo_data:
