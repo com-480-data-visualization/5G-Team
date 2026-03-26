@@ -592,6 +592,14 @@ select {
   padding-top: 4px;
 }
 
+.timeline-section-empty {
+  /* Explicit empty-state label for Available/Unavailable sections. */
+  color: var(--muted);
+  font-size: 1.5rem;
+  font-style: italic;
+  padding: 4px 0 8px;
+}
+
 .timeline-room-label {
   display: grid;
   gap: 4px;

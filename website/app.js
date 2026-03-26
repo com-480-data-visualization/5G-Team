@@ -836,6 +836,16 @@ function openBuildingPanel(buildingCode, rooms) {
     sectionHeading.textContent = section.title;
     timelineBody.appendChild(sectionHeading);
 
+    // Show an explicit placeholder when one side of the split is empty so the
+    // user can distinguish "no matching rooms" from a rendering issue.
+    if (!section.entries.length) {
+      const emptyRow = document.createElement("div");
+      emptyRow.className = "timeline-section-empty";
+      emptyRow.textContent = "None";
+      timelineBody.appendChild(emptyRow);
+      return;
+    }
+
     section.entries.forEach((roomEntry) => {
       const row = document.createElement("div");
       row.className = "timeline-row";
