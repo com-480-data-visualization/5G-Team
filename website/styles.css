@@ -218,7 +218,7 @@ select {
   display: grid;
   gap: 18px;
   margin-top: 0px;
-  min-height: calc(100vh - 132px);
+  min-height: calc(100vh - 28px);
 }
 
 .search-panel,
@@ -514,6 +514,27 @@ select {
   width: 100%;
   height: 100%;
   min-height: min(78vh, 920px);
+}
+
+@media (min-width: 1101px) {
+  /* Desktop: make the map row consume remaining viewport height so cards reach
+     the bottom of the screen even after removing the topbar. */
+  .content {
+    height: calc(100vh - 28px);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .map-section {
+    min-height: 0;
+    height: 100%;
+  }
+
+  .legend-card,
+  .map-frame,
+  #map {
+    min-height: 0;
+    height: 100%;
+  }
 }
 
 .building-panel {
