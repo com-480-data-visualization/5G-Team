@@ -25,8 +25,8 @@ services:
     depends_on:
       - mongo
     environment:
-      MONGO_URI: mongodb://mongo:27017/appdb?authSource=appdb
-      WRITE_API_KEY: strong_write_password
+      MONGO_URI: mongodb://5gteam-admin:reeeeeee@mongo:27017/appdb?authSource=appdb
+      API_KEY: aaaaaaaaa
     ports:
       - "80:8080"
 
@@ -36,6 +36,8 @@ services:
       dockerfile: Dockerfile.occupancy
     container_name: occupancy-container
     restart: unless-stopped
+    environment:
+      API_KEY: aaaaaaaaa
     depends_on:
       - api
 

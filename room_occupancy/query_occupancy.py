@@ -23,6 +23,10 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen, build_opener, HTTPCookieProcessor, OpenerDirector
 import concurrent.futures
 
+# only sane api that i actually understand ffs
+import requests
+import os
+
 BASE_URL = "https://ewa.epfl.ch/room/Default.aspx?room={room}"
 CALLBACK_URL = "https://ewa.epfl.ch/room/Default.aspx"
 DAYPILOT_CALLBACK_ID = "ctl00$ContentPlaceHolder1$DayPilotCalendar1"
@@ -702,11 +706,19 @@ def main() -> int:
                 }
             )
 
-        output_data = json.dumps({"rooms": output_rooms}, indent=2)
+        docs = normalize_room_days({"rooms": output_rooms})
+        headers = {
+            "Content-Type": "application/json",
+            "X-API-Key": os.environ["API_KEY"]
+        }
+        resp = requests.post("http://api:8080/items", json.dumps({"payload": docs}), headers=headers)
+        # print(docs)
+        print(resp.status_code)
+        print(resp.json())
 
         # Write to file
         args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(output_data, encoding="utf-8")
+        args.output.write_text(json.dumps(docs, indent=2), encoding="utf-8")
         print(f"Output written to: {args.output}")
     else:
         for index, summary in enumerate(summaries):
@@ -721,6 +733,37 @@ def main() -> int:
 
     return 0 if summaries else 1
 
+def normalize_room_days(data):
+    docs = []
 
+    for room in data.get("rooms", []):
+        room_name = room.get("name")
+        if not room_name:
+            continue
+
+        for day in room.get("dates", []):
+            date = day.get("date")
+            if not date:
+                continue
+
+            events = []
+            for event in day.get("events", []):
+                if not isinstance(event, list) or len(event) != 3:
+                    continue
+
+                title, start, end = event
+                events.append({
+                    "title": title,
+                    "start": start,
+                    "end": end,
+                })
+
+            docs.append({
+                "room": room_name,
+                "date": date,
+                "events": events,
+            })
+
+    return docs
 if __name__ == "__main__":
     raise SystemExit(main())

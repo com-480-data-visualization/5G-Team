@@ -1,24 +1,43 @@
 import os
-from fastapi import FastAPI, HTTPException, Header, Request
+from fastapi import FastAPI, HTTPException, Header, Request, Query
 from pymongo import MongoClient
+from pymongo.errors import OperationFailure
 
 app = FastAPI()
 
 mongo_uri = os.environ["MONGO_URI"]
+api_key = os.environ["API_KEY"]
 
 client = MongoClient(mongo_uri)
 db = client["appdb"]
 collection = db["items"]
 
 @app.get("/items")
-def get_items():
-    docs = list(collection.find({}, {"_id": 0}))
-    return {"items": docs}
+def get_items(
+    room: str | None = Query(default=None),
+    start_date: str | None = Query(default=None),
+    end_date: str | None = Query(default=None),
+):
+    try:
+        query = {}
 
-@app.get("/*")
-def get_items():
-    docs = list(collection.find({}, {"_id": 0}))
-    return {}
+        if room:
+            query["room"] = room
+
+        if start_date or end_date:
+            query["date"] = {}
+            if start_date:
+                query["date"]["$gte"] = start_date
+            if end_date:
+                query["date"]["$lte"] = end_date
+
+        docs = list(
+            collection.find(query, {"_id": 0}).sort([("date", 1), ("room", 1)])
+        )
+        return docs
+
+    except OperationFailure as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/items")
 def add_item(
@@ -26,5 +45,27 @@ def add_item(
     payload: dict,
     x_api_key: str | None = Header(default=None)
 ):
-    collection.insert_one(payload)
-    return {"ok": True}
+    if x_api_key != api_key:
+        raise HTTPException(status_code=403, detail="API token wrong")
+
+    if not payload:
+        raise HTTPException(status_code=400, detail="Empty payload")
+    
+    # print(f"PAYLOAD={payload}")
+
+    count = upsert_room_days(payload['payload'])
+    return {"updated": count}
+
+
+def upsert_room_days(docs) -> int:
+    count = 0
+
+    for doc in docs:
+        collection.update_one(
+            {"room": doc["room"], "date": doc["date"]},
+            {"$set": doc},
+            upsert=True,
+        )
+        count += 1
+
+    return count
