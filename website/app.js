@@ -1673,10 +1673,64 @@ function applyCurrentSearch() {
   }));
 }
 
+let autoSearchTimer = null;
+
+// Reuse the same search path as the submit button, but debounce free typing so
+// we do not flash transient validation errors while the user is mid-input.
+function scheduleAutoSearchApply(delayMs = 320) {
+  if (autoSearchTimer) {
+    clearTimeout(autoSearchTimer);
+  }
+
+  autoSearchTimer = setTimeout(() => {
+    autoSearchTimer = null;
+    const searchWindow = getSearchWindowFromForm();
+
+    if (!searchWindow) {
+      return;
+    }
+
+    applyCurrentSearch();
+  }, delayMs);
+}
+
+function initializeAutoSearchListeners() {
+  const startInput = document.getElementById("startTime");
+  const endInput = document.getElementById("endTime");
+  const durationSelect = document.getElementById("duration");
+  const roomTypeSelect = document.getElementById("roomType");
+
+  [startInput, endInput].forEach((input) => {
+    input.addEventListener("input", () => {
+      scheduleAutoSearchApply();
+    });
+
+    input.addEventListener("change", () => {
+      applyCurrentSearch();
+    });
+
+    input.addEventListener("blur", () => {
+      const searchWindow = getSearchWindowFromForm();
+
+      if (searchWindow) {
+        applyCurrentSearch();
+      }
+    });
+  });
+
+  [durationSelect, roomTypeSelect].forEach((select) => {
+    select.addEventListener("change", () => {
+      applyCurrentSearch();
+    });
+  });
+}
+
 document.getElementById("availability-form").addEventListener("submit", (event) => {
   event.preventDefault();
   applyCurrentSearch();
 });
+
+initializeAutoSearchListeners();
 
 // Preset buttons update the form and immediately apply the same search logic
 // so both the heatmap and any already-open building timeline refresh at once.
