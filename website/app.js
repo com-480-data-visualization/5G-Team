@@ -1461,6 +1461,7 @@ function indexOccupancyByRoom(payload) {
     const date = entry?.date;
 
     if (!roomName || !date) {
+      console.warn("Skipping malformed occupancy entry:", entry);
       return;
     }
 
@@ -1468,6 +1469,7 @@ function indexOccupancyByRoom(payload) {
     (Array.isArray(entry?.events) ? entry.events : []).forEach((event) => {
 
     if(!event?.start || !event?.end || !event?.title){
+      console.warn(`Skipping malformed event for room ${roomName} on ${date}:`, event);
         return;
     }
 
