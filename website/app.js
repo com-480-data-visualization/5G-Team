@@ -1441,7 +1441,7 @@ async function loadRoomOccupancyDataset() {
     const response = await fetch("https://ftpsens.epfl.ch/occupancy");
 
   if (!response.ok) {
-    throw new Error("Could not load room_occupancy.json");
+    throw new Error("Could not load room occupancy data");
   }
 
   return response.json();
