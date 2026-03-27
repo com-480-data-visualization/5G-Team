@@ -233,11 +233,28 @@
             </label>
             <label>
               <span id="roomTypeLabel">Room Type</span>
-              <select id="roomType" name="roomType">
-                <option value="all" selected>All room types</option>
-                <option value="conference">Conference Room</option>
-                <option value="study">Study Room</option>
-              </select>
+              <div class="room-type-group" id="roomType">
+                <label class="room-type-option" for="roomTypeConference">
+                  <input
+                    type="checkbox"
+                    id="roomTypeConference"
+                    name="roomType"
+                    value="conference"
+                    checked
+                  />
+                  <span id="roomTypeConferenceLabel">Conference Room</span>
+                </label>
+                <label class="room-type-option" for="roomTypeStudy">
+                  <input
+                    type="checkbox"
+                    id="roomTypeStudy"
+                    name="roomType"
+                    value="study"
+                    checked
+                  />
+                  <span id="roomTypeStudyLabel">Study Room</span>
+                </label>
+              </div>
             </label>
             <button class="search-button" id="searchButton" type="submit">Search</button>
           </form>

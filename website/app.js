@@ -79,7 +79,6 @@ const translations = {
     close_panel: "Close panel",
     theme_light: "Light mode",
     theme_dark: "Dark mode",
-    room_type_all: "All room types",
     room_type_conference: "Conference Room",
     room_type_study: "Study Room",
     room_header: "Room",
@@ -129,7 +128,6 @@ const translations = {
     close_panel: "Fermer le panneau",
     theme_light: "Mode clair",
     theme_dark: "Mode sombre",
-    room_type_all: "Tous les types de salle",
     room_type_conference: "Salle de conférence",
     room_type_study: "Salle d'étude",
     room_header: "Salle",
@@ -232,9 +230,8 @@ function refreshStaticTranslations() {
     option.textContent = formatDurationLabel(option.value);
   });
 
-  document.querySelector('#roomType option[value="all"]').textContent = t("room_type_all");
-  document.querySelector('#roomType option[value="conference"]').textContent = t("room_type_conference");
-  document.querySelector('#roomType option[value="study"]').textContent = t("room_type_study");
+  document.getElementById("roomTypeConferenceLabel").textContent = t("room_type_conference");
+  document.getElementById("roomTypeStudyLabel").textContent = t("room_type_study");
 }
 
 // Apply the selected theme to the <body> element and keep the toggle label
@@ -583,20 +580,47 @@ function roomBelongsToBuilding(roomName, buildingCode) {
   return extractBuildingCodeFromRoom(roomName) === normalizedBuilding;
 }
 
-// Read the currently selected room-type filter from the search form.
-function getSelectedRoomType() {
-  return document.getElementById("roomType").value || "all";
+// Read the currently selected room-type filters from the search form.
+// If both are unchecked, we keep both enabled so filtering never becomes empty
+// by accident.
+function getSelectedRoomTypes() {
+  const conferenceCheckbox = document.getElementById("roomTypeConference");
+  const studyCheckbox = document.getElementById("roomTypeStudy");
+  const selectedTypes = [];
+
+  if (conferenceCheckbox?.checked) {
+    selectedTypes.push("conference");
+  }
+
+  if (studyCheckbox?.checked) {
+    selectedTypes.push("study");
+  }
+
+  if (!selectedTypes.length) {
+    conferenceCheckbox.checked = true;
+    studyCheckbox.checked = true;
+    return ["conference", "study"];
+  }
+
+  return selectedTypes;
+}
+
+function formatSelectedRoomTypesLabel() {
+  const labels = getSelectedRoomTypes().map((type) =>
+    type === "conference" ? t("room_type_conference") : t("room_type_study")
+  );
+
+  if (labels.length === 2) {
+    return currentLanguage === "fr" ? `${labels[0]} et ${labels[1]}` : `${labels[0]} and ${labels[1]}`;
+  }
+
+  return labels[0] || t("room_type_conference");
 }
 
 // Map the selected search category to the raw EPFL room type labels.
 function roomMatchesSelectedType(roomType) {
-  const selectedRoomType = getSelectedRoomType();
-
-  if (selectedRoomType === "all") {
-    return true;
-  }
-
-  return ROOM_TYPE_GROUPS[selectedRoomType]?.has(roomType) || false;
+  const selectedRoomTypes = getSelectedRoomTypes();
+  return selectedRoomTypes.some((selectedType) => ROOM_TYPE_GROUPS[selectedType]?.has(roomType));
 }
 
 // Build the room list shown in the side panel for one building.
@@ -1642,7 +1666,7 @@ function seedDefaultTimes() {
 function applyCurrentSearch() {
   const start = document.getElementById("startTime").value;
   const duration = document.getElementById("duration").value;
-  const roomType = document.getElementById("roomType").selectedOptions[0]?.textContent || "All room types";
+  const roomType = formatSelectedRoomTypesLabel();
   const rangeAdjustment = ensureRangeCanFitDuration();
   const end = document.getElementById("endTime").value;
   const searchWindow = getSearchWindowFromForm();
@@ -1698,7 +1722,10 @@ function initializeAutoSearchListeners() {
   const startInput = document.getElementById("startTime");
   const endInput = document.getElementById("endTime");
   const durationSelect = document.getElementById("duration");
-  const roomTypeSelect = document.getElementById("roomType");
+  const roomTypeCheckboxes = [
+    document.getElementById("roomTypeConference"),
+    document.getElementById("roomTypeStudy"),
+  ];
 
   [startInput, endInput].forEach((input) => {
     input.addEventListener("input", () => {
@@ -1718,8 +1745,18 @@ function initializeAutoSearchListeners() {
     });
   });
 
-  [durationSelect, roomTypeSelect].forEach((select) => {
-    select.addEventListener("change", () => {
+  durationSelect.addEventListener("change", () => {
+    applyCurrentSearch();
+  });
+
+  roomTypeCheckboxes.forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+      const checkedCount = roomTypeCheckboxes.filter((entry) => entry.checked).length;
+
+      if (!checkedCount) {
+        checkbox.checked = true;
+      }
+
       applyCurrentSearch();
     });
   });
