@@ -238,8 +238,11 @@ function refreshStaticTranslations() {
 // synchronized with the actual current mode.
 function applyTheme(theme) {
   document.body.dataset.theme = theme;
-  themeToggle.textContent = theme === "light" ? t("theme_dark") : t("theme_light");
-  themeToggle.setAttribute("aria-pressed", String(theme === "light"));
+  const switchLabel = theme === "light" ? t("theme_dark") : t("theme_light");
+  themeToggle.textContent = theme === "light" ? "☾" : "☀";
+  themeToggle.setAttribute("aria-label", switchLabel);
+  themeToggle.setAttribute("title", switchLabel);
+  themeToggle.setAttribute("aria-pressed", String(theme === "dark"));
 }
 
 // Decide which theme to use on startup.
