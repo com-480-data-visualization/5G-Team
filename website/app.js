@@ -1444,7 +1444,7 @@ async function loadRoomOccupancyDataset() {
     throw new Error("Could not load room occupancy data");
   }
 
-  return response.json();
+  return await response.json();
 }
 
 // Convert the nested occupancy JSON structure into a map:
@@ -1454,35 +1454,51 @@ async function loadRoomOccupancyDataset() {
 function indexOccupancyByRoom(payload) {
   const indexed = new Map();
 
-  // const rooms = Array.isArray(payload?.rooms) ? payload.rooms : [];
+  if (payload && typeof payload.then === "function") {
+    console.warn("Occupancy payload is still a Promise. Await it before indexing.", payload);
+    return indexed;
+  }
 
-  payload.forEach((entry) => {
-    const roomName = entry?.room;
-    const date = entry?.date;
+  const entries = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.rooms)
+      ? payload.rooms
+      : [];
+
+  if (!entries.length) {
+    console.warn("Unexpected occupancy payload shape:", payload);
+    return indexed;
+  }
+
+  entries.forEach((entry) => {
+    const roomName = entry?.room || entry?.name;
+    const date = entry?.date || entry?.day;
 
     if (!roomName || !date) {
       console.warn("Skipping malformed occupancy entry:", entry);
       return;
     }
 
+    const roomKey = normalizeRoomKey(roomName);
     const events = [];
+
     (Array.isArray(entry?.events) ? entry.events : []).forEach((event) => {
-
-    if(!event?.start || !event?.end || !event?.title){
-      console.warn(`Skipping malformed event for room ${roomName} on ${date}:`, event);
+      if (!event?.start || !event?.end) {
+        console.warn(`Skipping malformed event for room ${roomName} on ${date}:`, event);
         return;
-    }
+      }
 
-    const [title, startIso, endIso] = [event.title, event.start, event.end];
+      const [title, startIso, endIso] = [event.title, event.start, event.end];
 
-    events.push({
-      title: title || "",
-      startIso,
-      endIso,
+      events.push({
+        title: title || "",
+        startIso,
+        endIso,
+      });
     });
-    });
 
-    indexed.set(normalizeRoomKey(roomName), events);
+    const existingEvents = indexed.get(roomKey) || [];
+    indexed.set(roomKey, existingEvents.concat(events));
   });
 
   return indexed;
@@ -1832,11 +1848,17 @@ async function initializeApp() {
     resetBuildingPanel();
     setStatus(t("loading_data"));
 
-    const [records, rooms, occupancy] = await Promise.all([
+    const [records, rooms, occupancyPayload] = await Promise.all([
       loadBuildingRecords(),
       loadRoomsDataset(),
       loadRoomOccupancyDataset(),
     ]);
+
+    const occupancy =
+      occupancyPayload && typeof occupancyPayload.then === "function"
+        ? await occupancyPayload
+        : occupancyPayload;
+
     roomsDataset = rooms;
     occupancyByRoom = indexOccupancyByRoom(occupancy);
 
