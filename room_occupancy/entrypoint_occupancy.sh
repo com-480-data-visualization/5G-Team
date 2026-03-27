@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-FROM="$(date '+%Y-%m-%dT%H:%M')"
+FROM="$(date '+%Y-%m-%dT00:00')"
 TO="$(date -d '+3 months' '+%Y-%m-%dT%H:%M')"
 
 exec python main.py \
