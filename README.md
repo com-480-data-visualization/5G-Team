@@ -31,9 +31,5 @@ We contacted the EPFL IT department to obtain access to the room availability da
 
 For the map, we used the OpenStreetMap data for the EPFL campus, and we overlayed the building shapes and locations on the map to provide a visual representation of the campus.
 
-## Repo structure:
-```.
-├── README.md
-```
-
 ## Want to contribute?
+We welcome contributions to EPFL Room Finder! If you have any ideas for new features, improvements, or bug fixes, please feel free to submit a pull request on our GitHub repository. We also encourage you to report any issues you encounter while using the application, so we can continue to improve it for everyone.
