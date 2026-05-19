@@ -745,7 +745,7 @@ select {
 
 .room-weekly-axis text {
   fill: var(--muted);
-  font-size: 11px;
+  font-size: 18px;
   font-weight: 700;
 }
 
@@ -782,7 +782,7 @@ select {
 .room-weekly-day-label,
 .room-weekly-free-label {
   fill: var(--muted);
-  font-size: 11px;
+  font-size: 18px;
   font-weight: 700;
 }
 

@@ -3045,6 +3045,8 @@ function renderRoomWeeklyChart(roomEntry, weekStart, target = roomWeeklyChart) {
   target.innerHTML = "";
 
   const weekDates = getWeekDates(weekStart);
+  const displayStartMinutes = 8 * 60;
+  const displayEndMinutes = 24 * 60;
   const chartWidth = 1120;
   const margins = { top: 92, right: 84, bottom: 52, left: 132 };
   const rowHeight = 42;
@@ -3052,9 +3054,9 @@ function renderRoomWeeklyChart(roomEntry, weekStart, target = roomWeeklyChart) {
   const legendY = 24;
   const chartHeight = margins.top + margins.bottom + weekDates.length * rowHeight;
   const xScale = d3.scaleLinear()
-    .domain([0, 24 * 60])
+    .domain([displayStartMinutes, displayEndMinutes])
     .range([margins.left, chartWidth - margins.right]);
-  const plotWidth = xScale(24 * 60) - xScale(0);
+  const plotWidth = xScale(displayEndMinutes) - xScale(displayStartMinutes);
   const isToday = (date) => {
     const now = new Date();
     return date.getFullYear() === now.getFullYear()
@@ -3152,7 +3154,7 @@ function renderRoomWeeklyChart(roomEntry, weekStart, target = roomWeeklyChart) {
   }
 
   const axis = d3.axisTop(xScale)
-    .tickValues(d3.range(0, 24 * 60 + 1, 120))
+    .tickValues(d3.range(displayStartMinutes, displayEndMinutes + 1, 120))
     .tickSizeOuter(0)
     .tickFormat((minutes) => minutes === 24 * 60 ? "24:00" : formatHour(minutes / 60));
 
@@ -3163,7 +3165,7 @@ function renderRoomWeeklyChart(roomEntry, weekStart, target = roomWeeklyChart) {
 
   svg.append("g")
     .selectAll("line")
-    .data(d3.range(0, 24 * 60 + 1, 60))
+    .data(d3.range(displayStartMinutes, displayEndMinutes + 1, 60))
     .join("line")
     .attr("class", (minutes) => minutes % 120 === 0 ? "room-weekly-hour-line major" : "room-weekly-hour-line")
     .attr("x1", (minutes) => xScale(minutes))
@@ -3205,11 +3207,15 @@ function renderRoomWeeklyChart(roomEntry, weekStart, target = roomWeeklyChart) {
     const rowGroup = d3.select(this);
 
     rowGroup.selectAll("rect.room-weekly-occupied")
-      .data(row.occupied)
+      .data(
+        row.occupied.filter(
+          (segment) => segment.endMinutes > displayStartMinutes && segment.startMinutes < displayEndMinutes
+        )
+      )
       .join("rect")
       .attr("class", "room-weekly-occupied")
       .attr("fill", `url(#${occupiedGradientId})`)
-      .attr("x", (segment) => xScale(segment.startMinutes))
+      .attr("x", (segment) => xScale(Math.max(displayStartMinutes, segment.startMinutes)))
       .attr("y", 8)
       .attr("width", 0)
       .attr("height", trackHeight - 2)
@@ -3224,7 +3230,11 @@ function renderRoomWeeklyChart(roomEntry, weekStart, target = roomWeeklyChart) {
       .transition()
       .duration(480)
       .delay((segment, index) => index * 50)
-      .attr("width", (segment) => Math.max(4, xScale(segment.endMinutes) - xScale(segment.startMinutes)));
+      .attr("width", (segment) => {
+        const visibleStart = Math.max(displayStartMinutes, segment.startMinutes);
+        const visibleEnd = Math.min(displayEndMinutes, segment.endMinutes);
+        return Math.max(4, xScale(visibleEnd) - xScale(visibleStart));
+      });
 
     rowGroup.append("rect")
       .attr("class", "room-weekly-utilization-bar")
