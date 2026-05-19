@@ -715,20 +715,27 @@ select {
 .room-weekly-svg {
   display: block;
   width: 100%;
-  min-width: 980px;
+  min-width: 1060px;
   height: auto;
 }
 
-.room-weekly-chart-title {
-  fill: var(--text);
-  font-size: 15px;
+.room-weekly-trend-title,
+.room-weekly-trend-label,
+.room-weekly-legend-label {
+  fill: var(--muted);
+  font-size: 12px;
   font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-.room-weekly-chart-range {
-  fill: var(--muted);
-  font-size: 11px;
-  font-weight: 700;
+.room-weekly-legend-panel {
+  fill: color-mix(in srgb, var(--surface-tint-3) 88%, var(--accent-soft) 12%);
+  stroke: var(--border);
+}
+
+.room-weekly-legend-item text {
+  dominant-baseline: central;
 }
 
 .room-weekly-axis path,
@@ -756,17 +763,20 @@ select {
   stroke: var(--border);
 }
 
+.room-weekly-track-glow {
+  fill: none;
+  stroke: color-mix(in srgb, var(--accent-soft) 48%, transparent);
+  stroke-width: 1;
+}
+
 .room-weekly-track.today {
   fill: color-mix(in srgb, var(--accent-soft) 46%, var(--timeline-grid-bg) 54%);
 }
 
 .room-weekly-occupied {
-  fill: color-mix(in srgb, var(--timeline-occupied-bg) 88%, #ff847f 12%);
   stroke: var(--timeline-occupied-border);
-}
-
-.room-weekly-free-highlight {
-  fill: color-mix(in srgb, var(--timeline-available-bg) 76%, transparent 24%);
+  stroke-width: 1;
+  filter: drop-shadow(0 3px 8px rgba(255, 82, 82, 0.2));
 }
 
 .room-weekly-day-label,
@@ -774,6 +784,38 @@ select {
   fill: var(--muted);
   font-size: 11px;
   font-weight: 700;
+}
+
+.room-weekly-day-label {
+  fill: var(--text);
+}
+
+.room-weekly-legend-swatch.occupied {
+  fill: #ff6565;
+  stroke: rgba(255, 255, 255, 0.18);
+}
+
+.room-weekly-legend-swatch.free {
+  fill: color-mix(in srgb, var(--timeline-available-bg) 88%, #74e2af 12%);
+  stroke: rgba(255, 255, 255, 0.18);
+}
+
+.room-weekly-legend-swatch.today {
+  fill: color-mix(in srgb, var(--accent-soft) 70%, var(--accent) 30%);
+  stroke: rgba(255, 255, 255, 0.18);
+}
+
+.room-weekly-utilization-bar {
+  fill: var(--surface-tint-4);
+}
+
+.room-weekly-utilization-fill {
+  fill: var(--accent);
+}
+
+.room-weekly-bottom-rule {
+  stroke: var(--timeline-grid-line);
+  stroke-width: 1;
 }
 
 .map-section {

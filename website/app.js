@@ -133,6 +133,7 @@ const translations = {
     room_day_free: "{hours} free",
     room_panel_hint: "Weekly availability opens in the map panel on the right.",
     room_panel_selected: "{room} selected for the week of {week}. Weekly availability opens in the map panel on the right.",
+    today_label: "Today",
     room_type_conference: "Conference Room",
     room_type_study: "Study Room",
     room_header: "Room",
@@ -212,6 +213,7 @@ const translations = {
     room_day_free: "{hours} libres",
     room_panel_hint: "La disponibilite hebdomadaire s'ouvre dans le panneau de carte a droite.",
     room_panel_selected: "{room} selectionnee pour la semaine du {week}. La disponibilite hebdomadaire s'ouvre dans le panneau de carte a droite.",
+    today_label: "Aujourd'hui",
     room_type_conference: "Salle de conférence",
     room_type_study: "Salle d'étude",
     room_header: "Salle",
@@ -3023,11 +3025,6 @@ function renderRoomSummaryCard(roomEntry, weekStart, target = roomSummaryCard) {
   });
 
   const totalFreeMinutes = dailyStats.reduce((sum, day) => sum + day.freeMinutes, 0);
-  const bestDay = dailyStats.reduce((best, day) => (day.freeMinutes > best.freeMinutes ? day : best), dailyStats[0]);
-  const bestSlotDuration = bestDay.bestSegment.endMinutes - bestDay.bestSegment.startMinutes;
-  const bestSlotLabel = bestSlotDuration > 0
-    ? `${minutesToClock(bestDay.bestSegment.startMinutes)} - ${minutesToClock(bestDay.bestSegment.endMinutes)}`
-    : t("room_no_free_slot");
 
   target.innerHTML = `
     <div class="room-summary-head">
@@ -3036,16 +3033,10 @@ function renderRoomSummaryCard(roomEntry, weekStart, target = roomSummaryCard) {
         <h3 class="room-summary-name">${roomEntry.room}</h3>
         <p class="room-summary-range">${formatEuropeanDateInput(weekDates[0])} - ${formatEuropeanDateInput(weekDates[6])}</p>
       </div>
-      <div class="room-summary-total">
-        <span class="room-summary-total-value">${formatRoomHoursLabel(totalFreeMinutes)}</span>
-        <span class="room-summary-total-label">${t("room_free_hours")}</span>
-      </div>
     </div>
     <div class="room-summary-metadata">
       <span class="room-summary-pill"><strong>${t("room_building")}</strong>${roomEntry.building}</span>
       <span class="room-summary-pill"><strong>${t("room_type")}</strong>${formatRoomTypeDisplay(roomEntry.type)}</span>
-      <span class="room-summary-pill"><strong>${t("room_best_day")}</strong>${formatRoomWeekdayLabel(bestDay.date)}</span>
-      <span class="room-summary-pill"><strong>${t("room_best_slot")}</strong>${bestSlotLabel}</span>
     </div>
   `;
 }
@@ -3055,18 +3046,38 @@ function renderRoomWeeklyChart(roomEntry, weekStart, target = roomWeeklyChart) {
 
   const weekDates = getWeekDates(weekStart);
   const chartWidth = 1120;
-  const margins = { top: 56, right: 88, bottom: 32, left: 108 };
-  const rowHeight = 34;
+  const margins = { top: 92, right: 84, bottom: 52, left: 132 };
+  const rowHeight = 42;
+  const trackHeight = 24;
+  const legendY = 24;
   const chartHeight = margins.top + margins.bottom + weekDates.length * rowHeight;
   const xScale = d3.scaleLinear()
     .domain([0, 24 * 60])
     .range([margins.left, chartWidth - margins.right]);
+  const plotWidth = xScale(24 * 60) - xScale(0);
   const isToday = (date) => {
     const now = new Date();
     return date.getFullYear() === now.getFullYear()
       && date.getMonth() === now.getMonth()
       && date.getDate() === now.getDate();
   };
+  const rowsData = weekDates.map((date) => {
+    const events = getRoomDayEvents(roomEntry.room, date);
+    const occupied = buildDailyOccupiedSegments(events, date);
+    const freeMinutes = getDailyFreeMinutes(events, date);
+    const occupiedMinutes = 24 * 60 - freeMinutes;
+
+    return {
+      date,
+      events,
+      occupied,
+      freeMinutes,
+      occupiedMinutes,
+      occupancyRatio: occupiedMinutes / (24 * 60),
+    };
+  });
+  const roomKey = normalizeRoomKey(roomEntry.room) || "room";
+  const occupiedGradientId = `room-weekly-occupied-gradient-${roomKey}`;
 
   const svg = d3.select(target)
     .append("svg")
@@ -3075,17 +3086,70 @@ function renderRoomWeeklyChart(roomEntry, weekStart, target = roomWeeklyChart) {
     .attr("role", "img")
     .attr("aria-label", `${roomEntry.room} ${t("room_weekly_title").toLowerCase()}`);
 
-  svg.append("text")
-    .attr("class", "room-weekly-chart-title")
-    .attr("x", margins.left)
-    .attr("y", 24)
-    .text(t("room_weekly_title"));
+  const defs = svg.append("defs");
+  const occupiedGradient = defs.append("linearGradient")
+    .attr("id", occupiedGradientId)
+    .attr("x1", "0%")
+    .attr("x2", "100%");
 
-  svg.append("text")
-    .attr("class", "room-weekly-chart-range")
-    .attr("x", margins.left)
-    .attr("y", 44)
-    .text(`${formatEuropeanDateInput(weekDates[0])} - ${formatEuropeanDateInput(weekDates[6])}`);
+  occupiedGradient.append("stop")
+    .attr("offset", "0%")
+    .attr("stop-color", "#ff7f7f");
+
+  occupiedGradient.append("stop")
+    .attr("offset", "100%")
+    .attr("stop-color", "#ff5252");
+
+  const legendWidth = 220;
+  const legend = svg.append("g")
+    .attr("class", "room-weekly-legend")
+    .attr("transform", `translate(${margins.left + plotWidth / 2 - legendWidth / 2}, ${legendY})`);
+
+  legend.append("rect")
+    .attr("class", "room-weekly-legend-panel")
+    .attr("x", 0)
+    .attr("y", -18)
+    .attr("width", legendWidth)
+    .attr("height", 36)
+    .attr("rx", 18);
+
+  const legendContent = legend.append("g")
+    .attr("class", "room-weekly-legend-content")
+    .attr("transform", "translate(0, 1)");
+
+  const legendItems = [
+    { className: "occupied", label: t("busy") },
+    { className: "today", label: t("today_label") },
+  ];
+
+  let legendOffset = 0;
+  legendItems.forEach((item) => {
+    const group = legendContent.append("g")
+      .attr("class", "room-weekly-legend-item")
+      .attr("transform", `translate(${legendOffset}, 0)`);
+
+    group.append("rect")
+      .attr("class", `room-weekly-legend-swatch ${item.className}`)
+      .attr("x", 0)
+      .attr("y", -8)
+      .attr("width", 16)
+      .attr("height", 16)
+      .attr("rx", 5);
+
+    group.append("text")
+      .attr("class", "room-weekly-legend-label")
+      .attr("x", 24)
+      .attr("y", 0)
+      .text(item.label);
+
+    legendOffset += item.label.length * 8.2 + 56;
+  });
+
+  const legendBounds = legendContent.node()?.getBBox();
+  if (legendBounds) {
+    const centeredX = (legendWidth - legendBounds.width) / 2 - legendBounds.x;
+    legendContent.attr("transform", `translate(${centeredX}, 1)`);
+  }
 
   const axis = d3.axisTop(xScale)
     .tickValues(d3.range(0, 24 * 60 + 1, 120))
@@ -3095,32 +3159,7 @@ function renderRoomWeeklyChart(roomEntry, weekStart, target = roomWeeklyChart) {
   svg.append("g")
     .attr("class", "room-weekly-axis")
     .attr("transform", `translate(0, ${margins.top - 12})`)
-    .call(axis)
-    .call((axisGroup) => {
-      axisGroup.selectAll(".tick text")
-        .attr("text-anchor", (minutes) => {
-          if (minutes === 0) {
-            return "start";
-          }
-
-          if (minutes === 24 * 60) {
-            return "end";
-          }
-
-          return "middle";
-        })
-        .attr("dx", (minutes) => {
-          if (minutes === 0) {
-            return "10px";
-          }
-
-          if (minutes === 24 * 60) {
-            return "-10px";
-          }
-
-          return "0";
-        });
-    });
+    .call(axis);
 
   svg.append("g")
     .selectAll("line")
@@ -3134,15 +3173,7 @@ function renderRoomWeeklyChart(roomEntry, weekStart, target = roomWeeklyChart) {
 
   const rows = svg.append("g")
     .selectAll("g")
-    .data(weekDates.map((date) => {
-      const events = getRoomDayEvents(roomEntry.room, date);
-      return {
-        date,
-        events,
-        occupied: buildDailyOccupiedSegments(events, date),
-        freeMinutes: getDailyFreeMinutes(events, date),
-      };
-    }))
+    .data(rowsData)
     .join("g")
     .attr("class", "room-weekly-row")
     .attr("transform", (_, index) => `translate(0, ${margins.top + index * rowHeight})`);
@@ -3151,23 +3182,24 @@ function renderRoomWeeklyChart(roomEntry, weekStart, target = roomWeeklyChart) {
     .attr("class", (row) => isToday(row.date) ? "room-weekly-track today" : "room-weekly-track")
     .attr("x", margins.left)
     .attr("y", 5)
-    .attr("width", xScale(24 * 60) - xScale(0))
-    .attr("height", 22)
-    .attr("rx", 11);
+    .attr("width", plotWidth)
+    .attr("height", trackHeight)
+    .attr("rx", 12);
+
+  rows.append("rect")
+    .attr("class", "room-weekly-track-glow")
+    .attr("x", margins.left)
+    .attr("y", 5)
+    .attr("width", plotWidth)
+    .attr("height", trackHeight)
+    .attr("rx", 12);
 
   rows.append("text")
     .attr("class", "room-weekly-day-label")
     .attr("x", margins.left - 14)
-    .attr("y", 20)
+    .attr("y", 21)
     .attr("text-anchor", "end")
     .text((row) => formatRoomWeekdayLabel(row.date));
-
-  rows.append("text")
-    .attr("class", "room-weekly-free-label")
-    .attr("x", chartWidth - 12)
-    .attr("y", 20)
-    .attr("text-anchor", "end")
-    .text((row) => t("room_day_free", { hours: formatRoomHoursLabel(row.freeMinutes) }));
 
   rows.each(function(row) {
     const rowGroup = d3.select(this);
@@ -3176,35 +3208,51 @@ function renderRoomWeeklyChart(roomEntry, weekStart, target = roomWeeklyChart) {
       .data(row.occupied)
       .join("rect")
       .attr("class", "room-weekly-occupied")
+      .attr("fill", `url(#${occupiedGradientId})`)
       .attr("x", (segment) => xScale(segment.startMinutes))
-      .attr("y", 7)
-      .attr("width", (segment) => Math.max(4, xScale(segment.endMinutes) - xScale(segment.startMinutes)))
-      .attr("height", 18)
-      .attr("rx", 9)
+      .attr("y", 8)
+      .attr("width", 0)
+      .attr("height", trackHeight - 2)
+      .attr("rx", 10)
       .append("title")
       .text((segment) => {
         const title = segment.title ? ` - ${segment.title}` : "";
         return `${minutesToClock(segment.startMinutes)} - ${minutesToClock(segment.endMinutes)}${title}`;
       });
 
-    const bestSegment = getBestFreeSegment(row.events, row.date);
+    rowGroup.selectAll("rect.room-weekly-occupied")
+      .transition()
+      .duration(480)
+      .delay((segment, index) => index * 50)
+      .attr("width", (segment) => Math.max(4, xScale(segment.endMinutes) - xScale(segment.startMinutes)));
 
-    if (bestSegment.endMinutes > bestSegment.startMinutes) {
-      rowGroup.append("rect")
-        .attr("class", "room-weekly-free-highlight")
-        .attr("x", xScale(bestSegment.startMinutes))
-        .attr("y", 10)
-        .attr("width", Math.max(2, xScale(bestSegment.endMinutes) - xScale(bestSegment.startMinutes)))
-        .attr("height", 12)
-        .attr("rx", 6)
-        .append("title")
-        .text(
-          bestSegment.endMinutes - bestSegment.startMinutes >= 24 * 60
-            ? t("room_all_day_free")
-            : `${t("room_best_slot")}: ${minutesToClock(bestSegment.startMinutes)} - ${minutesToClock(bestSegment.endMinutes)}`
-        );
-    }
+    rowGroup.append("rect")
+      .attr("class", "room-weekly-utilization-bar")
+      .attr("x", chartWidth - 72)
+      .attr("y", 12)
+      .attr("width", 52)
+      .attr("height", 8)
+      .attr("rx", 4);
+
+    rowGroup.append("rect")
+      .attr("class", "room-weekly-utilization-fill")
+      .attr("x", chartWidth - 72)
+      .attr("y", 12)
+      .attr("width", 0)
+      .attr("height", 8)
+      .attr("rx", 4)
+      .transition()
+      .duration(520)
+      .delay(120)
+      .attr("width", row.occupancyRatio * 52);
   });
+
+  svg.append("line")
+    .attr("class", "room-weekly-bottom-rule")
+    .attr("x1", margins.left)
+    .attr("x2", chartWidth - margins.right)
+    .attr("y1", chartHeight - margins.bottom + 10)
+    .attr("y2", chartHeight - margins.bottom + 10);
 }
 
 function renderRoomExplorerEmpty(message) {
