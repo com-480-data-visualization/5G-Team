@@ -535,18 +535,124 @@ select {
   min-height: min(78vh, 920px);
 }
 
-.campus-availability-chart {
+.map-overlay {
   position: absolute;
   left: 18px;
   bottom: 18px;
   z-index: 480;
+  display: grid;
+  gap: 10px;
   width: min(360px, calc(100% - 36px));
+}
+
+.campus-availability-chart {
+  width: 100%;
+  display: grid;
+  gap: 10px;
   padding: 14px 16px;
   border: 1px solid var(--border);
   border-radius: 20px;
   background: var(--panel);
   backdrop-filter: blur(18px);
   box-shadow: var(--shadow);
+}
+
+.campus-availability-legend {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  display: grid;
+  gap: 6px;
+}
+
+.campus-availability-legend-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.campus-availability-legend-clear {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: var(--surface-tint-2);
+  color: var(--text);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.campus-availability-legend-clear:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.campus-availability-legend-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.campus-availability-legend-track {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.campus-availability-legend-bin {
+  fill: transparent;
+  stroke: transparent;
+  cursor: pointer;
+}
+
+.campus-availability-legend-bin:hover,
+.campus-availability-legend-bin:focus {
+  stroke: var(--accent);
+  stroke-width: 1.5;
+}
+
+.campus-availability-legend-bin.is-active {
+  stroke: var(--accent);
+  stroke-width: 2;
+  fill: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.campus-availability-legend-bin.is-attention {
+  animation: availabilityLegendPulse 10s ease-in-out infinite;
+}
+
+.campus-availability-legend-label {
+  fill: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@keyframes availabilityLegendPulse {
+  0% {
+    stroke: transparent;
+    fill: transparent;
+  }
+  35% {
+    stroke: var(--accent);
+    stroke-width: 2;
+    fill: color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+  70% {
+    stroke: transparent;
+    fill: transparent;
+  }
+  100% {
+    stroke: transparent;
+    fill: transparent;
+  }
 }
 
 .campus-availability-svg {
@@ -1192,7 +1298,7 @@ select {
     padding: 16px 18px;
   }
 
-  .campus-availability-chart {
+  .map-overlay {
     top: 12px;
     bottom: auto;
     left: 12px;

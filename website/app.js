@@ -29,6 +29,14 @@ const timelineHeaderHeight = 46;
 const timelineRowHeight = 74;
 let timelineClipId = 0;
 
+const AVAILABILITY_BINS = [
+  { label: "0-20%", min: 0, max: 0.2 },
+  { label: "20-40%", min: 0.2, max: 0.4 },
+  { label: "40-60%", min: 0.4, max: 0.6 },
+  { label: "60-80%", min: 0.6, max: 0.8 },
+  { label: "80-100%", min: 0.8, max: 1.01 },
+];
+
 // Cache important DOM nodes once instead of querying the DOM repeatedly.
 const buildingPanel = document.getElementById("buildingPanel");
 const buildingPanelTitle = document.getElementById("buildingPanelTitle");
@@ -66,6 +74,8 @@ let baseBuildingFeatures = [];
 let activeSearchWindow = null;
 let knownBuildingCodes = [];
 let activeBuildingSelection = null;
+let activeAvailabilityFilter = null;
+let hasUsedAvailabilityFilter = false;
 let lastThemeToggleAt = 0;
 let startTimePicker = null;
 let endTimePicker = null;
@@ -96,6 +106,8 @@ const translations = {
     summary_title: "Room summary",
     heatmap_title: "Hourly occupancy",
     campus_summary_title: "Campus availability",
+    availability_filter_title: "Availability filter",
+    availability_filter_clear: "Show all",
     mostly_occupied: "Mostly occupied",
     mostly_free: "Mostly free",
     buildings_label: "Buildings",
@@ -155,6 +167,8 @@ const translations = {
     summary_title: "Résumé des salles",
     heatmap_title: "Occupation horaire",
     campus_summary_title: "Disponibilité du campus",
+    availability_filter_title: "Filtre de disponibilité",
+    availability_filter_clear: "Tout afficher",
     mostly_occupied: "Très occupé",
     mostly_free: "Plutôt libre",
     buildings_label: "Bâtiments",
@@ -419,6 +433,81 @@ function getBorderColor(score) {
   return color ? color.brighter(0.65).formatHex() : getColor(score);
 }
 
+function buildAvailabilityBins(features) {
+  return AVAILABILITY_BINS.map((bin) => ({
+    ...bin,
+    count: features.filter((feature) => {
+      const score = feature.properties?.score || 0;
+      return score >= bin.min && score < bin.max;
+    }).length,
+    midpoint: (bin.min + Math.min(bin.max, 1)) / 2,
+  }));
+}
+
+function getRenderedScore(feature) {
+  const name = feature?.properties?.name;
+
+  if (name && previousBuildingScores.has(name)) {
+    return previousBuildingScores.get(name);
+  }
+
+  return feature?.properties?.score ?? 0;
+}
+
+function isScoreInActiveFilter(score) {
+  if (!activeAvailabilityFilter) {
+    return true;
+  }
+
+  return score >= activeAvailabilityFilter.min && score < activeAvailabilityFilter.max;
+}
+
+function muteColor(color, saturationScale = 0.12, lightnessBoost = 0.18, maxLightness = 0.82) {
+  const hsl = d3.hsl(color);
+
+  if (!Number.isFinite(hsl.h)) {
+    return color;
+  }
+
+  hsl.s = Math.max(0, hsl.s * saturationScale);
+  hsl.l = Math.min(maxLightness, hsl.l + lightnessBoost);
+  return hsl.formatHex();
+}
+
+function getFeatureStyle(feature) {
+  const score = getRenderedScore(feature);
+  const baseColor = getColor(score);
+  const baseBorder = getBorderColor(score);
+
+  if (!activeAvailabilityFilter) {
+    return {
+      color: baseBorder,
+      weight: 1.2,
+      fillColor: baseColor,
+      fillOpacity: 0.42,
+      opacity: 1,
+    };
+  }
+
+  if (isScoreInActiveFilter(score)) {
+    return {
+      color: baseBorder,
+      weight: 1.2,
+      fillColor: baseColor,
+      fillOpacity: 0.56,
+      opacity: 1,
+    };
+  }
+
+  return {
+    color: muteColor(baseBorder, 0.18, 0.2, 0.78),
+    weight: 1,
+    fillColor: muteColor(baseColor),
+    fillOpacity: 0.14,
+    opacity: 0.45,
+  };
+}
+
 // Parse an OpenStreetMap URL like:
 // https://www.openstreetmap.org/way/30334086
 // into its type (`way`) and numeric id (`30334086`).
@@ -564,17 +653,7 @@ async function buildFeaturesFromRecords(records) {
 
 // Leaflet style callback for one building polygon.
 function styleFeature(feature) {
-  const { name, score } = feature.properties;
-  const renderedScore = previousBuildingScores.has(name)
-    ? previousBuildingScores.get(name)
-    : score;
-
-  return {
-    color: getBorderColor(renderedScore),
-    weight: 1.2,
-    fillColor: getColor(renderedScore),
-    fillOpacity: 0.42,
-  };
+  return getFeatureStyle(feature);
 }
 
 // Normalize a building code so comparisons are stable.
@@ -1415,6 +1494,168 @@ function renderBuildingHeatmapChart(rooms) {
     .text(t("busy"));
 }
 
+function applyAvailabilityFilter() {
+  if (!buildingLayer) {
+    return;
+  }
+
+  buildingLayer.setStyle(styleFeature);
+}
+
+function toggleAvailabilityFilter(bin) {
+  hasUsedAvailabilityFilter = true;
+
+  if (activeAvailabilityFilter && activeAvailabilityFilter.label === bin.label) {
+    activeAvailabilityFilter = null;
+  } else {
+    activeAvailabilityFilter = bin;
+  }
+
+  applyAvailabilityFilter();
+  renderAvailabilityLegend();
+}
+
+function renderAvailabilityLegend() {
+  if (!campusAvailabilityChart) {
+    return;
+  }
+
+  const existingLegend = campusAvailabilityChart.querySelector(".campus-availability-legend");
+
+  if (existingLegend) {
+    existingLegend.remove();
+  }
+
+  const legend = document.createElement("div");
+  legend.className = "campus-availability-legend";
+
+  const header = document.createElement("div");
+  header.className = "campus-availability-legend-header";
+
+  const title = document.createElement("span");
+  title.textContent = t("availability_filter_title");
+  header.appendChild(title);
+
+  const clearButton = document.createElement("button");
+  clearButton.type = "button";
+  clearButton.className = "campus-availability-legend-clear";
+  clearButton.textContent = t("availability_filter_clear");
+  clearButton.disabled = !activeAvailabilityFilter;
+  clearButton.addEventListener("click", () => {
+    if (!activeAvailabilityFilter) {
+      return;
+    }
+
+    hasUsedAvailabilityFilter = true;
+
+    activeAvailabilityFilter = null;
+    applyAvailabilityFilter();
+    renderAvailabilityLegend();
+  });
+
+  header.appendChild(clearButton);
+  legend.appendChild(header);
+
+  const width = 320;
+  const height = 76;
+  const margin = { top: 26, right: 12, bottom: 22, left: 12 };
+  const trackX = margin.left;
+  const trackY = 30;
+  const trackWidth = width - margin.left - margin.right;
+  const trackHeight = 12;
+
+  const svg = d3.select(legend)
+    .append("svg")
+    .attr("class", "campus-availability-legend-svg")
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("role", "img")
+    .attr("aria-label", t("availability_filter_title"));
+
+  const gradientId = "map-legend-gradient";
+  const defs = svg.append("defs");
+  const gradient = defs.append("linearGradient")
+    .attr("id", gradientId)
+    .attr("x1", "0%")
+    .attr("x2", "100%");
+
+  d3.range(0, 1.01, 0.2).forEach((step) => {
+    gradient.append("stop")
+      .attr("offset", `${step * 100}%`)
+      .attr("stop-color", getColor(step));
+  });
+
+  svg.append("rect")
+    .attr("class", "campus-availability-legend-track")
+    .attr("x", trackX)
+    .attr("y", trackY)
+    .attr("width", trackWidth)
+    .attr("height", trackHeight)
+    .attr("rx", 6)
+    .attr("fill", `url(#${gradientId})`);
+
+  const binScale = d3.scaleBand()
+    .domain(AVAILABILITY_BINS.map((bin) => bin.label))
+    .range([trackX, trackX + trackWidth])
+    .paddingInner(0.08)
+    .paddingOuter(0.02);
+
+  const shouldPulse = !activeAvailabilityFilter && !hasUsedAvailabilityFilter;
+
+  const bins = svg.append("g")
+    .attr("class", "campus-availability-legend-bins")
+    .selectAll("rect")
+    .data(AVAILABILITY_BINS)
+    .join("rect")
+    .attr("class", (bin) => {
+      const classes = ["campus-availability-legend-bin"];
+
+      if (activeAvailabilityFilter && activeAvailabilityFilter.label === bin.label) {
+        classes.push("is-active");
+      }
+
+      if (shouldPulse) {
+        classes.push("is-attention");
+      }
+
+      return classes.join(" ");
+    })
+    .style("animation-delay", (_, index) => (shouldPulse ? `${index * 120}ms` : null))
+    .attr("x", (bin) => binScale(bin.label))
+    .attr("y", trackY - 6)
+    .attr("width", binScale.bandwidth())
+    .attr("height", trackHeight + 12)
+    .attr("rx", 7)
+    .attr("role", "button")
+    .attr("tabindex", 0)
+    .attr("aria-label", (bin) => bin.label)
+    .on("click", (_, bin) => toggleAvailabilityFilter(bin))
+    .on("keydown", (event, bin) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        toggleAvailabilityFilter(bin);
+      }
+    });
+
+  bins.append("title")
+    .text((bin) => bin.label);
+
+  svg.append("text")
+    .attr("class", "campus-availability-legend-label")
+    .attr("x", trackX)
+    .attr("y", trackY + 28)
+    .attr("text-anchor", "start")
+    .text(t("mostly_occupied"));
+
+  svg.append("text")
+    .attr("class", "campus-availability-legend-label")
+    .attr("x", trackX + trackWidth)
+    .attr("y", trackY + 28)
+    .attr("text-anchor", "end")
+    .text(t("mostly_free"));
+
+  campusAvailabilityChart.appendChild(legend);
+}
+
 function formatSearchWindowShort() {
   if (!activeSearchWindow) {
     return "-";
@@ -1440,23 +1681,10 @@ function renderCampusAvailabilityChart(features) {
 
   const chartWidth = 360;
   const chartHeight = 228;
-  const margin = { top: 58, right: 28, bottom: 54, left: 28 };
+  const margin = { top: 58, right: 14, bottom: 30, left: 14 };
   const plotWidth = chartWidth - margin.left - margin.right;
-  const plotHeight = 82;
-  const bins = [
-    { label: "0-20%", min: 0, max: 0.2 },
-    { label: "20-40%", min: 0.2, max: 0.4 },
-    { label: "40-60%", min: 0.4, max: 0.6 },
-    { label: "60-80%", min: 0.6, max: 0.8 },
-    { label: "80-100%", min: 0.8, max: 1.01 },
-  ].map((bin) => ({
-    ...bin,
-    count: features.filter((feature) => {
-      const score = feature.properties?.score || 0;
-      return score >= bin.min && score < bin.max;
-    }).length,
-    midpoint: (bin.min + Math.min(bin.max, 1)) / 2,
-  }));
+  const plotHeight = chartHeight - margin.top - margin.bottom;
+  const bins = buildAvailabilityBins(features);
   const maxCount = Math.max(1, d3.max(bins, (bin) => bin.count));
   const xScale = d3.scaleBand()
     .domain(bins.map((bin) => bin.label))
@@ -1574,40 +1802,7 @@ function renderCampusAvailabilityChart(features) {
     .call(d3.axisBottom(xScale).tickSize(0))
     .call((axisGroup) => axisGroup.select(".domain").remove());
 
-  svg.append("text")
-    .attr("class", "campus-availability-axis-label")
-    .attr("x", margin.left)
-    .attr("y", chartHeight - 20)
-    .text(t("mostly_occupied"));
-
-  svg.append("text")
-    .attr("class", "campus-availability-axis-label")
-    .attr("x", chartWidth - margin.right)
-    .attr("y", chartHeight - 20)
-    .attr("text-anchor", "end")
-    .text(t("mostly_free"));
-
-  const gradientId = "campus-availability-gradient";
-  const defs = svg.append("defs");
-  const gradient = defs.append("linearGradient")
-    .attr("id", gradientId)
-    .attr("x1", "0%")
-    .attr("x2", "100%");
-
-  d3.range(0, 1.01, 0.25).forEach((step) => {
-    gradient.append("stop")
-      .attr("offset", `${step * 100}%`)
-      .attr("stop-color", getColor(step));
-  });
-
-  svg.append("rect")
-    .attr("class", "campus-availability-gradient-track")
-    .attr("x", margin.left)
-    .attr("y", chartHeight - 42)
-    .attr("width", plotWidth)
-    .attr("height", 8)
-    .attr("rx", 4)
-    .attr("fill", `url(#${gradientId})`);
+  renderAvailabilityLegend();
 }
 
 // Build a direct EPFL campus plan link for a building or room label.
@@ -2208,6 +2403,24 @@ function animateBuildingLayerStyles(features) {
     }
 
     const { name, score } = feature.properties;
+    const inRange = isScoreInActiveFilter(score);
+
+    if (activeAvailabilityFilter && !inRange) {
+      const filteredStyle = getFeatureStyle(feature);
+
+      d3.select(element)
+        .interrupt()
+        .transition()
+        .duration(360)
+        .ease(d3.easeCubicOut)
+        .attr("fill", filteredStyle.fillColor)
+        .attr("stroke", filteredStyle.color)
+        .attr("fill-opacity", filteredStyle.fillOpacity)
+        .attr("opacity", filteredStyle.opacity ?? 1)
+        .attr("stroke-width", filteredStyle.weight ?? 1.2);
+      return;
+    }
+
     const previousScore = previousBuildingScores.has(name)
       ? previousBuildingScores.get(name)
       : score;
@@ -2264,6 +2477,10 @@ function onEachFeature(feature, layer) {
   }
 
   layer.on("mouseover", () => {
+    if (activeAvailabilityFilter && !isScoreInActiveFilter(getRenderedScore(feature))) {
+      return;
+    }
+
     layer.setStyle({
       weight: 2,
       fillOpacity: 0.62,
