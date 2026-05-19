@@ -8,10 +8,3 @@
 | [Raphael Cannatà](https://raphaelcannata.com/) | 358968 |
 
 [Milestone 1](milestones/milestone1.md) • [Milestone 2](milestones/milestone2.md) • [Milestone 3](milestones/milestone3.md)
-
-# How to run the frontend of the Website locally
-```bash
-cd website
-python3 -m http.server 8001
-```
-Access via `http://localhost:8001`
