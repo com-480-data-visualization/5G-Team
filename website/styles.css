@@ -535,6 +535,71 @@ select {
   min-height: min(78vh, 920px);
 }
 
+.campus-availability-chart {
+  position: absolute;
+  left: 18px;
+  bottom: 18px;
+  z-index: 480;
+  width: min(360px, calc(100% - 36px));
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--panel);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow);
+}
+
+.campus-availability-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.campus-availability-title {
+  fill: var(--text);
+  font-size: 0.88rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.campus-availability-window,
+.campus-availability-count,
+.campus-availability-axis text,
+.campus-availability-axis-label {
+  fill: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.campus-availability-window {
+  font-size: 0.72rem;
+}
+
+.campus-availability-count {
+  fill: var(--text);
+}
+
+.campus-availability-grid line {
+  stroke: var(--timeline-grid-line);
+  stroke-width: 1;
+}
+
+.campus-availability-axis line {
+  display: none;
+}
+
+.campus-availability-bar {
+  stroke: rgba(255, 255, 255, 0.22);
+  stroke-width: 1;
+}
+
+.campus-availability-gradient-track {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
 @media (min-width: 1101px) {
   /* Desktop layout: keep the full search panel on the left and let the map
      occupy the wider right column. */
@@ -1039,6 +1104,13 @@ select {
     max-height: min(58vh, 520px);
     margin: 0;
     padding: 16px 18px;
+  }
+
+  .campus-availability-chart {
+    top: 12px;
+    bottom: auto;
+    left: 12px;
+    width: min(340px, calc(100% - 24px));
   }
 
   .building-panel.is-empty {

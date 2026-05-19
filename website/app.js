@@ -42,6 +42,7 @@ const themeToggle = document.getElementById("themeToggle");
 const languageToggle = document.getElementById("languageToggle");
 const mapSection = document.getElementById("map-section");
 const mapFrame = document.querySelector(".map-frame");
+const campusAvailabilityChart = document.getElementById("campusAvailabilityChart");
 const mobilePanelMedia = window.matchMedia("(max-width: 720px)");
 const systemDarkModeMedia = window.matchMedia("(prefers-color-scheme: dark)");
 const buildingPanelDesktopAnchor = document.createComment("building-panel-desktop-anchor");
@@ -93,6 +94,11 @@ const translations = {
     unavailable: "Unavailable",
     summary_title: "Room summary",
     heatmap_title: "Hourly occupancy",
+    campus_summary_title: "Campus availability",
+    mostly_occupied: "Mostly occupied",
+    mostly_free: "Mostly free",
+    buildings_label: "Buildings",
+    search_window_label: "Search window",
     busy: "Busy",
     quiet: "Quiet",
     all_rooms: "All rooms",
@@ -147,6 +153,11 @@ const translations = {
     unavailable: "Indisponible",
     summary_title: "Résumé des salles",
     heatmap_title: "Occupation horaire",
+    campus_summary_title: "Disponibilité du campus",
+    mostly_occupied: "Très occupé",
+    mostly_free: "Plutôt libre",
+    buildings_label: "Bâtiments",
+    search_window_label: "Plage recherchée",
     busy: "Occupé",
     quiet: "Calme",
     all_rooms: "Toutes les salles",
@@ -674,6 +685,14 @@ function formatHour(hour) {
   return `${String(hour).padStart(2, "0")}:00`;
 }
 
+function formatClockTime(date) {
+  return date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+}
+
 function buildTimelineScale() {
   return d3.scaleLinear()
     .domain([0, 24 * 60])
@@ -741,7 +760,7 @@ function appendSearchWindowBand(svg, height, xScale, withLabel = false) {
       .attr("x", x + width / 2)
       .attr("y", 16)
       .attr("text-anchor", "middle")
-      .text(`${activeSearchWindow.start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - ${activeSearchWindow.end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`);
+      .text(`${formatClockTime(activeSearchWindow.start)} - ${formatClockTime(activeSearchWindow.end)}`);
   }
 }
 
@@ -1396,6 +1415,163 @@ function renderBuildingHeatmapChart(rooms) {
     .text(t("busy"));
 }
 
+function formatSearchWindowShort() {
+  if (!activeSearchWindow) {
+    return "-";
+  }
+
+  const startDate = [
+    String(activeSearchWindow.start.getDate()).padStart(2, "0"),
+    String(activeSearchWindow.start.getMonth() + 1).padStart(2, "0"),
+    String(activeSearchWindow.start.getFullYear()),
+  ].join("/");
+  const startTime = formatClockTime(activeSearchWindow.start);
+  const endTime = formatClockTime(activeSearchWindow.end);
+
+  return `${startDate} ${startTime} - ${endTime}`;
+}
+
+function renderCampusAvailabilityChart(features) {
+  campusAvailabilityChart.innerHTML = "";
+
+  if (!features.length) {
+    return;
+  }
+
+  const chartWidth = 360;
+  const chartHeight = 228;
+  const margin = { top: 58, right: 28, bottom: 54, left: 28 };
+  const plotWidth = chartWidth - margin.left - margin.right;
+  const plotHeight = 82;
+  const bins = [
+    { label: "0-20%", min: 0, max: 0.2 },
+    { label: "20-40%", min: 0.2, max: 0.4 },
+    { label: "40-60%", min: 0.4, max: 0.6 },
+    { label: "60-80%", min: 0.6, max: 0.8 },
+    { label: "80-100%", min: 0.8, max: 1.01 },
+  ].map((bin) => ({
+    ...bin,
+    count: features.filter((feature) => {
+      const score = feature.properties?.score || 0;
+      return score >= bin.min && score < bin.max;
+    }).length,
+    midpoint: (bin.min + Math.min(bin.max, 1)) / 2,
+  }));
+  const maxCount = Math.max(1, d3.max(bins, (bin) => bin.count));
+  const xScale = d3.scaleBand()
+    .domain(bins.map((bin) => bin.label))
+    .range([0, plotWidth])
+    .padding(0.24);
+  const yScale = d3.scaleLinear()
+    .domain([0, maxCount])
+    .nice()
+    .range([plotHeight, 0]);
+
+  const svg = d3.select(campusAvailabilityChart)
+    .append("svg")
+    .attr("class", "campus-availability-svg")
+    .attr("viewBox", `0 0 ${chartWidth} ${chartHeight}`)
+    .attr("role", "img")
+    .attr("aria-label", t("campus_summary_title"));
+
+  svg.append("text")
+    .attr("class", "campus-availability-title")
+    .attr("x", chartWidth / 2)
+    .attr("y", 14)
+    .attr("text-anchor", "middle")
+    .text(t("campus_summary_title"));
+
+  svg.append("text")
+    .attr("class", "campus-availability-window")
+    .attr("x", chartWidth / 2)
+    .attr("y", 30)
+    .attr("text-anchor", "middle")
+    .text(formatSearchWindowShort());
+
+  const plot = svg.append("g")
+    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+  plot.append("g")
+    .attr("class", "campus-availability-grid")
+    .call(
+      d3.axisLeft(yScale)
+        .ticks(3)
+        .tickSize(-plotWidth)
+        .tickFormat("")
+    )
+    .call((axisGroup) => axisGroup.select(".domain").remove());
+
+  const bars = plot.selectAll(".campus-availability-bar")
+    .data(bins)
+    .join("rect")
+    .attr("class", "campus-availability-bar")
+    .attr("x", (bin) => xScale(bin.label))
+    .attr("y", plotHeight)
+    .attr("width", xScale.bandwidth())
+    .attr("height", 0)
+    .attr("rx", 8)
+    .attr("fill", (bin) => getColor(bin.midpoint));
+
+  bars.append("title")
+    .text((bin) => `${bin.count} ${t("buildings_label").toLowerCase()} (${bin.label})`);
+
+  bars.transition()
+    .duration(700)
+    .delay((_, index) => index * 70)
+    .attr("y", (bin) => yScale(bin.count))
+    .attr("height", (bin) => plotHeight - yScale(bin.count));
+
+  plot.selectAll(".campus-availability-count")
+    .data(bins)
+    .join("text")
+    .attr("class", "campus-availability-count")
+    .attr("x", (bin) => xScale(bin.label) + xScale.bandwidth() / 2)
+    .attr("y", (bin) => yScale(bin.count) - 7)
+    .attr("text-anchor", "middle")
+    .text((bin) => bin.count || "");
+
+  plot.append("g")
+    .attr("class", "campus-availability-axis")
+    .attr("transform", `translate(0, ${plotHeight + 6})`)
+    .call(d3.axisBottom(xScale).tickSize(0))
+    .call((axisGroup) => axisGroup.select(".domain").remove());
+
+  svg.append("text")
+    .attr("class", "campus-availability-axis-label")
+    .attr("x", margin.left)
+    .attr("y", chartHeight - 20)
+    .text(t("mostly_occupied"));
+
+  svg.append("text")
+    .attr("class", "campus-availability-axis-label")
+    .attr("x", chartWidth - margin.right)
+    .attr("y", chartHeight - 20)
+    .attr("text-anchor", "end")
+    .text(t("mostly_free"));
+
+  const gradientId = "campus-availability-gradient";
+  const defs = svg.append("defs");
+  const gradient = defs.append("linearGradient")
+    .attr("id", gradientId)
+    .attr("x1", "0%")
+    .attr("x2", "100%");
+
+  d3.range(0, 1.01, 0.25).forEach((step) => {
+    gradient.append("stop")
+      .attr("offset", `${step * 100}%`)
+      .attr("stop-color", getColor(step));
+  });
+
+  svg.append("rect")
+    .attr("class", "campus-availability-gradient-track")
+    .attr("x", margin.left)
+    .attr("y", chartHeight - 42)
+    .attr("width", plotWidth)
+    .attr("height", 8)
+    .attr("rx", 4)
+    .attr("fill", `url(#${gradientId})`);
+}
+
 // Build a direct EPFL campus plan link for a building or room label.
 // We keep the displayed text, including spaces, in the room query and let URL
 // encoding preserve it safely in the outgoing link.
@@ -1918,6 +2094,8 @@ function onEachFeature(feature, layer) {
 
 // Render the building heatmap and update the summary card beside the map.
 function renderBuildings(features) {
+  renderCampusAvailabilityChart(features);
+
   if (buildingLayer) {
     map.removeLayer(buildingLayer);
   }
