@@ -22,6 +22,11 @@ const languageStorageKey = "epfl-room-finder-language";
 
 // The room timeline is drawn as a fixed 24-hour day.
 const timelineHours = Array.from({ length: 24 }, (_, hour) => hour);
+const timelineHourWidth = 180;
+const timelineWidth = timelineHours.length * timelineHourWidth;
+const timelineHeaderHeight = 46;
+const timelineRowHeight = 74;
+let timelineClipId = 0;
 
 // Cache important DOM nodes once instead of querying the DOM repeatedly.
 const buildingPanel = document.getElementById("buildingPanel");
@@ -645,43 +650,156 @@ function formatHour(hour) {
   return `${String(hour).padStart(2, "0")}:00`;
 }
 
-// Draw the active search-window boundaries on top of a timeline grid so the
-// user can immediately see where the requested interval begins and ends.
-function appendSearchWindowMarkers(grid) {
+function buildTimelineScale() {
+  return d3.scaleLinear()
+    .domain([0, 24 * 60])
+    .range([0, timelineWidth]);
+}
+
+function getSearchWindowTimelineRange() {
   if (!activeSearchWindow) {
+    return null;
+  }
+
+  const dayStart = getTimelineDayStart().getTime();
+  const dayEnd = dayStart + 24 * 60 * 60000;
+  const startMs = Math.max(activeSearchWindow.start.getTime(), dayStart);
+  const endMs = Math.min(activeSearchWindow.end.getTime(), dayEnd);
+
+  if (endMs <= startMs) {
+    return null;
+  }
+
+  return {
+    startMinutes: Math.round((startMs - dayStart) / 60000),
+    endMinutes: Math.round((endMs - dayStart) / 60000),
+  };
+}
+
+function appendTimelineGrid(svg, height, xScale) {
+  svg.append("rect")
+    .attr("class", "timeline-grid-background")
+    .attr("width", timelineWidth)
+    .attr("height", height)
+    .attr("rx", 18);
+
+  svg.append("g")
+    .selectAll("line")
+    .data(timelineHours)
+    .join("line")
+    .attr("class", "timeline-grid-line")
+    .attr("x1", (hour) => xScale(hour * 60))
+    .attr("x2", (hour) => xScale(hour * 60))
+    .attr("y1", 0)
+    .attr("y2", height);
+}
+
+function appendSearchWindowBand(svg, height, xScale, withLabel = false) {
+  const range = getSearchWindowTimelineRange();
+
+  if (!range) {
     return;
   }
 
-  const markers = [
-    minutesWithinDay(activeSearchWindow.start),
-    minutesWithinDay(activeSearchWindow.end),
-  ];
+  const x = xScale(range.startMinutes);
+  const width = xScale(range.endMinutes) - x;
 
-  markers.forEach((minutes) => {
-    const marker = document.createElement("div");
-    marker.className = "timeline-search-marker";
-    marker.style.left = `${(clamp(minutes, 0, 24 * 60) / (24 * 60)) * 100}%`;
-    grid.appendChild(marker);
+  svg.append("rect")
+    .attr("class", "timeline-search-window-band")
+    .attr("x", x)
+    .attr("y", 0)
+    .attr("width", width)
+    .attr("height", height);
+
+  if (withLabel && width > 120) {
+    svg.append("text")
+      .attr("class", "timeline-search-window-label")
+      .attr("x", x + width / 2)
+      .attr("y", 16)
+      .attr("text-anchor", "middle")
+      .text(`${activeSearchWindow.start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - ${activeSearchWindow.end.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`);
+  }
+}
+
+// Draw the active search-window boundaries on top of a timeline SVG so the
+// user can immediately see where the requested interval begins and ends.
+function appendSearchWindowMarkers(svg, height, xScale) {
+  const range = getSearchWindowTimelineRange();
+
+  if (!range) {
+    return;
+  }
+
+  [range.startMinutes, range.endMinutes].forEach((minutes) => {
+    svg.append("line")
+      .attr("class", "timeline-search-marker")
+      .attr("x1", xScale(minutes))
+      .attr("x2", xScale(minutes))
+      .attr("y1", 0)
+      .attr("y2", height);
   });
 }
 
-// Create either:
-// - the header grid with hour labels
-// - or a room grid that receives colored segments later
-function createTimelineGrid(isHeader = false) {
-  const grid = document.createElement("div");
-  grid.className = `timeline-grid${isHeader ? " timeline-hours" : ""}`;
+function createTimelineSvg(isHeader = false) {
+  const height = isHeader ? timelineHeaderHeight : timelineRowHeight;
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 
-  timelineHours.forEach((hour) => {
-    const cell = document.createElement("div");
-    cell.className = isHeader ? "timeline-hour" : "timeline-slot";
-    cell.textContent = isHeader ? formatHour(hour) : "";
-    grid.appendChild(cell);
-  });
+  svg.setAttribute("class", `timeline-grid${isHeader ? " timeline-hours" : ""}`);
+  svg.setAttribute("width", String(timelineWidth));
+  svg.setAttribute("height", String(height));
+  svg.setAttribute("viewBox", `0 0 ${timelineWidth} ${height}`);
+  svg.setAttribute("role", "img");
+  svg.style.width = `${timelineWidth}px`;
+  svg.style.minWidth = `${timelineWidth}px`;
+  svg.style.height = `${height}px`;
 
-  appendSearchWindowMarkers(grid);
+  return svg;
+}
 
-  return grid;
+function drawTimelineHeader(svgElement) {
+  const svg = d3.select(svgElement);
+  const xScale = buildTimelineScale();
+
+  appendTimelineGrid(svg, timelineHeaderHeight, xScale);
+  appendSearchWindowBand(svg, timelineHeaderHeight, xScale, true);
+
+  const axis = d3.axisBottom(xScale)
+    .tickValues(d3.range(0, 24 * 60 + 1, 120))
+    .tickSize(8)
+    .tickPadding(6)
+    .tickFormat((minutes) => minutes === 24 * 60 ? "24:00" : formatHour(minutes / 60));
+
+  svg.append("g")
+    .attr("class", "timeline-axis")
+    .attr("transform", `translate(0, ${timelineHeaderHeight - 24})`)
+    .call(axis)
+    .call((axisGroup) => {
+      axisGroup.selectAll(".tick text")
+        .attr("text-anchor", (minutes) => {
+          if (minutes === 0) {
+            return "start";
+          }
+
+          if (minutes === 24 * 60) {
+            return "end";
+          }
+
+          return "middle";
+        })
+        .attr("dx", (minutes) => {
+          if (minutes === 0) {
+            return "12px";
+          }
+
+          if (minutes === 24 * 60) {
+            return "-12px";
+          }
+
+          return "0";
+        });
+    });
+
+  appendSearchWindowMarkers(svg, timelineHeaderHeight, xScale);
 }
 
 // The visible timeline day should follow the current search window.
@@ -944,49 +1062,60 @@ function showSegmentTooltip(target, text) {
   activeSegmentTooltip = tooltip;
 }
 
-// Draw one colored block in a timeline row.
-// Blocks are positioned as percentages of the full 24-hour width.
-function appendSegment(grid, startMinutes, endMinutes, className, title, labelText = "") {
+function appendD3Segment(svg, xScale, segment) {
+  const { startMinutes, endMinutes, className, title, labelText } = segment;
+
   if (endMinutes <= startMinutes) {
     return;
   }
 
-  const segment = document.createElement("div");
-  segment.className = `timeline-segment ${className}`;
-  segment.style.left = `${(startMinutes / (24 * 60)) * 100}%`;
-  segment.style.width = `${((endMinutes - startMinutes) / (24 * 60)) * 100}%`;
+  const x = xScale(startMinutes);
+  const width = Math.max(1, xScale(endMinutes) - x);
+  const group = svg.append("g")
+    .attr("class", `timeline-segment ${className}`)
+    .attr("tabindex", title ? 0 : null)
+    .attr("transform", `translate(${x}, 10)`);
+
+  group.append("rect")
+    .attr("width", width)
+    .attr("height", timelineRowHeight - 20)
+    .attr("rx", 12)
+    .attr("ry", 12);
+
   if (title) {
-    segment.title = title;
+    group.append("title").text(title);
   }
 
-  // Occupied blocks can show the event title directly on the segment so the
-  // user understands why the room is unavailable without relying on hover only.
+  // Occupied blocks show their event title directly when there is enough room;
+  // the full label is still available through the shared floating tooltip.
   if (labelText) {
-    const label = document.createElement("span");
-    label.className = "timeline-segment-label";
-    label.textContent = labelText;
-    segment.appendChild(label);
+    const clipId = `timeline-clip-${timelineClipId++}`;
+    const labelPadding = 10;
 
-    const maybeShowFullLabel = () => {
-      if (label.scrollWidth <= label.clientWidth) {
-        return;
-      }
+    svg.append("clipPath")
+      .attr("id", clipId)
+      .append("rect")
+      .attr("x", x + labelPadding)
+      .attr("y", 10)
+      .attr("width", Math.max(0, width - labelPadding * 2))
+      .attr("height", timelineRowHeight - 20);
 
-      showSegmentTooltip(label, labelText);
-    };
+    group.append("text")
+      .attr("class", "timeline-segment-label")
+      .attr("x", labelPadding)
+      .attr("y", 31)
+      .attr("clip-path", `url(#${clipId})`)
+      .text(labelText);
 
-    segment.addEventListener("mouseenter", maybeShowFullLabel);
-    segment.addEventListener("mouseleave", hideSegmentTooltip);
+    group
+      .on("mouseenter", (event) => showSegmentTooltip(event.currentTarget, labelText))
+      .on("mouseleave", hideSegmentTooltip)
+      .on("focus", (event) => showSegmentTooltip(event.currentTarget, labelText))
+      .on("blur", hideSegmentTooltip);
   }
-
-  grid.appendChild(segment);
 }
 
-// Draw the room timeline:
-// - red rounded blocks for occupied periods
-// - green rounded blocks for the gaps between them (available time)
-// If the room has no occupancy record at all, show the empty-data label instead.
-function addTimelineSegments(grid, roomName) {
+function buildRoomTimelineSegments(roomName) {
   const allRoomSlots = getRoomSlots(roomName);
   const slots = normalizeSlots(roomName);
 
@@ -994,62 +1123,95 @@ function addTimelineSegments(grid, roomName) {
   // show the "no occupancy data" state. If it has records on other days but not
   // on the selected day, it should appear fully available.
   if (!allRoomSlots.length) {
-    const emptyState = document.createElement("div");
-    emptyState.className = "timeline-empty-state";
-    emptyState.textContent = t("no_occupancy");
-    grid.appendChild(emptyState);
-    return;
+    return null;
   }
 
+  const segments = [];
   let cursor = 0;
 
   slots.forEach((slot) => {
-    // Available gap before the next occupied block.
-    appendSegment(
-      grid,
-      cursor,
-      slot.startMinutes,
-      "timeline-segment-available",
-      t("available_slot", {
+    segments.push({
+      startMinutes: cursor,
+      endMinutes: slot.startMinutes,
+      className: "timeline-segment-available",
+      title: t("available_slot", {
         start: formatHour(Math.floor(cursor / 60)),
         end: slot.startIso.slice(11, 16),
-      })
-    );
+      }),
+    });
 
-    // Occupied block itself.
-    appendSegment(
-      grid,
-      slot.startMinutes,
-      slot.endMinutes,
-      "timeline-segment-occupied",
-      t("occupied_slot", {
+    segments.push({
+      startMinutes: slot.startMinutes,
+      endMinutes: slot.endMinutes,
+      className: "timeline-segment-occupied",
+      title: t("occupied_slot", {
         start: slot.startIso.slice(11, 16),
         end: slot.endIso.slice(11, 16),
         title: slot.title ? `: ${slot.title}` : "",
       }),
-      slot.title || ""
-    );
+      labelText: slot.title || "",
+    });
+
     cursor = slot.endMinutes;
   });
 
-  // Final available block until the end of the day.
-  appendSegment(
-    grid,
-    cursor,
-    24 * 60,
-    "timeline-segment-available",
-    t("available_slot", {
+  segments.push({
+    startMinutes: cursor,
+    endMinutes: 24 * 60,
+    className: "timeline-segment-available",
+    title: t("available_slot", {
       start: formatHour(Math.floor(cursor / 60)),
       end: "24:00",
-    })
-  );
+    }),
+  });
+
+  return segments;
+}
+
+// Draw the room timeline as a D3 SVG Gantt row:
+// - red rounded bars for occupied periods
+// - green rounded bars for the gaps between them
+// If the room has no occupancy record at all, show the empty-data label instead.
+function drawRoomTimeline(svgElement, roomName) {
+  const svg = d3.select(svgElement);
+  const xScale = buildTimelineScale();
+  const segments = buildRoomTimelineSegments(roomName);
+
+  appendTimelineGrid(svg, timelineRowHeight, xScale);
+  appendSearchWindowBand(svg, timelineRowHeight, xScale);
+
+  if (!segments) {
+    svg.append("text")
+      .attr("class", "timeline-empty-state")
+      .attr("x", timelineWidth / 2)
+      .attr("y", timelineRowHeight / 2)
+      .attr("text-anchor", "middle")
+      .attr("dominant-baseline", "middle")
+      .text(t("no_occupancy"));
+    appendSearchWindowMarkers(svg, timelineRowHeight, xScale);
+    return;
+  }
+
+  segments.forEach((segment) => {
+    appendD3Segment(svg, xScale, segment);
+  });
+
+  appendSearchWindowMarkers(svg, timelineRowHeight, xScale);
 }
 
 // Wrap a timeline grid in a horizontally scrollable container.
-function createTimelineScroll(isHeader = false) {
+function createTimelineScroll(isHeader = false, roomName = "") {
   const scroll = document.createElement("div");
   scroll.className = "timeline-scroll";
-  scroll.appendChild(createTimelineGrid(isHeader));
+  const svg = createTimelineSvg(isHeader);
+
+  if (isHeader) {
+    drawTimelineHeader(svg);
+  } else {
+    drawRoomTimeline(svg, roomName);
+  }
+
+  scroll.appendChild(svg);
   return scroll;
 }
 
@@ -1257,8 +1419,7 @@ function openBuildingPanel(buildingCode, rooms) {
 
       rowLabel.append(roomLink, roomType);
 
-      const rowScroll = createTimelineScroll(false);
-      addTimelineSegments(rowScroll.firstChild, roomEntry.room);
+      const rowScroll = createTimelineScroll(false, roomEntry.room);
 
       row.append(rowLabel, rowScroll);
       timelineBody.appendChild(row);
@@ -1274,8 +1435,7 @@ function openBuildingPanel(buildingCode, rooms) {
     rowLabel.className = "timeline-room-label";
     rowLabel.innerHTML = `<strong>${t("no_room_found")}</strong><span>${t("no_matching_room")}</span>`;
 
-    const rowScroll = createTimelineScroll(false);
-    addTimelineSegments(rowScroll.firstChild, "No room found");
+    const rowScroll = createTimelineScroll(false, "No room found");
 
     row.append(rowLabel, rowScroll);
     timelineBody.appendChild(row);
