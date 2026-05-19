@@ -595,6 +595,23 @@ select {
   stroke-width: 1;
 }
 
+.campus-availability-curve-group {
+  pointer-events: none;
+}
+
+.campus-availability-curve-fill {
+  fill: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+.campus-availability-curve {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.9;
+}
+
 .campus-availability-gradient-track {
   stroke: var(--border);
   stroke-width: 1;

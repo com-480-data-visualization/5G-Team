@@ -1466,6 +1466,19 @@ function renderCampusAvailabilityChart(features) {
     .domain([0, maxCount])
     .nice()
     .range([plotHeight, 0]);
+  const curvePoints = bins.map((bin) => ({
+    x: xScale(bin.label) + xScale.bandwidth() / 2,
+    y: yScale(bin.count),
+  }));
+  const curveArea = d3.area()
+    .x((point) => point.x)
+    .y0(plotHeight)
+    .y1((point) => point.y)
+    .curve(d3.curveCatmullRom.alpha(0.6));
+  const curveLine = d3.line()
+    .x((point) => point.x)
+    .y((point) => point.y)
+    .curve(d3.curveCatmullRom.alpha(0.6));
 
   const svg = d3.select(campusAvailabilityChart)
     .append("svg")
@@ -1500,6 +1513,31 @@ function renderCampusAvailabilityChart(features) {
         .tickFormat("")
     )
     .call((axisGroup) => axisGroup.select(".domain").remove());
+
+  const curveGroup = plot.append("g")
+    .attr("class", "campus-availability-curve-group");
+
+  curveGroup.append("path")
+    .attr("class", "campus-availability-curve-fill")
+    .attr("d", curveArea(curvePoints))
+    .attr("opacity", 0)
+    .transition()
+    .duration(600)
+    .attr("opacity", 1);
+
+  const curvePath = curveGroup.append("path")
+    .attr("class", "campus-availability-curve")
+    .attr("d", curveLine(curvePoints));
+
+  const curveLength = curvePath.node().getTotalLength();
+
+  curvePath
+    .attr("stroke-dasharray", `${curveLength} ${curveLength}`)
+    .attr("stroke-dashoffset", curveLength)
+    .transition()
+    .duration(800)
+    .ease(d3.easeCubicOut)
+    .attr("stroke-dashoffset", 0);
 
   const bars = plot.selectAll(".campus-availability-bar")
     .data(bins)
