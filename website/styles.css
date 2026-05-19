@@ -559,9 +559,9 @@ select {
 
 .campus-availability-legend {
   border-top: 1px solid var(--border);
-  padding-top: 10px;
+  padding-top: 6px;
   display: grid;
-  gap: 6px;
+  gap: 2px;
 }
 
 .campus-availability-legend-header {
@@ -569,7 +569,7 @@ select {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 6px;
+  margin-bottom: 0;
   color: var(--muted);
   font-size: 0.74rem;
   font-weight: 800;
