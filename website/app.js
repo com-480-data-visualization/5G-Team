@@ -34,6 +34,7 @@ const buildingPanelTitle = document.getElementById("buildingPanelTitle");
 const buildingPanelCopy = document.getElementById("buildingPanelCopy");
 const buildingMeta = document.getElementById("buildingMeta");
 const buildingSummaryChart = document.getElementById("buildingSummaryChart");
+const buildingHeatmapChart = document.getElementById("buildingHeatmapChart");
 const timelineHeader = document.getElementById("timelineHeader");
 const timelineBody = document.getElementById("timelineBody");
 const closeBuildingPanel = document.getElementById("closeBuildingPanel");
@@ -91,6 +92,9 @@ const translations = {
     available: "Available",
     unavailable: "Unavailable",
     summary_title: "Room summary",
+    heatmap_title: "Hourly occupancy",
+    busy: "Busy",
+    quiet: "Quiet",
     all_rooms: "All rooms",
     none: "None",
     no_occupancy: "No occupancy data yet",
@@ -142,6 +146,9 @@ const translations = {
     available: "Disponible",
     unavailable: "Indisponible",
     summary_title: "Résumé des salles",
+    heatmap_title: "Occupation horaire",
+    busy: "Occupé",
+    quiet: "Calme",
     all_rooms: "Toutes les salles",
     none: "Aucune",
     no_occupancy: "Pas encore de données d'occupation",
@@ -1227,6 +1234,168 @@ function renderBuildingSummaryChart(available, unavailable) {
   });
 }
 
+function roomIsBusyDuringHour(roomName, hour) {
+  const dayStart = getTimelineDayStart();
+  const hourStart = new Date(dayStart.getTime() + hour * 60 * 60000);
+  const hourEnd = new Date(hourStart.getTime() + 60 * 60000);
+
+  return getRoomSlots(roomName).some((slot) => {
+    const start = new Date(slot.startIso);
+    const end = new Date(slot.endIso);
+    return end > hourStart && start < hourEnd;
+  });
+}
+
+function buildHourlyHeatmapRows(rooms) {
+  const groups = [
+    { key: "all", label: t("all_rooms"), rooms },
+    {
+      key: "conference",
+      label: t("room_type_conference"),
+      rooms: rooms.filter((room) => getRoomTypeGroup(room.type) === "conference"),
+    },
+    {
+      key: "study",
+      label: t("room_type_study"),
+      rooms: rooms.filter((room) => getRoomTypeGroup(room.type) === "study"),
+    },
+  ];
+
+  return groups
+    .filter((group) => group.rooms.length)
+    .map((group) => ({
+      ...group,
+      hours: timelineHours.map((hour) => {
+        const busyRooms = group.rooms.filter((room) => roomIsBusyDuringHour(room.room, hour)).length;
+        return {
+          hour,
+          busyRooms,
+          totalRooms: group.rooms.length,
+          ratio: busyRooms / group.rooms.length,
+        };
+      }),
+    }));
+}
+
+function renderBuildingHeatmapChart(rooms) {
+  buildingHeatmapChart.innerHTML = "";
+
+  const rows = buildHourlyHeatmapRows(rooms);
+  const chartWidth = 560;
+  const headerHeight = 28;
+  const labelWidth = 135;
+  const cellGap = 3;
+  const cellWidth = 14;
+  const cellHeight = 22;
+  const rowGap = 8;
+  const legendHeight = 28;
+  const heatmapWidth = timelineHours.length * cellWidth + (timelineHours.length - 1) * cellGap;
+  const chartHeight = headerHeight + rows.length * (cellHeight + rowGap) + 24 + legendHeight;
+  const colorScale = d3.scaleSequential(d3.interpolateRgb("#2b3242", "#ff6868"))
+    .domain([0, 1]);
+
+  const svg = d3.select(buildingHeatmapChart)
+    .append("svg")
+    .attr("class", "building-heatmap-svg")
+    .attr("viewBox", `0 0 ${chartWidth} ${chartHeight}`)
+    .attr("role", "img")
+    .attr("aria-label", t("heatmap_title"));
+
+  svg.append("text")
+    .attr("class", "building-heatmap-title")
+    .attr("x", 0)
+    .attr("y", 18)
+    .text(t("heatmap_title"));
+
+  const plotX = labelWidth;
+  const plotY = headerHeight;
+
+  const rowGroups = svg.append("g")
+    .attr("transform", `translate(0, ${plotY})`)
+    .selectAll("g")
+    .data(rows)
+    .join("g")
+    .attr("transform", (_, index) => `translate(0, ${index * (cellHeight + rowGap)})`);
+
+  rowGroups.append("text")
+    .attr("class", "building-heatmap-label")
+    .attr("x", 0)
+    .attr("y", 15)
+    .text((row) => row.label);
+
+  rowGroups.selectAll("rect")
+    .data((row) => row.hours.map((hour) => ({ ...hour, label: row.label })))
+    .join("rect")
+    .attr("class", "building-heatmap-cell")
+    .attr("x", (hour) => plotX + hour.hour * (cellWidth + cellGap))
+    .attr("y", 0)
+    .attr("width", cellWidth)
+    .attr("height", cellHeight)
+    .attr("rx", 5)
+    .attr("fill", (hour) => colorScale(hour.ratio))
+    .attr("opacity", 0)
+    .append("title")
+    .text((hour) => `${hour.label} ${formatHour(hour.hour)}-${formatHour(hour.hour + 1)}: ${hour.busyRooms}/${hour.totalRooms} ${t("busy").toLowerCase()}`);
+
+  rowGroups.selectAll("rect")
+    .transition()
+    .delay((hour) => hour.hour * 18)
+    .duration(320)
+    .attr("opacity", 0.95);
+
+  const hourAxisY = plotY + rows.length * (cellHeight + rowGap) + 7;
+  svg.append("g")
+    .selectAll("text")
+    .data([0, 6, 12, 18, 24])
+    .join("text")
+    .attr("class", "building-heatmap-hour")
+    .attr("x", (hour) => hour === 24 ? plotX + heatmapWidth + cellWidth : plotX + hour * (cellWidth + cellGap))
+    .attr("y", hourAxisY)
+    .attr("text-anchor", (hour) => hour === 24 ? "end" : "middle")
+    .text((hour) => formatHour(hour));
+
+  const range = getSearchWindowTimelineRange();
+  if (range) {
+    [range.startMinutes, range.endMinutes].forEach((minutes) => {
+      svg.append("line")
+        .attr("class", "building-heatmap-search-marker")
+        .attr("x1", plotX + (minutes / 60) * (cellWidth + cellGap))
+        .attr("x2", plotX + (minutes / 60) * (cellWidth + cellGap))
+        .attr("y1", plotY - 3)
+        .attr("y2", plotY + rows.length * (cellHeight + rowGap) - rowGap + 3);
+    });
+  }
+
+  const legendY = chartHeight - 10;
+  const legendWidth = 248;
+  const legendX = plotX + heatmapWidth / 2 - legendWidth / 2;
+  const legend = svg.append("g")
+    .attr("class", "building-heatmap-legend")
+    .attr("transform", `translate(${legendX}, ${legendY})`);
+
+  legend.append("text")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("text-anchor", "start")
+    .text(t("quiet"));
+
+  d3.range(0, 8).forEach((step) => {
+    legend.append("rect")
+      .attr("x", 52 + step * 17)
+      .attr("y", -11)
+      .attr("width", 15)
+      .attr("height", 10)
+      .attr("rx", 3)
+      .attr("fill", colorScale(step / 7));
+  });
+
+  legend.append("text")
+    .attr("x", legendWidth)
+    .attr("y", 0)
+    .attr("text-anchor", "end")
+    .text(t("busy"));
+}
+
 // Build a direct EPFL campus plan link for a building or room label.
 // We keep the displayed text, including spaces, in the room query and let URL
 // encoding preserve it safely in the outgoing link.
@@ -1555,6 +1724,7 @@ function openBuildingPanel(buildingCode, rooms) {
   );
 
   renderBuildingSummaryChart(available, unavailable);
+  renderBuildingHeatmapChart(rooms);
 
   timelineHeader.innerHTML = "";
   timelineBody.innerHTML = "";
@@ -1653,6 +1823,7 @@ function resetBuildingPanel() {
   buildingMeta.hidden = false;
   buildingMeta.innerHTML = `<span>${t("no_building_selected")}</span>`;
   buildingSummaryChart.innerHTML = "";
+  buildingHeatmapChart.innerHTML = "";
   timelineHeader.innerHTML = "";
   timelineBody.innerHTML = "";
 }

@@ -614,7 +614,8 @@ select {
   display: none;
 }
 
-.building-panel.is-empty .building-summary-chart {
+.building-panel.is-empty .building-summary-chart,
+.building-panel.is-empty .building-heatmap-chart {
   display: none;
 }
 
@@ -664,7 +665,8 @@ select {
   font-size: 0.9rem;
 }
 
-.building-summary-chart {
+.building-summary-chart,
+.building-heatmap-chart {
   min-width: 0;
   padding: 12px 14px;
   border: 1px solid var(--border);
@@ -672,14 +674,16 @@ select {
   background: var(--surface-tint-2);
 }
 
-.building-summary-svg {
+.building-summary-svg,
+.building-heatmap-svg {
   display: block;
   width: 100%;
   height: auto;
   overflow: visible;
 }
 
-.building-summary-title {
+.building-summary-title,
+.building-heatmap-title {
   fill: var(--text);
   font-size: 0.86rem;
   font-weight: 800;
@@ -749,6 +753,29 @@ select {
 .building-summary-dot-unavailable {
   fill: var(--timeline-occupied-bg);
   stroke: var(--timeline-occupied-border);
+}
+
+.building-heatmap-label,
+.building-heatmap-hour,
+.building-heatmap-legend text {
+  fill: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.building-heatmap-cell {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.building-heatmap-search-marker {
+  stroke: var(--timeline-search-marker);
+  stroke-width: 2;
+  opacity: 0.8;
+}
+
+.building-heatmap-legend-track {
+  fill: var(--surface-tint-4);
 }
 
 .timeline-shell {
