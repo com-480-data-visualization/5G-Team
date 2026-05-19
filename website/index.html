@@ -60,9 +60,11 @@
           <div class="panel-title-row">
             <h1 class="app-title">EPFL Room Finder</h1>
             <div class="panel-title-actions">
-              <button class="ghost-button language-toggle" id="languageToggle" type="button" aria-label="Switch language">
-                FR
-              </button>
+              <div class="language-toggle" id="languageToggle" role="group" aria-label="Choose language">
+                <button class="language-option" type="button" data-language="en" aria-pressed="true">EN</button>
+                <button class="language-option" type="button" data-language="fr" aria-pressed="false">FR</button>
+                <button class="language-option" type="button" data-language="de" aria-pressed="false">DE</button>
+              </div>
               <button
                 class="ghost-button theme-toggle"
                 id="themeToggle"

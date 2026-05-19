@@ -51,6 +51,7 @@ const timelineBody = document.getElementById("timelineBody");
 const closeBuildingPanel = document.getElementById("closeBuildingPanel");
 const themeToggle = document.getElementById("themeToggle");
 const languageToggle = document.getElementById("languageToggle");
+const languageOptions = [...document.querySelectorAll(".language-option")];
 const roomInput = document.getElementById("roomInput");
 const roomSuggestions = document.getElementById("roomSuggestions");
 const roomWeekInput = document.getElementById("roomWeekInput");
@@ -260,6 +261,85 @@ const translations = {
     available_slot: "{start} - {end} disponible",
     occupied_slot: "{start} - {end} occupé{title}",
   },
+  de: {
+    search_title: "Nach Zeit suchen",
+    start_label: "Beginn",
+    end_label: "Ende",
+    duration_label: "Dauer",
+    room_type_label: "Raumtyp",
+    search_button: "Suchen",
+    shortcut_now: "Jetzt",
+    shortcut_tomorrow_morning: "Morgen fruh",
+    shortcut_tomorrow_afternoon: "Morgen nachmittags",
+    building_timeline: "Gebaeude-Zeitplan",
+    close_panel: "Panel schliessen",
+    theme_light: "Heller Modus",
+    theme_dark: "Dunkler Modus",
+    room_explorer_title: "Nach Raum suchen",
+    room_input_label: "Raum",
+    room_input_placeholder: "Raum suchen",
+    room_week_label: "Woche ab",
+    room_week_picker: "Wochenauswahl offnen",
+    room_empty_state: "Waehlen Sie einen Raum, um die Wochenverfugbarkeit zu sehen.",
+    room_not_found: "Waehlen Sie einen Raum aus den Vorschlaegen, um die Wochenverfugbarkeit zu sehen.",
+    room_weekly_title: "Wochenverfugbarkeit",
+    room_free_hours: "Freie Stunden diese Woche",
+    room_best_day: "Bester Tag",
+    room_building: "Gebaeude",
+    room_type: "Typ",
+    room_all_day_free: "Ganztags frei",
+    room_best_slot: "Bestes freies Zeitfenster",
+    room_no_free_slot: "Kein freies Zeitfenster",
+    room_day_free: "{hours} frei",
+    room_panel_hint: "Die Wochenverfugbarkeit wird im Kartenpanel rechts geoffnet.",
+    room_panel_selected: "{room} fur die Woche ab {week} ausgewahlt. Die Wochenverfugbarkeit wird im Kartenpanel rechts geoffnet.",
+    today_label: "Heute",
+    room_type_conference: "Konferenzraum",
+    room_type_study: "Lernraum",
+    room_header: "Raum",
+    available: "Verfugbar",
+    unavailable: "Nicht verfugbar",
+    summary_title: "Raumubersicht",
+    heatmap_title: "Stundliche Belegung",
+    campus_summary_title: "Campus-Verfugbarkeit",
+    availability_filter_title: "Verfugbarkeitsfilter",
+    availability_filter_clear: "Alle anzeigen",
+    mostly_occupied: "Meist belegt",
+    mostly_free: "Meist frei",
+    buildings_label: "Gebaeude",
+    search_window_label: "Suchfenster",
+    busy: "Belegt",
+    quiet: "Ruhig",
+    all_rooms: "Alle Raume",
+    none: "Keine",
+    no_occupancy: "Noch keine Belegungsdaten",
+    no_room_found: "Kein Raum gefunden",
+    no_matching_room: "Kein passender Raum in room_occupancy.json",
+    select_building: "Gebaeude auswahlen",
+    click_building_copy:
+      "Klicken Sie auf ein Gebaeude auf der Karte, um die Raume zu sehen. Derzeit zeigt das Panel den ersten passenden Raum und eine leere Tageszeitleiste.",
+    no_building_selected: "Noch kein Gebaeude ausgewahlt",
+    selected_panel_copy:
+      "Raume werden danach gruppiert, ob sie innerhalb des gewahlten Zeitfensters einen zusammenhangenden freien Zeitraum fur die ausgewahlte Meeting-Dauer enthalten.",
+    open_on_plan: "In plan.epfl.ch offnen",
+    availability_in_window: "Verfugbarkeit im Suchfenster: {available}/{rooms} Raume",
+    selected_building_status:
+      "Gebaeude {name} ausgewahlt. Die Raumzeitleiste ist auf Ihr Suchfenster zentriert.",
+    invalid_search_window:
+      "Das Suchfenster ist ungueltig. Verwenden Sie TT/MM/JJJJ HH:MM und waehlen Sie einen Beginn vor dem Ende.",
+    search_applied:
+      "Suche angewendet: {start} bis {end} fur {duration}, gefiltert nach {roomType}. Raume gelten jetzt nur dann als verfugbar, wenn sie innerhalb des gewahlten Fensters einen zusammenhangenden freien Zeitraum von mindestens dieser Dauer enthalten.{adjustment}",
+    end_adjusted:
+      " Die Endzeit wurde automatisch von {previousEnd} auf {adjustedEnd} erweitert, damit das Suchfenster mindestens {duration} lang ist.",
+    loading_data: "EPFL-Gebaeude, Raume und Belegungsdaten werden geladen...",
+    loaded_data:
+      "{buildings} Gebaeude, {rooms} bekannte Raume und {occupancy} Raume mit Belegungsdaten wurden geladen. Verwenden Sie Suchen, um die Heatmap fur ein bestimmtes Zeitfenster zu aktualisieren.",
+    failed_data:
+      "Gebaeude-, Raum- oder Belegungsdaten konnten nicht geladen werden. Stellen Sie sicher, dass Sie die Seite uber einen lokalen Server ausfuhren und epfl_buildings.json, rooms.json und room_occupancy.json vorhanden sind.",
+    language_changed: "Sprache auf Deutsch umgestellt.",
+    available_slot: "{start} - {end} verfugbar",
+    occupied_slot: "{start} - {end} belegt{title}",
+  },
 };
 
 function t(key, vars = {}) {
@@ -336,7 +416,12 @@ function formatRoomTypeDisplay(roomType) {
 }
 
 function refreshStaticTranslations() {
-  document.documentElement.lang = currentLanguage === "fr" ? "fr" : "en-GB";
+  document.documentElement.lang =
+    currentLanguage === "fr"
+      ? "fr"
+      : currentLanguage === "de"
+        ? "de"
+        : "en-GB";
   // document.getElementById("searchEyebrow").textContent = t("search_eyebrow");
   document.getElementById("searchTitle").textContent = t("search_title");
   document.getElementById("startTimeLabel").textContent = t("start_label");
@@ -391,7 +476,7 @@ function resolveInitialTheme() {
 
 function resolveInitialLanguage() {
   const storedLanguage = localStorage.getItem(languageStorageKey);
-  return storedLanguage === "fr" ? "fr" : "en";
+  return ["en", "fr", "de"].includes(storedLanguage) ? storedLanguage : "en";
 }
 
 // Toggle between light and dark mode and persist the user's choice so the
@@ -403,13 +488,13 @@ function toggleTheme() {
 }
 
 function applyLanguage(language) {
-  currentLanguage = language === "fr" ? "fr" : "en";
+  const supportedLanguages = ["en", "fr", "de"];
+  currentLanguage = supportedLanguages.includes(language) ? language : "en";
   localStorage.setItem(languageStorageKey, currentLanguage);
-  languageToggle.textContent = currentLanguage === "en" ? "FR" : "EN";
-  languageToggle.setAttribute(
-    "aria-label",
-    currentLanguage === "en" ? "Switch language to French" : "Passer la langue en anglais"
-  );
+  languageOptions.forEach((option) => {
+    const isActive = option.dataset.language === currentLanguage;
+    option.setAttribute("aria-pressed", String(isActive));
+  });
   refreshStaticTranslations();
   applyTheme(document.body.dataset.theme || resolveInitialTheme());
 
@@ -433,8 +518,8 @@ function applyLanguage(language) {
   renderRoomExplorer();
 }
 
-function toggleLanguage() {
-  applyLanguage(currentLanguage === "en" ? "fr" : "en");
+function selectLanguage(language) {
+  applyLanguage(language);
   setStatus(t("language_changed"));
 }
 
@@ -2327,14 +2412,10 @@ function openRoomPanel(roomEntry, weekStart) {
   buildingPanel.classList.remove("is-empty");
   buildingPanel.dataset.mode = "room";
   buildingTimelineEyebrow.textContent = t("room_weekly_title");
-  buildingPanelTitle.textContent = roomEntry.room;
+  buildingPanelTitle.textContent = "";
   buildingPanelCopy.hidden = true;
-  buildingMeta.hidden = false;
-  buildingMeta.innerHTML = `
-    <span><strong>${t("room_building")}:</strong> ${roomEntry.building}</span>
-    <span><strong>${t("room_type")}:</strong> ${formatRoomTypeDisplay(roomEntry.type)}</span>
-    <span><strong>${t("room_week_label")}:</strong> ${formatEuropeanDateInput(weekStart)}</span>
-  `;
+  buildingMeta.hidden = true;
+  buildingMeta.innerHTML = "";
   buildingSummaryChart.hidden = false;
   buildingHeatmapChart.hidden = false;
   timelineShell.hidden = true;
@@ -2382,8 +2463,14 @@ themeToggle.addEventListener("click", () => {
   handleThemeToggle();
 });
 
-languageToggle.addEventListener("click", () => {
-  toggleLanguage();
+languageOptions.forEach((option) => {
+  option.addEventListener("click", () => {
+    if (option.dataset.language === currentLanguage) {
+      return;
+    }
+
+    selectLanguage(option.dataset.language);
+  });
 });
 
 themeToggle.addEventListener("pointerup", (event) => {
@@ -2889,7 +2976,10 @@ function formatRoomHoursLabel(totalMinutes) {
 }
 
 function formatRoomWeekdayLabel(date) {
-  return new Intl.DateTimeFormat(currentLanguage === "fr" ? "fr-CH" : "en-GB", {
+  const locale =
+    currentLanguage === "fr" ? "fr-CH" : currentLanguage === "de" ? "de-CH" : "en-GB";
+
+  return new Intl.DateTimeFormat(locale, {
     weekday: "short",
     day: "2-digit",
     month: "2-digit",
