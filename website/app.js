@@ -49,6 +49,12 @@ const timelineBody = document.getElementById("timelineBody");
 const closeBuildingPanel = document.getElementById("closeBuildingPanel");
 const themeToggle = document.getElementById("themeToggle");
 const languageToggle = document.getElementById("languageToggle");
+const roomInput = document.getElementById("roomInput");
+const roomSuggestions = document.getElementById("roomSuggestions");
+const roomWeekInput = document.getElementById("roomWeekInput");
+const roomWeekTrigger = document.getElementById("roomWeekTrigger");
+const roomSummaryCard = document.getElementById("roomSummaryCard");
+const roomWeeklyChart = document.getElementById("roomWeeklyChart");
 const mapSection = document.getElementById("map-section");
 const mapFrame = document.querySelector(".map-frame");
 const campusAvailabilityChart = document.getElementById("campusAvailabilityChart");
@@ -81,6 +87,13 @@ let startTimePicker = null;
 let endTimePicker = null;
 let activeSegmentTooltip = null;
 let currentLanguage = "en";
+let roomWeekPicker = null;
+let activeRoomSelection = null;
+let activeRoomWeekStart = null;
+
+[...document.querySelectorAll(".datetime-trigger")].forEach((button) => {
+  button.innerHTML = "&#128197;";
+});
 
 const translations = {
   en: {
@@ -98,6 +111,22 @@ const translations = {
     close_panel: "Close panel",
     theme_light: "Light mode",
     theme_dark: "Dark mode",
+    room_explorer_title: "Find by room",
+    room_input_label: "Room",
+    room_input_placeholder: "Search a room",
+    room_week_label: "Week of",
+    room_week_picker: "Open week picker",
+    room_empty_state: "Select a room to inspect its weekly availability.",
+    room_not_found: "Choose a room from the suggestions to see its weekly availability.",
+    room_weekly_title: "Weekly availability",
+    room_free_hours: "Free hours this week",
+    room_best_day: "Best day",
+    room_building: "Building",
+    room_type: "Type",
+    room_all_day_free: "Free all day",
+    room_best_slot: "Best free slot",
+    room_no_free_slot: "No free slot",
+    room_day_free: "{hours} free",
     room_type_conference: "Conference Room",
     room_type_study: "Study Room",
     room_header: "Room",
@@ -159,6 +188,22 @@ const translations = {
     close_panel: "Fermer le panneau",
     theme_light: "Mode clair",
     theme_dark: "Mode sombre",
+    room_explorer_title: "Trouver par salle",
+    room_input_label: "Salle",
+    room_input_placeholder: "Rechercher une salle",
+    room_week_label: "Semaine du",
+    room_week_picker: "Ouvrir le sélecteur de semaine",
+    room_empty_state: "Sélectionnez une salle pour voir sa disponibilité hebdomadaire.",
+    room_not_found: "Choisissez une salle depuis les suggestions pour voir sa disponibilité hebdomadaire.",
+    room_weekly_title: "Disponibilité hebdomadaire",
+    room_free_hours: "Heures libres cette semaine",
+    room_best_day: "Meilleur jour",
+    room_building: "Bâtiment",
+    room_type: "Type",
+    room_all_day_free: "Libre toute la journée",
+    room_best_slot: "Meilleur créneau libre",
+    room_no_free_slot: "Aucun créneau libre",
+    room_day_free: "{hours} libres",
     room_type_conference: "Salle de conférence",
     room_type_study: "Salle d'étude",
     room_header: "Salle",
@@ -266,6 +311,20 @@ function getRoomTypeGroup(roomType) {
   return "other";
 }
 
+function formatRoomTypeDisplay(roomType) {
+  const group = getRoomTypeGroup(roomType);
+
+  if (group === "conference") {
+    return t("room_type_conference");
+  }
+
+  if (group === "study") {
+    return t("room_type_study");
+  }
+
+  return roomType || t("none");
+}
+
 function refreshStaticTranslations() {
   document.documentElement.lang = currentLanguage === "fr" ? "fr" : "en-GB";
   // document.getElementById("searchEyebrow").textContent = t("search_eyebrow");
@@ -278,6 +337,12 @@ function refreshStaticTranslations() {
   document.getElementById("shortcutNow").textContent = t("shortcut_now");
   document.getElementById("shortcutTomorrowMorning").textContent = t("shortcut_tomorrow_morning");
   document.getElementById("shortcutTomorrowAfternoon").textContent = t("shortcut_tomorrow_afternoon");
+  document.getElementById("roomExplorerTitle").textContent = t("room_explorer_title");
+  document.getElementById("roomInputLabel").textContent = t("room_input_label");
+  roomInput.placeholder = t("room_input_placeholder");
+  document.getElementById("roomWeekLabel").textContent = t("room_week_label");
+  roomWeekInput.placeholder = "DD/MM/YYYY";
+  roomWeekTrigger.setAttribute("aria-label", t("room_week_picker"));
   document.getElementById("buildingTimelineEyebrow").textContent = t("building_timeline");
   closeBuildingPanel.setAttribute("aria-label", t("close_panel"));
 
@@ -347,6 +412,8 @@ function applyLanguage(language) {
   if (baseBuildingFeatures.length) {
     renderBuildings(applyAvailabilityToFeatures(baseBuildingFeatures, activeSearchWindow));
   }
+
+  renderRoomExplorer();
 }
 
 function toggleLanguage() {
@@ -2684,6 +2751,524 @@ function formatEuropeanDateTimeInput(date) {
   return `${day}/${month}/${year} ${hour}:${minute}`;
 }
 
+function parseEuropeanDateInput(value) {
+  const match = String(value || "").trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+
+  if (!match) {
+    return new Date(Number.NaN);
+  }
+
+  const [, dayText, monthText, yearText] = match;
+  const day = Number.parseInt(dayText, 10);
+  const month = Number.parseInt(monthText, 10);
+  const year = Number.parseInt(yearText, 10);
+  const date = new Date(year, month - 1, day, 0, 0, 0, 0);
+
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return new Date(Number.NaN);
+  }
+
+  return date;
+}
+
+function formatEuropeanDateInput(date) {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = String(date.getFullYear());
+  return `${day}/${month}/${year}`;
+}
+
+function getStartOfWeek(date) {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  const day = start.getDay();
+  const offset = day === 0 ? -6 : 1 - day;
+  start.setDate(start.getDate() + offset);
+  return start;
+}
+
+function getWeekDates(weekStart) {
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(weekStart);
+    date.setDate(weekStart.getDate() + index);
+    return date;
+  });
+}
+
+function formatRoomHoursLabel(totalMinutes) {
+  const roundedMinutes = Math.max(0, Math.round(totalMinutes));
+  const hours = Math.floor(roundedMinutes / 60);
+  const minutes = roundedMinutes % 60;
+
+  if (!hours) {
+    return currentLanguage === "fr" ? `${minutes} min` : `${minutes}m`;
+  }
+
+  if (!minutes) {
+    return currentLanguage === "fr" ? `${hours} h` : `${hours}h`;
+  }
+
+  return currentLanguage === "fr"
+    ? `${hours} h ${String(minutes).padStart(2, "0")}`
+    : `${hours}h ${String(minutes).padStart(2, "0")}m`;
+}
+
+function formatRoomWeekdayLabel(date) {
+  return new Intl.DateTimeFormat(currentLanguage === "fr" ? "fr-CH" : "en-GB", {
+    weekday: "short",
+    day: "2-digit",
+    month: "2-digit",
+  }).format(date);
+}
+
+function getRoomCatalogue() {
+  return roomsDataset
+    .filter((entry) => Array.isArray(entry) && entry.length >= 2)
+    .map(([room, type]) => ({
+      room,
+      type,
+      building: extractBuildingCodeFromRoom(room) || t("none"),
+      key: normalizeRoomKey(room),
+    }))
+    .filter((entry) => occupancyByRoom.has(entry.key))
+    .sort((left, right) => left.room.localeCompare(right.room, undefined, { sensitivity: "base" }));
+}
+
+function getRoomMetadata(roomName) {
+  const targetKey = normalizeRoomKey(roomName);
+  return getRoomCatalogue().find((entry) => entry.key === targetKey) || null;
+}
+
+function getRoomDayEvents(roomName, date) {
+  const dayStart = new Date(date);
+  dayStart.setHours(0, 0, 0, 0);
+  const dayEnd = new Date(dayStart);
+  dayEnd.setDate(dayEnd.getDate() + 1);
+
+  return getRoomSlots(roomName)
+    .map((slot) => ({
+      title: slot.title || "",
+      start: new Date(slot.startIso),
+      end: new Date(slot.endIso),
+    }))
+    .filter((slot) => slot.end > dayStart && slot.start < dayEnd)
+    .sort((left, right) => left.start.getTime() - right.start.getTime());
+}
+
+function buildDailyOccupiedSegments(events, date) {
+  const dayStart = new Date(date);
+  dayStart.setHours(0, 0, 0, 0);
+  const dayEnd = new Date(dayStart);
+  dayEnd.setDate(dayEnd.getDate() + 1);
+
+  return events.map((event) => {
+    const start = new Date(Math.max(event.start.getTime(), dayStart.getTime()));
+    const end = new Date(Math.min(event.end.getTime(), dayEnd.getTime()));
+
+    return {
+      ...event,
+      startMinutes: minutesWithinDay(start),
+      endMinutes: Math.max(minutesWithinDay(end), end.getTime() === dayEnd.getTime() ? 24 * 60 : 0),
+    };
+  }).filter((segment) => segment.endMinutes > segment.startMinutes);
+}
+
+function mergeOccupiedSegments(segments) {
+  return segments
+    .slice()
+    .sort((left, right) => left.startMinutes - right.startMinutes)
+    .reduce((merged, segment) => {
+      const previous = merged[merged.length - 1];
+
+      if (!previous || segment.startMinutes > previous.endMinutes) {
+        merged.push({ ...segment });
+        return merged;
+      }
+
+      previous.endMinutes = Math.max(previous.endMinutes, segment.endMinutes);
+      if (segment.title && !previous.title) {
+        previous.title = segment.title;
+      }
+      return merged;
+    }, []);
+}
+
+function getDailyFreeMinutes(events, date) {
+  const occupiedMinutes = mergeOccupiedSegments(buildDailyOccupiedSegments(events, date)).reduce(
+    (sum, segment) => sum + (segment.endMinutes - segment.startMinutes),
+    0
+  );
+
+  return Math.max(0, 24 * 60 - occupiedMinutes);
+}
+
+function getBestFreeSegment(events, date) {
+  const occupiedSegments = mergeOccupiedSegments(buildDailyOccupiedSegments(events, date));
+  let cursor = 0;
+  let bestSegment = { startMinutes: 0, endMinutes: 24 * 60 };
+
+  if (!occupiedSegments.length) {
+    return bestSegment;
+  }
+
+  bestSegment = { startMinutes: 0, endMinutes: 0 };
+
+  occupiedSegments.forEach((segment) => {
+    if (segment.startMinutes - cursor > bestSegment.endMinutes - bestSegment.startMinutes) {
+      bestSegment = { startMinutes: cursor, endMinutes: segment.startMinutes };
+    }
+
+    cursor = Math.max(cursor, segment.endMinutes);
+  });
+
+  if (24 * 60 - cursor > bestSegment.endMinutes - bestSegment.startMinutes) {
+    bestSegment = { startMinutes: cursor, endMinutes: 24 * 60 };
+  }
+
+  return bestSegment;
+}
+
+function minutesToClock(minutes) {
+  const safeMinutes = clamp(minutes, 0, 24 * 60);
+  const hours = Math.floor(safeMinutes / 60);
+  const remainder = safeMinutes % 60;
+  return `${String(hours).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
+}
+
+function renderRoomSummaryCard(roomEntry, weekStart) {
+  const weekDates = getWeekDates(weekStart);
+  const dailyStats = weekDates.map((date) => {
+    const events = getRoomDayEvents(roomEntry.room, date);
+    const freeMinutes = getDailyFreeMinutes(events, date);
+    const bestSegment = getBestFreeSegment(events, date);
+
+    return {
+      date,
+      freeMinutes,
+      bestSegment,
+    };
+  });
+
+  const totalFreeMinutes = dailyStats.reduce((sum, day) => sum + day.freeMinutes, 0);
+  const bestDay = dailyStats.reduce((best, day) => (day.freeMinutes > best.freeMinutes ? day : best), dailyStats[0]);
+  const bestSlotDuration = bestDay.bestSegment.endMinutes - bestDay.bestSegment.startMinutes;
+  const bestSlotLabel = bestSlotDuration > 0
+    ? `${minutesToClock(bestDay.bestSegment.startMinutes)} - ${minutesToClock(bestDay.bestSegment.endMinutes)}`
+    : t("room_no_free_slot");
+
+  roomSummaryCard.innerHTML = `
+    <div class="room-summary-head">
+      <div>
+        <p class="room-summary-overline">${t("room_weekly_title")}</p>
+        <h3 class="room-summary-name">${roomEntry.room}</h3>
+        <p class="room-summary-range">${formatEuropeanDateInput(weekDates[0])} - ${formatEuropeanDateInput(weekDates[6])}</p>
+      </div>
+      <div class="room-summary-total">
+        <span class="room-summary-total-value">${formatRoomHoursLabel(totalFreeMinutes)}</span>
+        <span class="room-summary-total-label">${t("room_free_hours")}</span>
+      </div>
+    </div>
+    <div class="room-summary-metadata">
+      <span class="room-summary-pill"><strong>${t("room_building")}</strong>${roomEntry.building}</span>
+      <span class="room-summary-pill"><strong>${t("room_type")}</strong>${formatRoomTypeDisplay(roomEntry.type)}</span>
+      <span class="room-summary-pill"><strong>${t("room_best_day")}</strong>${formatRoomWeekdayLabel(bestDay.date)}</span>
+      <span class="room-summary-pill"><strong>${t("room_best_slot")}</strong>${bestSlotLabel}</span>
+    </div>
+  `;
+}
+
+function renderRoomWeeklyChart(roomEntry, weekStart) {
+  roomWeeklyChart.innerHTML = "";
+
+  const weekDates = getWeekDates(weekStart);
+  const chartWidth = 1120;
+  const margins = { top: 56, right: 88, bottom: 32, left: 108 };
+  const rowHeight = 34;
+  const chartHeight = margins.top + margins.bottom + weekDates.length * rowHeight;
+  const xScale = d3.scaleLinear()
+    .domain([0, 24 * 60])
+    .range([margins.left, chartWidth - margins.right]);
+  const isToday = (date) => {
+    const now = new Date();
+    return date.getFullYear() === now.getFullYear()
+      && date.getMonth() === now.getMonth()
+      && date.getDate() === now.getDate();
+  };
+
+  const svg = d3.select(roomWeeklyChart)
+    .append("svg")
+    .attr("class", "room-weekly-svg")
+    .attr("viewBox", `0 0 ${chartWidth} ${chartHeight}`)
+    .attr("role", "img")
+    .attr("aria-label", `${roomEntry.room} ${t("room_weekly_title").toLowerCase()}`);
+
+  svg.append("text")
+    .attr("class", "room-weekly-chart-title")
+    .attr("x", margins.left)
+    .attr("y", 24)
+    .text(t("room_weekly_title"));
+
+  svg.append("text")
+    .attr("class", "room-weekly-chart-range")
+    .attr("x", margins.left)
+    .attr("y", 44)
+    .text(`${formatEuropeanDateInput(weekDates[0])} - ${formatEuropeanDateInput(weekDates[6])}`);
+
+  const axis = d3.axisTop(xScale)
+    .tickValues(d3.range(0, 24 * 60 + 1, 120))
+    .tickSizeOuter(0)
+    .tickFormat((minutes) => minutes === 24 * 60 ? "24:00" : formatHour(minutes / 60));
+
+  svg.append("g")
+    .attr("class", "room-weekly-axis")
+    .attr("transform", `translate(0, ${margins.top - 12})`)
+    .call(axis)
+    .call((axisGroup) => {
+      axisGroup.selectAll(".tick text")
+        .attr("text-anchor", (minutes) => {
+          if (minutes === 0) {
+            return "start";
+          }
+
+          if (minutes === 24 * 60) {
+            return "end";
+          }
+
+          return "middle";
+        })
+        .attr("dx", (minutes) => {
+          if (minutes === 0) {
+            return "10px";
+          }
+
+          if (minutes === 24 * 60) {
+            return "-10px";
+          }
+
+          return "0";
+        });
+    });
+
+  svg.append("g")
+    .selectAll("line")
+    .data(d3.range(0, 24 * 60 + 1, 60))
+    .join("line")
+    .attr("class", (minutes) => minutes % 120 === 0 ? "room-weekly-hour-line major" : "room-weekly-hour-line")
+    .attr("x1", (minutes) => xScale(minutes))
+    .attr("x2", (minutes) => xScale(minutes))
+    .attr("y1", margins.top)
+    .attr("y2", chartHeight - margins.bottom);
+
+  const rows = svg.append("g")
+    .selectAll("g")
+    .data(weekDates.map((date) => {
+      const events = getRoomDayEvents(roomEntry.room, date);
+      return {
+        date,
+        events,
+        occupied: buildDailyOccupiedSegments(events, date),
+        freeMinutes: getDailyFreeMinutes(events, date),
+      };
+    }))
+    .join("g")
+    .attr("class", "room-weekly-row")
+    .attr("transform", (_, index) => `translate(0, ${margins.top + index * rowHeight})`);
+
+  rows.append("rect")
+    .attr("class", (row) => isToday(row.date) ? "room-weekly-track today" : "room-weekly-track")
+    .attr("x", margins.left)
+    .attr("y", 5)
+    .attr("width", xScale(24 * 60) - xScale(0))
+    .attr("height", 22)
+    .attr("rx", 11);
+
+  rows.append("text")
+    .attr("class", "room-weekly-day-label")
+    .attr("x", margins.left - 14)
+    .attr("y", 20)
+    .attr("text-anchor", "end")
+    .text((row) => formatRoomWeekdayLabel(row.date));
+
+  rows.append("text")
+    .attr("class", "room-weekly-free-label")
+    .attr("x", chartWidth - 12)
+    .attr("y", 20)
+    .attr("text-anchor", "end")
+    .text((row) => t("room_day_free", { hours: formatRoomHoursLabel(row.freeMinutes) }));
+
+  rows.each(function(row) {
+    const rowGroup = d3.select(this);
+
+    rowGroup.selectAll("rect.room-weekly-occupied")
+      .data(row.occupied)
+      .join("rect")
+      .attr("class", "room-weekly-occupied")
+      .attr("x", (segment) => xScale(segment.startMinutes))
+      .attr("y", 7)
+      .attr("width", (segment) => Math.max(4, xScale(segment.endMinutes) - xScale(segment.startMinutes)))
+      .attr("height", 18)
+      .attr("rx", 9)
+      .append("title")
+      .text((segment) => {
+        const title = segment.title ? ` - ${segment.title}` : "";
+        return `${minutesToClock(segment.startMinutes)} - ${minutesToClock(segment.endMinutes)}${title}`;
+      });
+
+    const bestSegment = getBestFreeSegment(row.events, row.date);
+
+    if (bestSegment.endMinutes > bestSegment.startMinutes) {
+      rowGroup.append("rect")
+        .attr("class", "room-weekly-free-highlight")
+        .attr("x", xScale(bestSegment.startMinutes))
+        .attr("y", 10)
+        .attr("width", Math.max(2, xScale(bestSegment.endMinutes) - xScale(bestSegment.startMinutes)))
+        .attr("height", 12)
+        .attr("rx", 6)
+        .append("title")
+        .text(
+          bestSegment.endMinutes - bestSegment.startMinutes >= 24 * 60
+            ? t("room_all_day_free")
+            : `${t("room_best_slot")}: ${minutesToClock(bestSegment.startMinutes)} - ${minutesToClock(bestSegment.endMinutes)}`
+        );
+    }
+  });
+}
+
+function renderRoomExplorerEmpty(message) {
+  roomSummaryCard.innerHTML = `<p class="room-empty-state">${message}</p>`;
+  roomWeeklyChart.innerHTML = "";
+}
+
+function renderRoomExplorer() {
+  if (!roomsDataset.length || !occupancyByRoom.size) {
+    renderRoomExplorerEmpty(t("room_empty_state"));
+    return;
+  }
+
+  if (!activeRoomSelection) {
+    renderRoomExplorerEmpty(t("room_empty_state"));
+    return;
+  }
+
+  const roomEntry = getRoomMetadata(activeRoomSelection.room || activeRoomSelection);
+
+  if (!roomEntry) {
+    renderRoomExplorerEmpty(t("room_not_found"));
+    return;
+  }
+
+  const weekStart = activeRoomWeekStart || getStartOfWeek(new Date());
+  renderRoomSummaryCard(roomEntry, weekStart);
+  renderRoomWeeklyChart(roomEntry, weekStart);
+}
+
+function initializeRoomExplorer() {
+  const roomCatalogue = getRoomCatalogue();
+  roomSuggestions.innerHTML = "";
+  roomCatalogue.forEach((entry) => {
+    const option = document.createElement("option");
+    option.value = entry.room;
+    roomSuggestions.appendChild(option);
+  });
+
+  if (!activeRoomWeekStart) {
+    activeRoomWeekStart = getStartOfWeek(new Date());
+  }
+
+  roomWeekInput.value = formatEuropeanDateInput(activeRoomWeekStart);
+
+  if (typeof flatpickr === "function") {
+    roomWeekPicker = flatpickr("#roomWeekInput", {
+      enableTime: false,
+      allowInput: true,
+      dateFormat: "d/m/Y",
+      disableMobile: true,
+      defaultDate: activeRoomWeekStart,
+      parseDate: parseEuropeanDateInput,
+      formatDate: formatEuropeanDateInput,
+      onChange: ([selectedDate]) => {
+        if (!selectedDate) {
+          return;
+        }
+
+        activeRoomWeekStart = getStartOfWeek(selectedDate);
+        roomWeekInput.value = formatEuropeanDateInput(activeRoomWeekStart);
+        renderRoomExplorer();
+      },
+      onClose: () => {
+        const typedDate = parseEuropeanDateInput(roomWeekInput.value);
+
+        if (Number.isNaN(typedDate.getTime())) {
+          roomWeekInput.value = formatEuropeanDateInput(activeRoomWeekStart || getStartOfWeek(new Date()));
+          return;
+        }
+
+        activeRoomWeekStart = getStartOfWeek(typedDate);
+        roomWeekInput.value = formatEuropeanDateInput(activeRoomWeekStart);
+        renderRoomExplorer();
+      },
+    });
+  }
+
+  const commitRoomSelection = () => {
+    const roomEntry = getRoomMetadata(roomInput.value);
+
+    if (!roomInput.value.trim()) {
+      activeRoomSelection = null;
+      renderRoomExplorer();
+      return;
+    }
+
+    if (!roomEntry) {
+      activeRoomSelection = { room: roomInput.value.trim() };
+      renderRoomExplorer();
+      return;
+    }
+
+    activeRoomSelection = roomEntry;
+    roomInput.value = roomEntry.room;
+    renderRoomExplorer();
+  };
+
+  roomInput.addEventListener("change", commitRoomSelection);
+  roomInput.addEventListener("blur", commitRoomSelection);
+  roomInput.addEventListener("input", () => {
+    const roomEntry = getRoomMetadata(roomInput.value);
+
+    if (roomEntry) {
+      activeRoomSelection = roomEntry;
+      renderRoomExplorer();
+      return;
+    }
+
+    if (!roomInput.value.trim()) {
+      activeRoomSelection = null;
+      renderRoomExplorer();
+    }
+  });
+
+  roomWeekInput.addEventListener("change", () => {
+    const typedDate = parseEuropeanDateInput(roomWeekInput.value);
+
+    if (Number.isNaN(typedDate.getTime())) {
+      roomWeekInput.value = formatEuropeanDateInput(activeRoomWeekStart || getStartOfWeek(new Date()));
+      return;
+    }
+
+    activeRoomWeekStart = getStartOfWeek(typedDate);
+    roomWeekInput.value = formatEuropeanDateInput(activeRoomWeekStart);
+    renderRoomExplorer();
+  });
+
+  roomWeekTrigger.addEventListener("click", () => {
+    roomWeekPicker?.open();
+  });
+}
+
 // If the requested meeting duration is longer than the chosen search window,
 // automatically extend the end time so the window is at least that long.
 function ensureRangeCanFitDuration() {
@@ -2785,10 +3370,14 @@ function initializeDateTimePickers() {
   });
 
   // The explicit calendar buttons open the matching picker on demand.
-  document.querySelectorAll(".datetime-trigger").forEach((button) => {
+  document.querySelectorAll(".datetime-trigger[data-picker-target]").forEach((button) => {
     button.addEventListener("click", () => {
       const targetId = button.dataset.pickerTarget;
-      const picker = targetId === "startTime" ? startTimePicker : endTimePicker;
+      const picker = targetId === "startTime"
+        ? startTimePicker
+        : targetId === "endTime"
+          ? endTimePicker
+          : null;
       picker?.open();
     });
   });
@@ -2994,6 +3583,8 @@ async function initializeApp() {
 
     roomsDataset = rooms;
     occupancyByRoom = indexOccupancyByRoom(occupancy);
+    initializeRoomExplorer();
+    renderRoomExplorer();
 
     baseBuildingFeatures = await buildFeaturesFromRecords(records);
     activeSearchWindow = getSearchWindowFromForm();

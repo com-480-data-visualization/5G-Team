@@ -285,6 +285,61 @@
             Search is currently in demo mode. It updates the summary but does
             not fetch live room data yet.
           </p>
+
+          <div class="panel-section-divider panel-section-divider-room" aria-hidden="true"></div>
+
+          <section class="room-explorer" id="roomExplorer" aria-labelledby="roomExplorerTitle">
+            <div class="search-heading room-explorer-heading">
+              <div>
+                <h2 id="roomExplorerTitle">Find by room</h2>
+              </div>
+            </div>
+
+            <div class="room-explorer-controls">
+              <label>
+                <span id="roomInputLabel">Room</span>
+                <input
+                  type="text"
+                  id="roomInput"
+                  name="roomInput"
+                  list="roomSuggestions"
+                  autocomplete="off"
+                  placeholder="Search a room"
+                />
+                <datalist id="roomSuggestions"></datalist>
+              </label>
+
+              <label>
+                <span id="roomWeekLabel">Week of</span>
+                <div class="datetime-picker room-week-picker">
+                  <input
+                    type="text"
+                    id="roomWeekInput"
+                    name="roomWeekInput"
+                    inputmode="numeric"
+                    placeholder="DD/MM/YYYY"
+                    autocomplete="off"
+                  />
+                  <button
+                    class="datetime-trigger"
+                    type="button"
+                    id="roomWeekTrigger"
+                    aria-label="Open week picker"
+                  >
+                    馃搮
+                  </button>
+                </div>
+              </label>
+            </div>
+
+            <div class="room-summary-card" id="roomSummaryCard">
+              <p class="room-empty-state" id="roomEmptyState">
+                Select a room to inspect its weekly availability.
+              </p>
+            </div>
+
+            <div class="room-weekly-chart" id="roomWeeklyChart"></div>
+          </section>
         </section>
 
         <!-- Map area: the map frame contains both the map and the room timeline panel. -->

@@ -542,6 +542,232 @@ select {
   border: 1px solid var(--status-border);
 }
 
+.panel-section-divider-room {
+  margin-top: 22px;
+}
+
+.room-explorer {
+  display: grid;
+  gap: 16px;
+}
+
+.room-explorer-heading {
+  margin-bottom: 0;
+}
+
+.room-explorer-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.room-explorer-controls label {
+  display: grid;
+  gap: 8px;
+}
+
+.room-explorer-controls span {
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.room-explorer-controls input {
+  width: 100%;
+  padding: 16px 18px;
+  color: var(--text);
+  border-radius: 18px;
+  border: 1px solid var(--field-border);
+  background: var(--field-bg);
+  outline: none;
+}
+
+.room-explorer-controls input:focus {
+  border-color: var(--focus-border);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.room-week-picker {
+  border-radius: 18px;
+}
+
+.room-week-picker input {
+  border-radius: 18px 0 0 18px;
+}
+
+.room-week-picker .datetime-trigger {
+  border-top-right-radius: 18px;
+  border-bottom-right-radius: 18px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.room-summary-card,
+.room-weekly-chart {
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: linear-gradient(180deg, var(--surface-tint-2), var(--surface-tint-1));
+}
+
+.room-summary-card {
+  padding: 18px;
+}
+
+.room-empty-state {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.room-summary-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.room-summary-overline,
+.room-summary-range {
+  margin: 0;
+  color: var(--muted);
+}
+
+.room-summary-overline {
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.room-summary-name {
+  margin: 6px 0 4px;
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+
+.room-summary-range {
+  font-size: 0.88rem;
+}
+
+.room-summary-total {
+  display: grid;
+  gap: 4px;
+  min-width: 120px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--accent-soft) 58%, var(--panel-soft) 42%);
+  text-align: right;
+}
+
+.room-summary-total-value {
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.room-summary-total-label {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.room-summary-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.room-summary-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: var(--surface-tint-2);
+  color: var(--text);
+  font-size: 0.84rem;
+}
+
+.room-summary-pill strong {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.room-weekly-chart {
+  padding: 14px 14px 10px;
+  overflow-x: auto;
+}
+
+.room-weekly-svg {
+  display: block;
+  width: 100%;
+  min-width: 980px;
+  height: auto;
+}
+
+.room-weekly-chart-title {
+  fill: var(--text);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.room-weekly-chart-range {
+  fill: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.room-weekly-axis path,
+.room-weekly-axis line {
+  stroke: var(--timeline-grid-line);
+}
+
+.room-weekly-axis text {
+  fill: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.room-weekly-hour-line {
+  stroke: var(--timeline-grid-line);
+  stroke-width: 1;
+}
+
+.room-weekly-hour-line.major {
+  stroke: color-mix(in srgb, var(--timeline-grid-line) 58%, var(--text) 42%);
+}
+
+.room-weekly-track {
+  fill: var(--timeline-grid-bg);
+  stroke: var(--border);
+}
+
+.room-weekly-track.today {
+  fill: color-mix(in srgb, var(--accent-soft) 46%, var(--timeline-grid-bg) 54%);
+}
+
+.room-weekly-occupied {
+  fill: color-mix(in srgb, var(--timeline-occupied-bg) 88%, #ff847f 12%);
+  stroke: var(--timeline-occupied-border);
+}
+
+.room-weekly-free-highlight {
+  fill: color-mix(in srgb, var(--timeline-available-bg) 76%, transparent 24%);
+}
+
+.room-weekly-day-label,
+.room-weekly-free-label {
+  fill: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
 .map-section {
   /* The map area is now a single full-width frame. */
   display: block;
@@ -1358,6 +1584,10 @@ select {
     grid-template-columns: 1fr;
   }
 
+  .room-explorer-controls {
+    grid-template-columns: 1fr;
+  }
+
   .panel-title-row {
     align-items: flex-start;
     flex-wrap: wrap;
@@ -1423,5 +1653,18 @@ select {
 
   .timeline-grid {
     min-height: 64px;
+  }
+
+  .room-summary-head {
+    flex-direction: column;
+  }
+
+  .room-summary-total {
+    width: 100%;
+    text-align: left;
+  }
+
+  .room-weekly-chart {
+    padding-inline: 10px;
   }
 }
