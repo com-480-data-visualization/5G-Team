@@ -175,7 +175,7 @@ const translations = {
   },
   fr: {
     // search_eyebrow: "Disponibilité des salles",
-    search_title: "Find by time",
+    search_title: "Trouver par heure",
     start_label: "Début",
     end_label: "Fin",
     duration_label: "Durée",

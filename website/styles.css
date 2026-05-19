@@ -591,7 +591,15 @@ select {
 }
 
 .room-week-picker input {
+  border: 0;
   border-radius: 18px 0 0 18px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.room-week-picker input:focus {
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .room-week-picker .datetime-trigger {
