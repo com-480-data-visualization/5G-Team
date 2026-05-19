@@ -57,18 +57,9 @@
       <main class="content">
         <!-- Search section: this is where the future room query will begin. -->
         <section class="search-panel" id="search-panel">
-          <!-- Section heading explains the purpose of the form. -->
-          <div class="search-heading">
-            <div>
-              <p class="eyebrow" id="searchEyebrow">Meeting availability</p>
-              <h2 id="searchTitle">Find free rooms across the EPFL campus</h2>
-            </div>
-            <div class="search-heading-meta">
-              <!-- <p class="search-copy">
-                Enter a start date, end date, and meeting duration. The current
-                prototype keeps the form UI and map flow in place while the real
-                room-availability backend is still to be connected.
-              </p> -->
+          <div class="panel-title-row">
+            <h1 class="app-title">EPFL Room Finder</h1>
+            <div class="panel-title-actions">
               <button class="ghost-button language-toggle" id="languageToggle" type="button" aria-label="Switch language">
                 FR
               </button>
@@ -80,8 +71,18 @@
                 aria-label="Toggle theme"
                 title="Toggle theme"
               >
-                ☾
+                鈽?
               </button>
+            </div>
+          </div>
+
+          <div class="panel-section-divider" aria-hidden="true"></div>
+
+          <!-- Section heading explains the purpose of the form. -->
+          <div class="search-heading">
+            <div>
+              <!-- <p class="eyebrow" id="searchEyebrow">Meeting availability</p> -->
+              <h2 id="searchTitle">Find free rooms across the EPFL campus</h2>
             </div>
           </div>
 

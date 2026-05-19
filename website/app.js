@@ -84,8 +84,8 @@ let currentLanguage = "en";
 
 const translations = {
   en: {
-    search_eyebrow: "Meeting availability",
-    search_title: "Find free rooms across the EPFL campus",
+    // search_eyebrow: "Meeting availability",
+    search_title: "Find by time",
     start_label: "Beginning",
     end_label: "End",
     duration_label: "Duration",
@@ -145,8 +145,8 @@ const translations = {
     occupied_slot: "{start} - {end} occupied{title}",
   },
   fr: {
-    search_eyebrow: "Disponibilité des salles",
-    search_title: "Trouvez des salles libres sur le campus de l'EPFL",
+    // search_eyebrow: "Disponibilité des salles",
+    search_title: "Find by time",
     start_label: "Début",
     end_label: "Fin",
     duration_label: "Durée",
@@ -268,7 +268,7 @@ function getRoomTypeGroup(roomType) {
 
 function refreshStaticTranslations() {
   document.documentElement.lang = currentLanguage === "fr" ? "fr" : "en-GB";
-  document.getElementById("searchEyebrow").textContent = t("search_eyebrow");
+  // document.getElementById("searchEyebrow").textContent = t("search_eyebrow");
   document.getElementById("searchTitle").textContent = t("search_title");
   document.getElementById("startTimeLabel").textContent = t("start_label");
   document.getElementById("endTimeLabel").textContent = t("end_label");
@@ -1467,6 +1467,12 @@ function renderBuildingHeatmapChart(rooms) {
   const legendY = chartHeight - 10;
   const legendWidth = 248;
   const legendX = plotX + heatmapWidth / 2 - legendWidth / 2;
+  const legendSwatchWidth = 15;
+  const legendSwatchGap = 2;
+  const legendSwatchCount = 8;
+  const legendStripWidth =
+    legendSwatchCount * legendSwatchWidth + (legendSwatchCount - 1) * legendSwatchGap;
+  const legendStripX = (legendWidth - legendStripWidth) / 2;
   const legend = svg.append("g")
     .attr("class", "building-heatmap-legend")
     .attr("transform", `translate(${legendX}, ${legendY})`);
@@ -1479,9 +1485,9 @@ function renderBuildingHeatmapChart(rooms) {
 
   d3.range(0, 8).forEach((step) => {
     legend.append("rect")
-      .attr("x", 52 + step * 17)
+      .attr("x", legendStripX + step * (legendSwatchWidth + legendSwatchGap))
       .attr("y", -11)
-      .attr("width", 15)
+      .attr("width", legendSwatchWidth)
       .attr("height", 10)
       .attr("rx", 3)
       .attr("fill", colorScale(step / 7));

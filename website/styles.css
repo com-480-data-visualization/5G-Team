@@ -241,24 +241,46 @@ select {
   border-radius: 28px;
 }
 
-.search-heading {
-  /* Heading and explanatory text sit side by side on wide screens. */
+.app-title {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.85rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  white-space: nowrap;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.panel-title-row {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 20px;
-}
-
-.search-heading-meta {
-  /* Groups helper text and the theme toggle in the search panel header. */
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
+  gap: 16px;
+  margin-bottom: 18px;
   flex-wrap: nowrap;
-  gap: 12px;
 }
 
-.search-heading-meta .theme-toggle {
+.panel-section-divider {
+  height: 1px;
+  margin: 0 0 18px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--border) 12%,
+    var(--border) 88%,
+    transparent 100%
+  );
+}
+
+.panel-title-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.panel-title-actions .theme-toggle {
   width: 46px;
   min-width: 46px;
   height: 46px;
@@ -267,6 +289,14 @@ select {
   place-items: center;
   font-size: 1.15rem;
   line-height: 1;
+}
+
+.search-heading {
+  /* Heading and explanatory text sit side by side on wide screens. */
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 20px;
 }
 
 .search-copy,
@@ -909,13 +939,13 @@ select {
 
 .building-summary-donut-value {
   fill: var(--text);
-  font-size: 1.05rem;
+  font-size: 0.88rem;
   font-weight: 900;
 }
 
 .building-summary-donut-label {
   fill: var(--muted);
-  font-size: 0.68rem;
+  font-size: 0.5rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -1326,6 +1356,11 @@ select {
 
   .search-controls {
     grid-template-columns: 1fr;
+  }
+
+  .panel-title-row {
+    align-items: flex-start;
+    flex-wrap: wrap;
   }
 
   .brand-group {
