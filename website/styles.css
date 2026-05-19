@@ -1065,6 +1065,53 @@ select {
   color: var(--muted);
 }
 
+.room-popup-chart {
+  width: 190px;
+  margin: 8px 0 7px;
+}
+
+.room-popup-chart-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.room-popup-chart-value {
+  fill: var(--text);
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
+.room-popup-chart-label {
+  fill: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.room-popup-chart-track {
+  fill: var(--surface-tint-4);
+}
+
+.room-popup-chart-available {
+  fill: var(--timeline-available-bg);
+  stroke: var(--timeline-available-border);
+  stroke-width: 1;
+}
+
+.room-popup-chart-unavailable {
+  fill: var(--timeline-occupied-bg);
+  stroke: var(--timeline-occupied-border);
+  stroke-width: 1;
+}
+
+.room-popup-chart-dot {
+  stroke: var(--popup-bg);
+  stroke-width: 2;
+}
+
 @media (max-width: 1100px) {
   /* Tablet layout: stack major sections vertically and reduce column count. */
   .topbar,

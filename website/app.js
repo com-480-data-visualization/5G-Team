@@ -14,6 +14,7 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 
 // Reference to the currently rendered building layer on the map.
 let buildingLayer;
+let previousBuildingScores = new Map();
 
 // LocalStorage key for cached building geometry fetched from OSM.
 const osmGeometryCacheKey = "epfl-building-geometry-v2";
@@ -406,20 +407,16 @@ function buildAvailability(name) {
 }
 
 // Map fill colors for the building heatmap.
-// Instead of discrete buckets, interpolate smoothly from red (low availability)
-// to green (high availability).
+// D3 owns the same red-to-green availability scale used by the map overlays.
 function getColor(score) {
   const clamped = clamp(score, 0, 1);
-  const hue = clamped * 120;
-  return `hsl(${hue}, 62%, 42%)`;
+  return d3.scaleSequential(d3.interpolateRdYlGn).domain([0, 1])(clamped);
 }
 
 // Slightly lighter outline colors so the polygon edges stay readable.
-// We keep the same hue as the fill but increase lightness and reduce saturation.
 function getBorderColor(score) {
-  const clamped = clamp(score, 0, 1);
-  const hue = clamped * 120;
-  return `hsl(${hue}, 46%, 68%)`;
+  const color = d3.color(getColor(score));
+  return color ? color.brighter(0.65).formatHex() : getColor(score);
 }
 
 // Parse an OpenStreetMap URL like:
@@ -567,12 +564,15 @@ async function buildFeaturesFromRecords(records) {
 
 // Leaflet style callback for one building polygon.
 function styleFeature(feature) {
-  const { score } = feature.properties;
+  const { name, score } = feature.properties;
+  const renderedScore = previousBuildingScores.has(name)
+    ? previousBuildingScores.get(name)
+    : score;
 
   return {
-    color: getBorderColor(score),
+    color: getBorderColor(renderedScore),
     weight: 1.2,
-    fillColor: getColor(score),
+    fillColor: getColor(renderedScore),
     fillOpacity: 0.42,
   };
 }
@@ -2051,6 +2051,150 @@ function refreshOpenBuildingPanel() {
   openBuildingPanel(activeBuildingSelection, rooms);
 }
 
+function createPopupChartId(buildingName) {
+  return `room-popup-chart-${normalizeBuildingCode(buildingName) || "building"}`;
+}
+
+function renderPopupAvailabilityChart(container, availableRooms, totalRooms) {
+  container.innerHTML = "";
+
+  const unavailableRooms = Math.max(0, totalRooms - availableRooms);
+  const score = totalRooms ? availableRooms / totalRooms : 0;
+  const width = 190;
+  const height = 54;
+  const barX = 0;
+  const barY = 28;
+  const barWidth = 188;
+  const barHeight = 12;
+
+  const svg = d3.select(container)
+    .append("svg")
+    .attr("class", "room-popup-chart-svg")
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("role", "img")
+    .attr("aria-label", t("availability_in_window", {
+      available: availableRooms,
+      rooms: totalRooms,
+    }));
+
+  svg.append("text")
+    .attr("class", "room-popup-chart-value")
+    .attr("x", 0)
+    .attr("y", 14)
+    .text(`${availableRooms}/${totalRooms}`);
+
+  svg.append("text")
+    .attr("class", "room-popup-chart-label")
+    .attr("x", 48)
+    .attr("y", 14)
+    .text(t("available"));
+
+  svg.append("rect")
+    .attr("class", "room-popup-chart-track")
+    .attr("x", barX)
+    .attr("y", barY)
+    .attr("width", barWidth)
+    .attr("height", barHeight)
+    .attr("rx", 6);
+
+  svg.append("rect")
+    .attr("class", "room-popup-chart-unavailable")
+    .attr("x", barX + score * barWidth)
+    .attr("y", barY)
+    .attr("width", 0)
+    .attr("height", barHeight)
+    .attr("rx", 6)
+    .transition()
+    .duration(520)
+    .attr("width", totalRooms ? (unavailableRooms / totalRooms) * barWidth : 0);
+
+  svg.append("rect")
+    .attr("class", "room-popup-chart-available")
+    .attr("x", barX)
+    .attr("y", barY)
+    .attr("width", 0)
+    .attr("height", barHeight)
+    .attr("rx", 6)
+    .transition()
+    .duration(520)
+    .attr("width", score * barWidth);
+
+  svg.append("circle")
+    .attr("class", "room-popup-chart-dot")
+    .attr("cx", score * barWidth)
+    .attr("cy", barY + barHeight / 2)
+    .attr("r", 0)
+    .attr("fill", getColor(score))
+    .transition()
+    .delay(260)
+    .duration(320)
+    .attr("r", 5);
+}
+
+function buildBuildingPopupContent(feature) {
+  const { name, availableRooms, rooms } = feature.properties;
+  const chartId = createPopupChartId(name);
+
+  return `
+    <div class="room-popup">
+      <h4>${name}</h4>
+      <div class="room-popup-chart" id="${chartId}"></div>
+      <p>${t("availability_in_window", { available: availableRooms, rooms })}</p>
+      <p><a href="${buildPlanEpflUrl(name)}" target="_blank" rel="noreferrer">${t("open_on_plan")}</a></p>
+    </div>
+  `;
+}
+
+function animateBuildingLayerStyles(features) {
+  const nextScores = new Map(features.map((feature) => [
+    feature.properties.name,
+    feature.properties.score,
+  ]));
+
+  buildingLayer.eachLayer((layer) => {
+    const element = layer.getElement?.();
+    const feature = layer.feature;
+
+    if (!element || !feature?.properties) {
+      return;
+    }
+
+    const { name, score } = feature.properties;
+    const previousScore = previousBuildingScores.has(name)
+      ? previousBuildingScores.get(name)
+      : score;
+    const fillInterpolator = d3.interpolateRgb(getColor(previousScore), getColor(score));
+    const borderInterpolator = d3.interpolateRgb(getBorderColor(previousScore), getBorderColor(score));
+    const isStrongOption = score >= 0.8 && score > previousScore;
+
+    d3.select(element)
+      .interrupt()
+      .transition()
+      .duration(720)
+      .ease(d3.easeCubicOut)
+      .attrTween("fill", () => fillInterpolator)
+      .attrTween("stroke", () => borderInterpolator)
+      .attr("fill-opacity", 0.46)
+      .on("end", () => {
+        if (!isStrongOption) {
+          return;
+        }
+
+        d3.select(element)
+          .transition()
+          .duration(180)
+          .attr("stroke-width", 3)
+          .attr("fill-opacity", 0.68)
+          .transition()
+          .duration(420)
+          .attr("stroke-width", 1.2)
+          .attr("fill-opacity", 0.42);
+      });
+  });
+
+  previousBuildingScores = nextScores;
+}
+
 // Leaflet feature callback for each building polygon.
 // This wires hover feedback, popup content, and click-to-open behavior.
 function onEachFeature(feature, layer) {
@@ -2061,13 +2205,14 @@ function onEachFeature(feature, layer) {
   // On touch/mobile we skip it, because popup autopan competes with the
   // custom building panel and can make the map jump around awkwardly.
   if (enableMapPopup) {
-    layer.bindPopup(`
-      <div class="room-popup">
-        <h4>${name}</h4>
-        <p>${t("availability_in_window", { available: availableRooms, rooms })}</p>
-        <p><a href="${buildPlanEpflUrl(name)}" target="_blank" rel="noreferrer">${t("open_on_plan")}</a></p>
-      </div>
-    `);
+    layer.bindPopup(buildBuildingPopupContent(feature));
+    layer.on("popupopen", () => {
+      const chart = document.getElementById(createPopupChartId(name));
+
+      if (chart) {
+        renderPopupAvailabilityChart(chart, availableRooms, rooms);
+      }
+    });
   }
 
   layer.on("mouseover", () => {
@@ -2110,6 +2255,8 @@ function renderBuildings(features) {
       onEachFeature,
     }
   ).addTo(map);
+
+  animateBuildingLayerStyles(features);
 
   // Leaflet computes the bounds from the real rendered geometry.
   // On mobile we still zoom in a bit after fitting so the campus is easier to
