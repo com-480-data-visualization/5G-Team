@@ -535,62 +535,6 @@ select {
   min-height: min(78vh, 920px);
 }
 
-.map-availability-bubbles {
-  position: absolute;
-  inset: 0;
-  z-index: 450;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.map-availability-bubble {
-  pointer-events: none;
-  transition: opacity 160ms ease;
-}
-
-.map-availability-bubble.is-hidden {
-  opacity: 0;
-}
-
-.map-availability-bubble-halo {
-  opacity: 0.12;
-  transform-box: fill-box;
-  transform-origin: center;
-}
-
-.map-availability-bubble-halo.is-strong {
-  animation: bubble-pulse 1.8s ease-in-out infinite;
-}
-
-.map-availability-bubble-core {
-  fill-opacity: 0.9;
-  stroke: rgba(255, 255, 255, 0.78);
-  stroke-width: 1.5;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.24));
-}
-
-.map-availability-bubble-label {
-  fill: #ffffff;
-  font-weight: 900;
-  letter-spacing: 0.02em;
-  paint-order: stroke;
-  stroke: rgba(0, 0, 0, 0.42);
-  stroke-width: 2;
-}
-
-@keyframes bubble-pulse {
-  0%,
-  100% {
-    opacity: 0.12;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 0.28;
-    transform: scale(1.18);
-  }
-}
-
 .campus-availability-chart {
   position: absolute;
   left: 18px;
@@ -695,6 +639,10 @@ select {
   border-radius: 24px;
   overflow: hidden;
   min-height: 0;
+}
+
+.building-panel[hidden] {
+  display: none;
 }
 
 .building-panel.is-empty {
