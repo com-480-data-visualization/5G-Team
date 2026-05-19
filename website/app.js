@@ -33,6 +33,7 @@ const buildingPanel = document.getElementById("buildingPanel");
 const buildingPanelTitle = document.getElementById("buildingPanelTitle");
 const buildingPanelCopy = document.getElementById("buildingPanelCopy");
 const buildingMeta = document.getElementById("buildingMeta");
+const buildingSummaryChart = document.getElementById("buildingSummaryChart");
 const timelineHeader = document.getElementById("timelineHeader");
 const timelineBody = document.getElementById("timelineBody");
 const closeBuildingPanel = document.getElementById("closeBuildingPanel");
@@ -89,6 +90,8 @@ const translations = {
     room_header: "Room",
     available: "Available",
     unavailable: "Unavailable",
+    summary_title: "Room summary",
+    all_rooms: "All rooms",
     none: "None",
     no_occupancy: "No occupancy data yet",
     no_room_found: "No room found",
@@ -138,6 +141,8 @@ const translations = {
     room_header: "Salle",
     available: "Disponible",
     unavailable: "Indisponible",
+    summary_title: "Résumé des salles",
+    all_rooms: "Toutes les salles",
     none: "Aucune",
     no_occupancy: "Pas encore de données d'occupation",
     no_room_found: "Aucune salle trouvée",
@@ -214,6 +219,18 @@ function formatAvailabilityCountLabel(count, key) {
     return `${count} ${t(key).toLowerCase()}${count > 1 ? "s" : ""}`;
   }
   return `${count} ${t(key).toLowerCase()}`;
+}
+
+function getRoomTypeGroup(roomType) {
+  if (ROOM_TYPE_GROUPS.conference.has(roomType)) {
+    return "conference";
+  }
+
+  if (ROOM_TYPE_GROUPS.study.has(roomType)) {
+    return "study";
+  }
+
+  return "other";
 }
 
 function refreshStaticTranslations() {
@@ -1023,6 +1040,137 @@ function splitRoomsByAvailability(rooms, searchWindow, durationMinutes) {
   return { available, unavailable };
 }
 
+function buildBuildingSummaryRows(available, unavailable) {
+  const rows = [
+    {
+      key: "all",
+      label: t("all_rooms"),
+      available: available.length,
+      unavailable: unavailable.length,
+    },
+  ];
+
+  [
+    { key: "conference", label: t("room_type_conference") },
+    { key: "study", label: t("room_type_study") },
+  ].forEach((group) => {
+    const availableCount = available.filter((room) => getRoomTypeGroup(room.type) === group.key).length;
+    const unavailableCount = unavailable.filter((room) => getRoomTypeGroup(room.type) === group.key).length;
+
+    if (availableCount || unavailableCount) {
+      rows.push({
+        key: group.key,
+        label: group.label,
+        available: availableCount,
+        unavailable: unavailableCount,
+      });
+    }
+  });
+
+  return rows.map((row) => ({
+    ...row,
+    total: row.available + row.unavailable,
+  }));
+}
+
+function renderBuildingSummaryChart(available, unavailable) {
+  buildingSummaryChart.innerHTML = "";
+
+  const rows = buildBuildingSummaryRows(available, unavailable);
+  const chartWidth = 520;
+  const rowHeight = 30;
+  const headerHeight = 28;
+  const footerHeight = 22;
+  const labelWidth = 132;
+  const chartHeight = headerHeight + rows.length * rowHeight + footerHeight;
+  const valueWidth = 48;
+  const barGap = 12;
+  const barWidth = chartWidth - labelWidth - valueWidth - barGap;
+
+  const svg = d3.select(buildingSummaryChart)
+    .append("svg")
+    .attr("class", "building-summary-svg")
+    .attr("viewBox", `0 0 ${chartWidth} ${chartHeight}`)
+    .attr("role", "img")
+    .attr(
+      "aria-label",
+      `${t("summary_title")}: ${available.length} ${t("available").toLowerCase()}, ${unavailable.length} ${t("unavailable").toLowerCase()}`
+    );
+
+  svg.append("text")
+    .attr("class", "building-summary-title")
+    .attr("x", 0)
+    .attr("y", 18)
+    .text(t("summary_title"));
+
+  const rowGroups = svg.append("g")
+    .attr("transform", `translate(0, ${headerHeight})`)
+    .selectAll("g")
+    .data(rows)
+    .join("g")
+    .attr("transform", (_, index) => `translate(0, ${index * rowHeight})`);
+
+  rowGroups.append("text")
+    .attr("class", "building-summary-label")
+    .attr("x", 0)
+    .attr("y", 18)
+    .text((row) => row.label);
+
+  rowGroups.append("rect")
+    .attr("class", "building-summary-bar-bg")
+    .attr("x", labelWidth)
+    .attr("y", 5)
+    .attr("width", barWidth)
+    .attr("height", 16)
+    .attr("rx", 8);
+
+  rowGroups.append("rect")
+    .attr("class", "building-summary-bar-unavailable")
+    .attr("x", (row) => labelWidth + (row.total ? (row.available / row.total) * barWidth : 0))
+    .attr("y", 5)
+    .attr("width", (row) => row.total ? (row.unavailable / row.total) * barWidth : 0)
+    .attr("height", 16)
+    .attr("rx", 8);
+
+  rowGroups.append("rect")
+    .attr("class", "building-summary-bar-available")
+    .attr("x", labelWidth)
+    .attr("y", 5)
+    .attr("width", (row) => row.total ? (row.available / row.total) * barWidth : 0)
+    .attr("height", 16)
+    .attr("rx", 8);
+
+  rowGroups.append("text")
+    .attr("class", "building-summary-value")
+    .attr("x", chartWidth)
+    .attr("y", 18)
+    .attr("text-anchor", "end")
+    .text((row) => `${row.available}/${row.total}`);
+
+  const legend = svg.append("g")
+    .attr("class", "building-summary-legend")
+    .attr("transform", `translate(${labelWidth}, ${chartHeight - 8})`);
+
+  [
+    { className: "building-summary-dot-available", label: t("available") },
+    { className: "building-summary-dot-unavailable", label: t("unavailable") },
+  ].forEach((item, index) => {
+    const group = legend.append("g")
+      .attr("transform", `translate(${index * 120}, 0)`);
+
+    group.append("circle")
+      .attr("class", item.className)
+      .attr("cx", 0)
+      .attr("cy", -4)
+      .attr("r", 4);
+
+    group.append("text")
+      .attr("x", 10)
+      .attr("y", 0)
+      .text(item.label);
+  });
+}
+
 // Build a direct EPFL campus plan link for a building or room label.
 // We keep the displayed text, including spaces, in the room query and let URL
 // encoding preserve it safely in the outgoing link.
@@ -1361,6 +1509,8 @@ function openBuildingPanel(buildingCode, rooms) {
     buildingMeta.appendChild(chip);
   });
 
+  renderBuildingSummaryChart(available, unavailable);
+
   timelineHeader.innerHTML = "";
   timelineBody.innerHTML = "";
 
@@ -1455,6 +1605,7 @@ function resetBuildingPanel() {
   buildingPanelTitle.textContent = t("select_building");
   buildingPanelCopy.textContent = t("click_building_copy");
   buildingMeta.innerHTML = `<span>${t("no_building_selected")}</span>`;
+  buildingSummaryChart.innerHTML = "";
   timelineHeader.innerHTML = "";
   timelineBody.innerHTML = "";
 }
