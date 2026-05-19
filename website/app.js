@@ -39,11 +39,13 @@ const AVAILABILITY_BINS = [
 
 // Cache important DOM nodes once instead of querying the DOM repeatedly.
 const buildingPanel = document.getElementById("buildingPanel");
+const buildingTimelineEyebrow = document.getElementById("buildingTimelineEyebrow");
 const buildingPanelTitle = document.getElementById("buildingPanelTitle");
 const buildingPanelCopy = document.getElementById("buildingPanelCopy");
 const buildingMeta = document.getElementById("buildingMeta");
 const buildingSummaryChart = document.getElementById("buildingSummaryChart");
 const buildingHeatmapChart = document.getElementById("buildingHeatmapChart");
+const timelineShell = document.getElementById("timelineShell");
 const timelineHeader = document.getElementById("timelineHeader");
 const timelineBody = document.getElementById("timelineBody");
 const closeBuildingPanel = document.getElementById("closeBuildingPanel");
@@ -90,6 +92,8 @@ let currentLanguage = "en";
 let roomWeekPicker = null;
 let activeRoomSelection = null;
 let activeRoomWeekStart = null;
+let activeDetailPanelMode = null;
+let roomPanelDismissed = false;
 
 [...document.querySelectorAll(".datetime-trigger")].forEach((button) => {
   button.innerHTML = "&#128197;";
@@ -127,6 +131,8 @@ const translations = {
     room_best_slot: "Best free slot",
     room_no_free_slot: "No free slot",
     room_day_free: "{hours} free",
+    room_panel_hint: "Weekly availability opens in the map panel on the right.",
+    room_panel_selected: "{room} selected for the week of {week}. Weekly availability opens in the map panel on the right.",
     room_type_conference: "Conference Room",
     room_type_study: "Study Room",
     room_header: "Room",
@@ -204,6 +210,8 @@ const translations = {
     room_best_slot: "Meilleur créneau libre",
     room_no_free_slot: "Aucun créneau libre",
     room_day_free: "{hours} libres",
+    room_panel_hint: "La disponibilite hebdomadaire s'ouvre dans le panneau de carte a droite.",
+    room_panel_selected: "{room} selectionnee pour la semaine du {week}. La disponibilite hebdomadaire s'ouvre dans le panneau de carte a droite.",
     room_type_conference: "Salle de conférence",
     room_type_study: "Salle d'étude",
     room_header: "Salle",
@@ -343,7 +351,7 @@ function refreshStaticTranslations() {
   document.getElementById("roomWeekLabel").textContent = t("room_week_label");
   roomWeekInput.placeholder = "DD/MM/YYYY";
   roomWeekTrigger.setAttribute("aria-label", t("room_week_picker"));
-  document.getElementById("buildingTimelineEyebrow").textContent = t("building_timeline");
+  buildingTimelineEyebrow.textContent = t("building_timeline");
   closeBuildingPanel.setAttribute("aria-label", t("close_panel"));
 
   document.querySelectorAll("#duration option").forEach((option) => {
@@ -403,10 +411,17 @@ function applyLanguage(language) {
   refreshStaticTranslations();
   applyTheme(document.body.dataset.theme || resolveInitialTheme());
 
-  if (activeBuildingSelection) {
+  if (activeDetailPanelMode === "room" && activeRoomSelection) {
+    const roomEntry = getRoomMetadata(activeRoomSelection.room || activeRoomSelection);
+    if (roomEntry) {
+      openRoomPanel(roomEntry, activeRoomWeekStart || getStartOfWeek(new Date()));
+    } else {
+      hideDetailPanel();
+    }
+  } else if (activeBuildingSelection) {
     openBuildingPanel(activeBuildingSelection, getRoomsForBuilding(activeBuildingSelection));
   } else {
-    resetBuildingPanel();
+    hideDetailPanel();
   }
 
   if (baseBuildingFeatures.length) {
@@ -2192,12 +2207,18 @@ function syncTimelineScroll(scrollElements) {
 // Build the right-side building panel for the selected building.
 // This creates one timeline row per room and keeps all rows horizontally linked.
 function openBuildingPanel(buildingCode, rooms) {
+  activeDetailPanelMode = "building";
   activeBuildingSelection = buildingCode;
   buildingPanel.hidden = false;
   buildingPanel.classList.remove("is-empty");
+  buildingPanel.dataset.mode = "building";
+  buildingTimelineEyebrow.textContent = t("building_timeline");
   buildingPanelTitle.textContent = buildingCode;
   buildingPanelCopy.hidden = true;
   buildingMeta.hidden = true;
+  buildingSummaryChart.hidden = false;
+  buildingHeatmapChart.hidden = false;
+  timelineShell.hidden = false;
 
   const durationMinutes = getSearchDurationMinutes();
   const { available, unavailable } = splitRoomsByAvailability(
@@ -2296,24 +2317,63 @@ function openBuildingPanel(buildingCode, rooms) {
   revealBuildingPanelIfNeeded();
 }
 
-// Return the side panel to its initial "select a building" state.
-function resetBuildingPanel() {
+function openRoomPanel(roomEntry, weekStart) {
+  activeDetailPanelMode = "room";
+  roomPanelDismissed = false;
   activeBuildingSelection = null;
+  buildingPanel.hidden = false;
+  buildingPanel.classList.remove("is-empty");
+  buildingPanel.dataset.mode = "room";
+  buildingTimelineEyebrow.textContent = t("room_weekly_title");
+  buildingPanelTitle.textContent = roomEntry.room;
+  buildingPanelCopy.hidden = true;
+  buildingMeta.hidden = false;
+  buildingMeta.innerHTML = `
+    <span><strong>${t("room_building")}:</strong> ${roomEntry.building}</span>
+    <span><strong>${t("room_type")}:</strong> ${formatRoomTypeDisplay(roomEntry.type)}</span>
+    <span><strong>${t("room_week_label")}:</strong> ${formatEuropeanDateInput(weekStart)}</span>
+  `;
+  buildingSummaryChart.hidden = false;
+  buildingHeatmapChart.hidden = false;
+  timelineShell.hidden = true;
+  timelineHeader.innerHTML = "";
+  timelineBody.innerHTML = "";
+  renderRoomSummaryCard(roomEntry, weekStart, buildingSummaryChart);
+  renderRoomWeeklyChart(roomEntry, weekStart, buildingHeatmapChart);
+  revealBuildingPanelIfNeeded();
+}
+
+function hideDetailPanel() {
+  activeDetailPanelMode = null;
   buildingPanel.hidden = true;
   buildingPanel.classList.add("is-empty");
+  buildingPanel.dataset.mode = "empty";
   buildingPanelTitle.textContent = t("select_building");
+  buildingTimelineEyebrow.textContent = t("building_timeline");
   buildingPanelCopy.hidden = false;
   buildingPanelCopy.textContent = t("click_building_copy");
   buildingMeta.hidden = false;
   buildingMeta.innerHTML = `<span>${t("no_building_selected")}</span>`;
+  buildingSummaryChart.hidden = false;
+  buildingHeatmapChart.hidden = false;
+  timelineShell.hidden = false;
   buildingSummaryChart.innerHTML = "";
   buildingHeatmapChart.innerHTML = "";
   timelineHeader.innerHTML = "";
   timelineBody.innerHTML = "";
 }
 
+// Return the side panel to its initial "select a building" state.
+function resetBuildingPanel() {
+  activeBuildingSelection = null;
+  hideDetailPanel();
+}
+
 closeBuildingPanel.addEventListener("click", () => {
-  resetBuildingPanel();
+  roomPanelDismissed = true;
+  activeBuildingSelection = null;
+  hideDetailPanel();
+  renderRoomExplorer();
 });
 
 themeToggle.addEventListener("click", () => {
@@ -2351,6 +2411,15 @@ mobilePanelMedia.addEventListener("change", () => {
 // If the user changes the search while a building panel is open, rebuild the
 // panel immediately so the room timelines reflect the new searched period.
 function refreshOpenBuildingPanel() {
+  if (activeDetailPanelMode === "room" && activeRoomSelection) {
+    const roomEntry = getRoomMetadata(activeRoomSelection.room || activeRoomSelection);
+
+    if (roomEntry) {
+      openRoomPanel(roomEntry, activeRoomWeekStart || getStartOfWeek(new Date()));
+    }
+    return;
+  }
+
   if (!activeBuildingSelection) {
     return;
   }
@@ -2939,7 +3008,7 @@ function minutesToClock(minutes) {
   return `${String(hours).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
 }
 
-function renderRoomSummaryCard(roomEntry, weekStart) {
+function renderRoomSummaryCard(roomEntry, weekStart, target = roomSummaryCard) {
   const weekDates = getWeekDates(weekStart);
   const dailyStats = weekDates.map((date) => {
     const events = getRoomDayEvents(roomEntry.room, date);
@@ -2960,7 +3029,7 @@ function renderRoomSummaryCard(roomEntry, weekStart) {
     ? `${minutesToClock(bestDay.bestSegment.startMinutes)} - ${minutesToClock(bestDay.bestSegment.endMinutes)}`
     : t("room_no_free_slot");
 
-  roomSummaryCard.innerHTML = `
+  target.innerHTML = `
     <div class="room-summary-head">
       <div>
         <p class="room-summary-overline">${t("room_weekly_title")}</p>
@@ -2981,8 +3050,8 @@ function renderRoomSummaryCard(roomEntry, weekStart) {
   `;
 }
 
-function renderRoomWeeklyChart(roomEntry, weekStart) {
-  roomWeeklyChart.innerHTML = "";
+function renderRoomWeeklyChart(roomEntry, weekStart, target = roomWeeklyChart) {
+  target.innerHTML = "";
 
   const weekDates = getWeekDates(weekStart);
   const chartWidth = 1120;
@@ -2999,7 +3068,7 @@ function renderRoomWeeklyChart(roomEntry, weekStart) {
       && date.getDate() === now.getDate();
   };
 
-  const svg = d3.select(roomWeeklyChart)
+  const svg = d3.select(target)
     .append("svg")
     .attr("class", "room-weekly-svg")
     .attr("viewBox", `0 0 ${chartWidth} ${chartHeight}`)
@@ -3140,6 +3209,7 @@ function renderRoomWeeklyChart(roomEntry, weekStart) {
 
 function renderRoomExplorerEmpty(message) {
   roomSummaryCard.innerHTML = `<p class="room-empty-state">${message}</p>`;
+  roomWeeklyChart.hidden = true;
   roomWeeklyChart.innerHTML = "";
 }
 
@@ -3151,6 +3221,9 @@ function renderRoomExplorer() {
 
   if (!activeRoomSelection) {
     renderRoomExplorerEmpty(t("room_empty_state"));
+    if (activeDetailPanelMode === "room") {
+      hideDetailPanel();
+    }
     return;
   }
 
@@ -3158,12 +3231,23 @@ function renderRoomExplorer() {
 
   if (!roomEntry) {
     renderRoomExplorerEmpty(t("room_not_found"));
+    if (activeDetailPanelMode === "room") {
+      hideDetailPanel();
+    }
     return;
   }
 
   const weekStart = activeRoomWeekStart || getStartOfWeek(new Date());
-  renderRoomSummaryCard(roomEntry, weekStart);
-  renderRoomWeeklyChart(roomEntry, weekStart);
+  roomSummaryCard.innerHTML = `<p class="room-empty-state">${t("room_panel_selected", {
+    room: roomEntry.room,
+    week: formatEuropeanDateInput(weekStart),
+  })}</p>`;
+  roomWeeklyChart.hidden = true;
+  roomWeeklyChart.innerHTML = "";
+
+  if (!roomPanelDismissed) {
+    openRoomPanel(roomEntry, weekStart);
+  }
 }
 
 function initializeRoomExplorer() {
@@ -3195,6 +3279,7 @@ function initializeRoomExplorer() {
           return;
         }
 
+        roomPanelDismissed = false;
         activeRoomWeekStart = getStartOfWeek(selectedDate);
         roomWeekInput.value = formatEuropeanDateInput(activeRoomWeekStart);
         renderRoomExplorer();
@@ -3207,6 +3292,7 @@ function initializeRoomExplorer() {
           return;
         }
 
+        roomPanelDismissed = false;
         activeRoomWeekStart = getStartOfWeek(typedDate);
         roomWeekInput.value = formatEuropeanDateInput(activeRoomWeekStart);
         renderRoomExplorer();
@@ -3218,17 +3304,20 @@ function initializeRoomExplorer() {
     const roomEntry = getRoomMetadata(roomInput.value);
 
     if (!roomInput.value.trim()) {
+      roomPanelDismissed = false;
       activeRoomSelection = null;
       renderRoomExplorer();
       return;
     }
 
     if (!roomEntry) {
+      roomPanelDismissed = false;
       activeRoomSelection = { room: roomInput.value.trim() };
       renderRoomExplorer();
       return;
     }
 
+    roomPanelDismissed = false;
     activeRoomSelection = roomEntry;
     roomInput.value = roomEntry.room;
     renderRoomExplorer();
@@ -3240,12 +3329,14 @@ function initializeRoomExplorer() {
     const roomEntry = getRoomMetadata(roomInput.value);
 
     if (roomEntry) {
+      roomPanelDismissed = false;
       activeRoomSelection = roomEntry;
       renderRoomExplorer();
       return;
     }
 
     if (!roomInput.value.trim()) {
+      roomPanelDismissed = false;
       activeRoomSelection = null;
       renderRoomExplorer();
     }
@@ -3259,6 +3350,7 @@ function initializeRoomExplorer() {
       return;
     }
 
+    roomPanelDismissed = false;
     activeRoomWeekStart = getStartOfWeek(typedDate);
     roomWeekInput.value = formatEuropeanDateInput(activeRoomWeekStart);
     renderRoomExplorer();

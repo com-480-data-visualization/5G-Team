@@ -1130,6 +1130,12 @@ select {
   background: var(--surface-tint-2);
 }
 
+.building-panel[data-mode="room"] .building-heatmap-chart {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
 .building-summary-svg,
 .building-heatmap-svg {
   display: block;
