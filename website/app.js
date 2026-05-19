@@ -48,6 +48,12 @@ const mobilePanelMedia = window.matchMedia("(max-width: 720px)");
 const systemDarkModeMedia = window.matchMedia("(prefers-color-scheme: dark)");
 const buildingPanelDesktopAnchor = document.createComment("building-panel-desktop-anchor");
 
+const mapAvailabilityBubbles = d3.select(map.getContainer())
+  .append("svg")
+  .attr("class", "map-availability-bubbles")
+  .attr("aria-hidden", "true")
+  .node();
+
 // The building panel lives inside the map on desktop, but on mobile we move it
 // below the map so it behaves like a normal content card instead of competing
 // with the map viewport.
@@ -2040,6 +2046,10 @@ mobilePanelMedia.addEventListener("change", () => {
   mountBuildingPanelForViewport();
 });
 
+map.on("move zoom resize", () => {
+  updateAvailabilityBubblePositions();
+});
+
 // If the user changes the search while a building panel is open, rebuild the
 // panel immediately so the room timelines reflect the new searched period.
 function refreshOpenBuildingPanel() {
@@ -2076,6 +2086,14 @@ function renderPopupAvailabilityChart(container, availableRooms, totalRooms) {
       available: availableRooms,
       rooms: totalRooms,
     }));
+
+  svg.append("rect")
+    .attr("class", "room-popup-chart-bg")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("width", width)
+    .attr("height", height)
+    .attr("rx", 10);
 
   svg.append("text")
     .attr("class", "room-popup-chart-value")
@@ -2195,6 +2213,145 @@ function animateBuildingLayerStyles(features) {
   previousBuildingScores = nextScores;
 }
 
+function getBuildingBubbleData() {
+  if (!buildingLayer) {
+    return [];
+  }
+
+  const data = [];
+
+  buildingLayer.eachLayer((layer) => {
+    const feature = layer.feature;
+
+    if (!feature?.properties || typeof layer.getBounds !== "function") {
+      return;
+    }
+
+    const center = layer.getBounds().getCenter();
+
+    data.push({
+      name: feature.properties.name,
+      score: feature.properties.score || 0,
+      rooms: feature.properties.rooms || 0,
+      availableRooms: feature.properties.availableRooms || 0,
+      center,
+    });
+  });
+
+  return data;
+}
+
+function positionAvailabilityBubble(selection) {
+  selection
+    .attr("transform", (entry) => {
+      const point = map.latLngToContainerPoint(entry.center);
+      return `translate(${point.x}, ${point.y})`;
+    });
+}
+
+function updateAvailabilityBubblePositions() {
+  if (!mapAvailabilityBubbles) {
+    return;
+  }
+
+  const size = map.getSize();
+  d3.select(mapAvailabilityBubbles)
+    .attr("width", size.x)
+    .attr("height", size.y)
+    .style("left", "0px")
+    .style("top", "0px")
+    .attr("viewBox", `0 0 ${size.x} ${size.y}`)
+    .selectAll(".map-availability-bubble")
+    .call(positionAvailabilityBubble);
+}
+
+function renderAvailabilityBubbles() {
+  if (!mapAvailabilityBubbles) {
+    return;
+  }
+
+  const data = getBuildingBubbleData();
+  const maxRooms = Math.max(1, d3.max(data, (entry) => entry.rooms) || 1);
+  const radiusScale = d3.scaleSqrt()
+    .domain([0, maxRooms])
+    .range([4, 18]);
+  const svg = d3.select(mapAvailabilityBubbles);
+  const size = map.getSize();
+
+  svg
+    .attr("width", size.x)
+    .attr("height", size.y)
+    .style("left", "0px")
+    .style("top", "0px")
+    .attr("viewBox", `0 0 ${size.x} ${size.y}`);
+
+  const bubbles = svg.selectAll(".map-availability-bubble")
+    .data(data, (entry) => entry.name)
+    .join(
+      (enter) => {
+        const group = enter.append("g")
+          .attr("class", "map-availability-bubble")
+          .call(positionAvailabilityBubble);
+
+        group.append("circle")
+          .attr("class", "map-availability-bubble-halo")
+          .attr("r", 0);
+
+        group.append("circle")
+          .attr("class", "map-availability-bubble-core")
+          .attr("r", 0);
+
+        group.append("text")
+          .attr("class", "map-availability-bubble-label")
+          .attr("text-anchor", "middle")
+          .attr("dominant-baseline", "middle")
+          .text((entry) => entry.name);
+
+        return group;
+      },
+      (update) => update,
+      (exit) => exit
+        .transition()
+        .duration(240)
+        .style("opacity", 0)
+        .remove()
+    );
+
+  bubbles
+    .call(positionAvailabilityBubble)
+    .style("opacity", 1);
+
+  bubbles.select(".map-availability-bubble-halo")
+    .classed("is-strong", (entry) => entry.score >= 0.8 && entry.rooms > 0)
+    .transition()
+    .duration(520)
+    .attr("r", (entry) => radiusScale(entry.rooms) + 7)
+    .attr("fill", (entry) => getColor(entry.score));
+
+  bubbles.select(".map-availability-bubble-core")
+    .transition()
+    .duration(520)
+    .attr("r", (entry) => radiusScale(entry.rooms))
+    .attr("fill", (entry) => getColor(entry.score));
+
+  bubbles.select(".map-availability-bubble-label")
+    .style("display", (entry) => radiusScale(entry.rooms) >= 9 ? null : "none")
+    .transition()
+    .duration(520)
+    .style("font-size", (entry) => `${Math.max(8, Math.min(11, radiusScale(entry.rooms) * 0.58))}px`);
+}
+
+function setBuildingBubbleHidden(buildingName, hidden) {
+  if (!mapAvailabilityBubbles) {
+    return;
+  }
+
+  d3.select(mapAvailabilityBubbles)
+    .selectAll(".map-availability-bubble")
+    .filter((entry) => entry.name === buildingName)
+    .classed("is-hidden", hidden);
+}
+
 // Leaflet feature callback for each building polygon.
 // This wires hover feedback, popup content, and click-to-open behavior.
 function onEachFeature(feature, layer) {
@@ -2207,11 +2364,15 @@ function onEachFeature(feature, layer) {
   if (enableMapPopup) {
     layer.bindPopup(buildBuildingPopupContent(feature));
     layer.on("popupopen", () => {
+      setBuildingBubbleHidden(name, true);
       const chart = document.getElementById(createPopupChartId(name));
 
       if (chart) {
         renderPopupAvailabilityChart(chart, availableRooms, rooms);
       }
+    });
+    layer.on("popupclose", () => {
+      setBuildingBubbleHidden(name, false);
     });
   }
 
@@ -2266,6 +2427,8 @@ function renderBuildings(features) {
   if (mobilePanelMedia.matches) {
     map.setZoom(map.getZoom() + 1);
   }
+
+  renderAvailabilityBubbles();
 }
 
 // Fetch the building source file that maps EPFL codes to OSM ids.
