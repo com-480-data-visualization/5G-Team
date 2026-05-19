@@ -645,6 +645,11 @@ select {
   line-height: 1.5;
 }
 
+.building-panel-copy[hidden],
+.building-meta[hidden] {
+  display: none;
+}
+
 .building-meta {
   display: flex;
   flex-wrap: wrap;
@@ -692,6 +697,32 @@ select {
 
 .building-summary-value {
   fill: var(--text);
+}
+
+.building-summary-donut-available {
+  fill: var(--timeline-available-bg);
+  stroke: var(--timeline-available-border);
+  stroke-width: 1.5;
+}
+
+.building-summary-donut-unavailable {
+  fill: var(--timeline-occupied-bg);
+  stroke: var(--timeline-occupied-border);
+  stroke-width: 1.5;
+}
+
+.building-summary-donut-value {
+  fill: var(--text);
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.building-summary-donut-label {
+  fill: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .building-summary-bar-bg {

@@ -1077,15 +1077,21 @@ function renderBuildingSummaryChart(available, unavailable) {
   buildingSummaryChart.innerHTML = "";
 
   const rows = buildBuildingSummaryRows(available, unavailable);
-  const chartWidth = 520;
-  const rowHeight = 30;
+  const totalRooms = available.length + unavailable.length;
+  const availableRatio = totalRooms ? available.length / totalRooms : 0;
+  const chartWidth = 560;
+  const rowHeight = 32;
   const headerHeight = 28;
-  const footerHeight = 22;
-  const labelWidth = 132;
-  const chartHeight = headerHeight + rows.length * rowHeight + footerHeight;
+  const footerHeight = 24;
+  const donutSize = 104;
+  const donutCenter = { x: 52, y: headerHeight + donutSize / 2 };
+  const barStartX = 124;
+  const labelWidth = 128;
   const valueWidth = 48;
   const barGap = 12;
-  const barWidth = chartWidth - labelWidth - valueWidth - barGap;
+  const barWidth = chartWidth - barStartX - labelWidth - valueWidth - barGap;
+  const chartBodyHeight = Math.max(donutSize, rows.length * rowHeight);
+  const chartHeight = headerHeight + chartBodyHeight + footerHeight;
 
   const svg = d3.select(buildingSummaryChart)
     .append("svg")
@@ -1103,8 +1109,52 @@ function renderBuildingSummaryChart(available, unavailable) {
     .attr("y", 18)
     .text(t("summary_title"));
 
+  const donutData = [
+    { key: "available", value: available.length },
+    { key: "unavailable", value: unavailable.length },
+  ];
+  const arc = d3.arc()
+    .innerRadius(30)
+    .outerRadius(46)
+    .cornerRadius(8);
+  const pie = d3.pie()
+    .sort(null)
+    .value((entry) => entry.value || 0.0001);
+
+  const donut = svg.append("g")
+    .attr("class", "building-summary-donut")
+    .attr("transform", `translate(${donutCenter.x}, ${donutCenter.y})`);
+
+  donut.selectAll("path")
+    .data(pie(donutData))
+    .join("path")
+    .attr("class", (entry) => `building-summary-donut-${entry.data.key}`)
+    .attr("d", arc)
+    .each(function storeInitialArc(entry) {
+      this._current = { ...entry, startAngle: entry.startAngle, endAngle: entry.startAngle };
+    })
+    .transition()
+    .duration(650)
+    .attrTween("d", function tweenArc(entry) {
+      const interpolate = d3.interpolate(this._current, entry);
+      this._current = entry;
+      return (progress) => arc(interpolate(progress));
+    });
+
+  donut.append("text")
+    .attr("class", "building-summary-donut-value")
+    .attr("text-anchor", "middle")
+    .attr("y", -2)
+    .text(`${Math.round(availableRatio * 100)}%`);
+
+  donut.append("text")
+    .attr("class", "building-summary-donut-label")
+    .attr("text-anchor", "middle")
+    .attr("y", 17)
+    .text(t("available"));
+
   const rowGroups = svg.append("g")
-    .attr("transform", `translate(0, ${headerHeight})`)
+    .attr("transform", `translate(${barStartX}, ${headerHeight})`)
     .selectAll("g")
     .data(rows)
     .join("g")
@@ -1113,43 +1163,49 @@ function renderBuildingSummaryChart(available, unavailable) {
   rowGroups.append("text")
     .attr("class", "building-summary-label")
     .attr("x", 0)
-    .attr("y", 18)
+    .attr("y", 19)
     .text((row) => row.label);
 
   rowGroups.append("rect")
     .attr("class", "building-summary-bar-bg")
     .attr("x", labelWidth)
-    .attr("y", 5)
+    .attr("y", 6)
     .attr("width", barWidth)
-    .attr("height", 16)
-    .attr("rx", 8);
+    .attr("height", 14)
+    .attr("rx", 7);
 
   rowGroups.append("rect")
     .attr("class", "building-summary-bar-unavailable")
     .attr("x", (row) => labelWidth + (row.total ? (row.available / row.total) * barWidth : 0))
-    .attr("y", 5)
-    .attr("width", (row) => row.total ? (row.unavailable / row.total) * barWidth : 0)
-    .attr("height", 16)
-    .attr("rx", 8);
+    .attr("y", 6)
+    .attr("width", 0)
+    .attr("height", 14)
+    .attr("rx", 7)
+    .transition()
+    .duration(650)
+    .attr("width", (row) => row.total ? (row.unavailable / row.total) * barWidth : 0);
 
   rowGroups.append("rect")
     .attr("class", "building-summary-bar-available")
     .attr("x", labelWidth)
-    .attr("y", 5)
-    .attr("width", (row) => row.total ? (row.available / row.total) * barWidth : 0)
-    .attr("height", 16)
-    .attr("rx", 8);
+    .attr("y", 6)
+    .attr("width", 0)
+    .attr("height", 14)
+    .attr("rx", 7)
+    .transition()
+    .duration(650)
+    .attr("width", (row) => row.total ? (row.available / row.total) * barWidth : 0);
 
   rowGroups.append("text")
     .attr("class", "building-summary-value")
-    .attr("x", chartWidth)
-    .attr("y", 18)
+    .attr("x", labelWidth + barWidth + barGap + valueWidth)
+    .attr("y", 19)
     .attr("text-anchor", "end")
     .text((row) => `${row.available}/${row.total}`);
 
   const legend = svg.append("g")
     .attr("class", "building-summary-legend")
-    .attr("transform", `translate(${labelWidth}, ${chartHeight - 8})`);
+    .attr("transform", `translate(${barStartX + labelWidth}, ${chartHeight - 8})`);
 
   [
     { className: "building-summary-dot-available", label: t("available") },
@@ -1488,7 +1544,8 @@ function openBuildingPanel(buildingCode, rooms) {
   activeBuildingSelection = buildingCode;
   buildingPanel.classList.remove("is-empty");
   buildingPanelTitle.textContent = buildingCode;
-  buildingPanelCopy.textContent = t("selected_panel_copy");
+  buildingPanelCopy.hidden = true;
+  buildingMeta.hidden = true;
 
   const durationMinutes = getSearchDurationMinutes();
   const { available, unavailable } = splitRoomsByAvailability(
@@ -1496,18 +1553,6 @@ function openBuildingPanel(buildingCode, rooms) {
     activeSearchWindow,
     durationMinutes
   );
-  const roomCount = rooms.length;
-
-  buildingMeta.innerHTML = "";
-  [
-    formatRoomCountLabel(roomCount),
-    formatAvailabilityCountLabel(available.length, "available"),
-    formatAvailabilityCountLabel(unavailable.length, "unavailable"),
-  ].forEach((label) => {
-    const chip = document.createElement("span");
-    chip.textContent = label;
-    buildingMeta.appendChild(chip);
-  });
 
   renderBuildingSummaryChart(available, unavailable);
 
@@ -1603,7 +1648,9 @@ function resetBuildingPanel() {
   activeBuildingSelection = null;
   buildingPanel.classList.add("is-empty");
   buildingPanelTitle.textContent = t("select_building");
+  buildingPanelCopy.hidden = false;
   buildingPanelCopy.textContent = t("click_building_copy");
+  buildingMeta.hidden = false;
   buildingMeta.innerHTML = `<span>${t("no_building_selected")}</span>`;
   buildingSummaryChart.innerHTML = "";
   timelineHeader.innerHTML = "";
